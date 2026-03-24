@@ -1,0 +1,45 @@
+USE master
+GO
+
+ALTER DATABASE KhoaLuanTotNghiep
+SET SINGLE_USER
+WITH ROLLBACK IMMEDIATE
+GO
+
+DROP DATABASE KhoaLuanTotNghiep
+GO
+CREATE DATABASE KhoaLuanTotNghiep
+GO
+
+USE KhoaLuanTotNghiep
+GO
+
+CREATE TABLE Zones
+(
+    Id INT IDENTITY PRIMARY KEY,
+    ZoneName NVARCHAR(50),
+    AreaName NVARCHAR(100),
+    Points NVARCHAR(MAX),
+    CreatedAt DATETIME DEFAULT GETDATE()
+)
+GO
+SELECT * FROM Zones
+CREATE TABLE Users
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    Password NVARCHAR(100) NOT NULL,
+    Role NVARCHAR(20) NOT NULL
+)
+GO
+
+INSERT INTO Users (Username, Password, Role) VALUES
+('admin', '123', 'Admin'),
+('dp1', '123', 'DP'),
+('tx1', '123', 'TX')
+SELECT * FROM Users
+ALTER TABLE Zones
+ADD CenterLat FLOAT,
+    CenterLng FLOAT
+
+

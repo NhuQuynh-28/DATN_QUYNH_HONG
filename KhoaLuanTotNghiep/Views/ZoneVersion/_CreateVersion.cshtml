@@ -1,0 +1,23 @@
+﻿@model KhoaLuanTotNghiep.Models.ZoneVersion
+
+<h3>Thêm Version</h3>
+
+<form method="post" action="/ZoneVersion/Create">
+
+	<input type="hidden" name="AreaId" value="@ViewBag.AreaId" />
+
+	<div>
+		<label>Tên Version</label>
+		<input type="text" name="VersionName" required />
+	</div>
+
+	<div>
+		<label>Active</label>
+		<input type="checkbox" name="IsActive" value="true" />
+	</div>
+
+	<br>
+
+	<button type="submit">Lưu</button>
+
+</form>

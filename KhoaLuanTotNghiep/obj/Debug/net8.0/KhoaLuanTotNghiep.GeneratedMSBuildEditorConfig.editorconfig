@@ -1,0 +1,125 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = KhoaLuanTotNghiep
+build_property.RootNamespace = KhoaLuanTotNghiep
+build_property.ProjectDir = C:\KhoaLuanTotNghiep\KhoaLuanTotNghiep\KhoaLuanTotNghiep\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\KhoaLuanTotNghiep\KhoaLuanTotNghiep\KhoaLuanTotNghiep
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Account/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Account/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Area/_AreaList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYVxfQXJlYUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Area/_CreateArea.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYVxfQ3JlYXRlQXJlYS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Dispatcher/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlzcGF0Y2hlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Driver/ByMonth.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyXEJ5TW9udGguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Driver/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyXERldGFpbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Driver/IndexDriver.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyXEluZGV4RHJpdmVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Driver/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyXExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Driver/_ByMonthTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHJpdmVyXF9CeU1vbnRoVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Home/AuthHome.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBdXRoSG9tZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Report/_Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XF9EYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Shared/_AdminLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BZG1pbkxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Shared/_LayoutDispatcher.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXREaXNwYXRjaGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/ZoneVersion/_CreateVersion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcWm9uZVZlcnNpb25cX0NyZWF0ZVZlcnNpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/ZoneVersion/_VersionList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcWm9uZVZlcnNpb25cX1ZlcnNpb25MaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Zone/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcWm9uZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Zone/_ZoneMap.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcWm9uZVxfWm9uZU1hcC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/KhoaLuanTotNghiep/KhoaLuanTotNghiep/KhoaLuanTotNghiep/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-lg08wtu78f

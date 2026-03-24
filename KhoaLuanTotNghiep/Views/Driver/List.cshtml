@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null;
+}
+@model List<Driver>
+
+<h3>Danh sách tài xế</h3>
+
+<form onsubmit="return false;">
+    <input id="name" placeholder="Tên tài xế" />
+    <input id="phone" placeholder="SĐT" />
+
+    <select id="status">
+        <option>DangLam</option>
+        <option>NghiLam</option>
+        <option>RoiBo</option>
+    </select>
+
+    <button type="button" onclick="addDriver()">Thêm</button>
+</form>
+
+<table border="1" width="100%">
+    <tr>
+        <th>Tên</th>
+        <th>SĐT</th>
+        <th>Trạng thái</th>
+    </tr>
+
+    @foreach (var d in Model)
+    {
+        <tr>
+            <td>@d.DriverName</td>
+            <td>@d.Phone</td>
+            <td>@d.Status</td>
+        </tr>
+    }
+</table>
+<script>
+
+         function addDriver(){
+
+        let data = {
+            driverName: document.getElementById("name").value,
+            phone: document.getElementById("phone").value,
+            status: document.getElementById("status").value
+        };
+
+        fetch('/Driver/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'   // ⚠️ QUAN TRỌNG
+            },
+            body: JSON.stringify(data)              // ⚠️ QUAN TRỌNG
+        })
+        .then(res => res.json())
+        .then(d => {
+            if(d.success){
+                alert("Thêm thành công");
+                loadPage('/Driver/List');
+            }
+        });
+    }
+</script>

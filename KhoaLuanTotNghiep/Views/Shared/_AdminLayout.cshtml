@@ -1,0 +1,1282 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var role = Context.Session.GetString("Role");
+    var username = Context.Session.GetString("Username");
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Delivery Zone</title>
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Segoe UI;
+            background: #0f172a;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        /* MENU */
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color:white;
+        }
+
+            .menu-item:hover {
+                background: #2563eb;
+            }
+
+        /* SUB MENU */
+
+        .submenu {
+            display: none;
+            padding-left: 15px;
+            margin-bottom: 10px;
+        }
+
+            .submenu a {
+                display: block;
+                padding: 8px;
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+            }
+
+                .submenu a:hover {
+                    background: #1e40af;
+                }
+
+        /* CONTENT */
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TOPBAR */
+
+        .topbar {
+            height: 60px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+        }
+
+        .user-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            border: none;
+            padding: 6px 12px;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* PAGE */
+
+        .page-body {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: #0f172a;
+        }
+
+        .leaflet-div-icon {
+            width: 8px !important;
+            height: 8px !important;
+        }
+
+        .leaflet-editing-icon {
+            width: 8px !important;
+            height: 8px !important;
+            margin-left: -4px !important;
+            margin-top: -4px !important;
+        }
+        #map {
+            width: 100%;
+            height: 650px;
+            border-radius: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+
+            <div class="logo">
+                🚚 Delivery Zone
+            </div>
+
+
+
+            @if (!string.IsNullOrEmpty(role) && role.ToLower() == "admin")
+            {
+
+                <div class="menu-item" onclick="toggleMenu()">
+                    <span>📍 Quản lý khu vực</span>
+                    <span id="arrow">▼</span>
+                </div>
+
+                <div id="areaMenu" class="submenu">
+
+                    <a href="#" onclick="loadArea()">Danh sách khu vực</a>
+
+                    <a href="#" onclick="enableDraw()">
+                        <i class="fas fa-draw-polygon"></i>
+                        Vẽ vùng giao hàng
+                    </a>
+
+                    <a href="#" onclick="clearAll()">
+                        <i class="fas fa-trash"></i>
+                        Xóa tất cả vùng
+                    </a>
+                    <input type="text" id="zoneName" placeholder="Nhập tên vùng"
+                           style="padding:6px;border-radius:6px;border:none">
+                    <a href="#" onclick="saveZone()">
+                        <i class="fas fa-floppy-disk"></i>
+                        Save vùng
+                    </a>
+
+                    <a href="#" onclick="finishArea()">
+                        <i class="fas fa-check"></i>
+                        Done khu vực
+                    </a>
+
+                    <a href="#" onclick="deleteSelected()">
+                        <i class="fas fa-xmark"></i>
+                        Xóa vùng đang chọn
+                    </a>
+
+                    <a href="#" onclick="updateZone()">
+                        <i class="fas fa-pen"></i>
+                        Update vùng
+                    </a>
+
+                    <a href="#" onclick="calculateDistances()">
+                        <i class="fas fa-ruler"></i>
+                        Tính khoảng cách
+                    </a>
+
+                    <a href="#" onclick="checkAdjacency()">
+                        <i class="fas fa-link"></i>
+                        Kiểm tra vùng kề
+                    </a>
+
+                </div>
+
+                <div class="menu-item" onclick="loadUsers()">
+                    👤 Quản lý User
+                </div>
+                <div class="menu-item" onclick="toggleDriverMenu()">
+                    <span>🚚 Quản lý tài xế</span>
+                    <span id="arrowDriver">▼</span>
+                </div>
+
+                <div id="driverMenu" class="submenu">
+
+                    <a href="#" onclick="loadPage('/Driver/ByMonth') ; return false;">
+                        📅 Xem theo tháng
+                    </a>
+
+                    <a href="#" onclick="loadPage('/Driver/List') ; return false;">
+                        📋 Danh sách tài xế
+                    </a>
+
+                    <a href="#" onclick="loadPage('/Driver/Detail') ; return false">
+                        📊 Thông tin phân công
+                    </a>
+
+                
+
+                </div>
+                <div class="menu-item" onclick="toggleReportMenu()">
+                    📊 Thống kê báo cáo
+                    <span id="arrowReport">▼</span>
+                </div>
+
+                <div id="reportMenu" style="display:none; padding-left:15px;">
+
+                    <div class="menu-sub" onclick="loadDashboard()">
+                        📈 Tổng quan
+                    </div>
+
+                    <div class="menu-sub" onclick="loadReportZone()">
+                        📍 Thống kê vùng
+                    </div>
+
+                    <div class="menu-sub" onclick="loadReportShipper()">
+                        🚴 Theo bưu tá
+                    </div>
+
+                    <div class="menu-sub" onclick="loadReportOrder()">
+                        📦 Đơn hàng
+                    </div>
+
+                </div>  
+            }
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <div class="topbar">
+
+                <div class="user-box">
+                    <i class="fas fa-user"></i>
+                    <span>@username</span>
+
+                    <a href="/Account/Logout" class="logout-btn">
+                        Đăng xuất
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="page-body">
+
+                <div id="content-area">
+                    @RenderBody()
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<script>
+
+/* ================= MENU ================= */
+
+        /* ================= MENU ================= */
+
+        function toggleMenu(){
+
+        var menu=document.getElementById("areaMenu");
+        var arrow=document.getElementById("arrow");
+
+        if(menu.style.display==="block"){
+        menu.style.display="none";
+        arrow.innerHTML="▼";
+        }
+        else{
+        menu.style.display="block";
+        arrow.innerHTML="▲";
+        }
+
+        }
+                function openCreateArea(){ 
+                    fetch("/Area/Create") 
+                    .then(res=>res.text())
+                    .then(data=>{
+                        document.getElementById("content-area").innerHTML=data;
+                    })
+                } 
+                function deleteArea(id){ 
+                    if(confirm("Xóa khu vực?")){
+                        fetch("/Area/Delete/"+id) 
+                        .then(()=>{
+                            loadArea()
+                        }) 
+                    }
+                }
+                function loadVersion(areaId){ 
+                    fetch("/ZoneVersion/Index?areaId=" + areaId)
+                    .then(res => res.text())
+                    .then(data => { 
+                        document.getElementById("content-area").innerHTML = data;
+                    });
+                }
+
+        /* ================= GLOBAL ================= */
+
+        var map;
+        var drawnItems;
+        var versionId;
+
+        var draw=false;
+        var points=[];
+        var polygon=null;
+
+        var markers=[];
+        var selectedPolygon=null;
+        var selectedId=null;
+
+        var polygons=[];
+
+        /* ================= LOAD AREA ================= */
+
+        function loadArea(){
+
+        fetch("/Area/Index")
+        .then(res=>res.text())
+        .then(data=>{
+        document.getElementById("content-area").innerHTML=data;
+        });
+
+        }
+
+        /* ================= LOAD VERSION ================= */
+
+        function loadVersion(areaId , name){
+            areaName = name;
+         fetch("/ZoneVersion/Index?areaId="+areaId)
+        .then(res=>res.text())
+        .then(data=>{
+        document.getElementById("content-area").innerHTML=data;
+        });
+
+        }
+
+        /* ================= OPEN MAP ================= */
+
+        function openMap(id){
+
+        fetch("/Zone/Map?versionId="+id)
+        .then(res=>res.text())
+        .then(data=>{
+
+        document.getElementById("content-area").innerHTML=data;
+
+        setTimeout(function(){
+
+        initMap(id);
+
+        },300);
+
+        });
+
+        }
+
+        /* ================= INIT MAP ================= */
+        function initMap(vId){
+
+        versionId=vId;
+
+        map=L.map('map').setView([21.0285,105.8542],13);
+
+        L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {maxZoom:19}
+        ).addTo(map);
+
+        drawnItems=new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        var drawControl=new L.Control.Draw({
+        edit:{
+        featureGroup: drawnItems
+        },
+        draw:false
+        });
+
+        map.addControl(drawControl);
+
+        map.on("click",function(e){
+
+        if(!draw) return;
+
+        points.push([e.latlng.lat,e.latlng.lng]);
+
+        var marker=L.circleMarker(e.latlng,{
+        radius:5,
+        color:"blue"
+        }).addTo(map);
+
+        markers.push(marker);
+
+        if(polygon)
+        map.removeLayer(polygon);
+
+        polygon=L.polygon(points,{
+        color:"#2563eb",
+        fillOpacity:0.3
+        }).addTo(map);
+
+        });
+
+        loadZones(versionId);
+
+        }
+
+        /* ================= DRAW ================= */
+
+        function enableDraw(){
+
+        draw=true;
+
+        points=[];
+
+        if(polygon){
+        map.removeLayer(polygon);
+        polygon=null;
+        }
+
+        markers.forEach(m=>map.removeLayer(m));
+        markers=[];
+
+        }
+
+        /* ================= DONE ================= */
+
+
+        function finishArea(){
+
+        if(!polygon){
+        alert("Chưa vẽ vùng");
+        return;
+        }
+
+        draw=false;
+
+        selectedPolygon=polygon;
+
+        drawnItems.addLayer(polygon);
+
+        // ⭐ HIỆN FORM CHỌN KHU VỰC
+
+        loadAreaSelect();
+
+        }
+        function loadAreaSelect(){
+
+        fetch("/Area/GetAll")
+        .then(r=>r.json())
+        .then(data=>{
+
+        let html = `<h3>Chọn khu vực</h3>`;
+
+        html += `<select id="areaSelect">`;
+
+        data.forEach(a=>{
+        html += `<option value="${a.id}">${a.id} - ${a.areaName}</option>`;
+        });
+
+        html += `</select><br><br>`;
+
+        html += `
+        <button onclick="assignAreaToZone()">Lưu khu vực</button>
+        `;
+
+        document.getElementById("matrixResult").innerHTML = html;
+
+        });
+
+        }
+        function assignAreaToZone(){
+
+        let areaId = document.getElementById("areaSelect").value;
+
+        if(!selectedId){
+        alert("Chọn vùng trước");
+        return;
+        }
+
+        fetch("/Zone/UpdateArea",{
+        method:"POST",
+        headers:{
+        'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+        zoneId:selectedId,
+        areaId:areaId
+        })
+        })
+        .then(r=>r.json())
+        .then(d=>{
+
+        if(d.success){
+        alert("Đã cập nhật khu vực");
+        }
+
+        });
+
+        }
+        /* ================= CALCULATE AREA ================= */
+function calculateArea(latlngs) {
+    let points = latlngs[0] || latlngs;
+
+    let area = 0;
+
+    for (let i = 0; i < points.length; i++) {
+        let j = (i + 1) % points.length;
+
+        let p1 = points[i];
+        let p2 = points[j];
+
+        area += (p1.lng * p2.lat) - (p2.lng * p1.lat);
+    }
+
+    return Math.abs(area / 2) * 111000 * 111000;
+}
+
+
+/* ================= SAVE ================= */
+function saveZone(){
+
+    let name = document.getElementById("zoneName").value;
+
+    if(!name){
+        alert("Nhập tên vùng");
+        return;
+    }
+
+    if(!polygon){
+        alert("Chưa vẽ vùng");
+        return;
+    }
+
+    let latlngs = polygon.getLatLngs();
+
+    if(!latlngs || latlngs.length === 0){
+        alert("Chưa có dữ liệu vùng");
+        return;
+    }
+
+    // ⭐ tính diện tích
+    let area = calculateArea(latlngs);
+    console.log("AREA:", area); // debug
+
+    let center = polygon.getBounds().getCenter();
+
+    // ❌ BỎ areaSelect → vì không tồn tại trong map
+    // let areaName = "";
+
+    if(!versionId){
+        alert("Chưa chọn version");
+        return;
+    }
+
+    fetch("/Zone/SaveZone",{
+        method:"POST",
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify({
+            zoneName: name,
+            areaName: currentAreaName,
+            points: JSON.stringify(latlngs),
+            centerLat: center.lat,
+            centerLng: center.lng,
+            versionId: versionId,
+            area: area
+        })
+    })
+    .then(r=>r.json())
+    .then(d=>{
+
+        if(d.success){
+
+            alert("Đã lưu vùng");
+
+            polygon = null;
+
+            loadZones(versionId);
+
+            // ⭐ reload lại version để cập nhật diện tích
+            if(typeof loadVersion === "function"){
+                loadVersion(currentAreaId);
+            }
+        }
+        else{
+            alert("Lưu thất bại");
+        }
+
+    })
+    .catch(err=>{
+        console.error(err);
+        alert("Lỗi khi lưu");
+    });
+
+}
+        /* ================= LOAD ZONE ================= */
+                     function loadZones(versionId){
+
+            drawnItems.clearLayers();
+
+            fetch("/Zone/GetZones?versionId="+versionId)
+            .then(r=>r.json())
+            .then(data=>{
+
+                polygons=[];
+
+                data.forEach(z=>{
+
+                    let pts = JSON.parse(z.points);
+
+            let poly = L.polygon(pts,{
+            color:'blue',
+            fillOpacity:0.3
+        });
+
+        drawnItems.addLayer(poly); // ⭐ thêm vào layer chuẩn
+
+                    poly.zoneId = z.id;
+                    polygons.push(poly);
+
+                    // HIỆN TÊN
+                    let center = poly.getBounds().getCenter();
+                    let name = z.zoneName ?? z.ZoneName ?? "Zone";
+
+                    L.marker(center,{
+                        icon: L.divIcon({
+                            className:'zone-label',
+                            html:`<div style="
+                                background:#2563eb;
+                                color:white;
+                                padding:3px 6px;
+                                border-radius:4px;
+                                font-size:12px;
+                            ">${name}</div>`
+                        })
+                    }).addTo(map);
+
+                    // CLICK
+                    poly.on("click", function () {
+
+                        selectedPolygon = poly;
+                        selectedId = z.id;
+
+                        loadHistory(z.id);
+                        loadPredict(z.id);
+
+                        drawnItems.addLayer(poly);
+
+                        polygons.forEach(p=>{
+                            p.setStyle({
+                                color:'blue',
+                                fillOpacity:0.3
+                            });
+                        });
+
+                        poly.setStyle({
+                            color:'red',
+                            fillOpacity:0.6
+                        });
+
+                        poly.editing.enable();
+                    });
+
+                }); // ✅ đóng forEach
+
+            }); // ✅ đóng then
+
+        } // ✅ đóng function
+        /* ================= DELETE ================= */
+
+        function deleteSelected(){
+
+        if(!selectedId){
+        alert("Chọn vùng trước");
+        return;
+        }
+
+        fetch('/Zone/DeleteZone?id='+selectedId,{
+        method:'POST'
+        })
+        .then(r=>r.json())
+        .then(d=>{
+
+        if(d.success){
+
+        alert("Đã xóa");
+
+        loadZones(versionId);
+
+        }
+
+        })
+
+        }
+
+        /* ================= UPDATE ================= */
+
+        function updateZone(){
+
+        if(!selectedPolygon){
+        alert("Chọn vùng");
+        return;
+        }
+
+        let coords=selectedPolygon.getLatLngs()[0];
+
+        let pts=[];
+
+        coords.forEach(c=>{
+        pts.push([c.lat,c.lng]);
+        });
+
+        let center=getCenter(pts);
+
+        fetch('/Zone/UpdateZone',{
+        method:'POST',
+        headers:{
+        'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+
+        Id:selectedId,
+        Points:JSON.stringify(pts),
+        CenterLat:center.lat,
+        CenterLng:center.lng
+
+        })
+        })
+        .then(r=>r.json())
+        .then(d=>{
+
+        if(d.success){
+        alert("Đã cập nhật");
+        }
+
+        })
+
+        }
+
+        /* ================= DELETE ALL ================= */
+
+        function clearAll(){
+
+        fetch('/Zone/DeleteAll?versionId='+versionId,{
+        method:'POST'
+        })
+        .then(r=>r.json())
+        .then(d=>{
+
+        if(d.success){
+
+        loadZones(versionId);
+
+        }
+
+        })
+
+        }
+
+        /* ================= DISTANCE ================= */
+
+                function calculateDistances(){
+
+        let polys=[];
+        let names=[];
+
+        drawnItems.eachLayer(function(layer){
+
+        polys.push(layer);
+
+        names.push("Zone "+layer.zoneId);
+
+        });
+
+        let html="<h3>Ma trận khoảng cách</h3>";
+        html+="<table border='1' style='border-collapse:collapse'>";
+
+        html+="<tr><th></th>";
+
+        names.forEach(n=>{
+        html+="<th>"+n+"</th>";
+        });
+
+        html+="</tr>";
+
+        for(let i=0;i<polys.length;i++){
+
+        html+="<tr>";
+
+        html+="<th>"+names[i]+"</th>";
+
+        for(let j=0;j<polys.length;j++){
+
+        if(i==j){
+        html+="<td>0</td>";
+        }
+        else{
+
+        let c1=polys[i].getBounds().getCenter();
+        let c2=polys[j].getBounds().getCenter();
+
+        let d=map.distance(c1,c2);
+
+        html+="<td>"+Math.round(d)+" m</td>";
+
+        }
+
+        }
+
+        html+="</tr>";
+
+        }
+
+        html+="</table>";
+
+        document.getElementById("matrixResult").innerHTML=html;
+
+        }
+        /* ================= ADJACENT ================= */
+
+        function checkAdjacency(){
+
+        let polys=[];
+        let names=[];
+
+        drawnItems.eachLayer(function(layer){
+
+        polys.push(layer);
+        names.push("Zone " + layer.zoneId);
+
+        });
+
+        let html="<h3>Ma trận vùng kề</h3>";
+        html+="<table border='1' style='border-collapse:collapse'>";
+
+        html+="<tr><th></th>";
+
+        names.forEach(n=>{
+        html+="<th>"+n+"</th>";
+        });
+
+        html+="</tr>";
+
+        for(let i=0;i<polys.length;i++){
+
+        html+="<tr>";
+        html+="<th>"+names[i]+"</th>";
+
+        for(let j=0;j<polys.length;j++){
+
+        if(i==j){
+        html+="<td>0</td>";
+        }
+        else{
+
+        let isAdjacent = polys[i]
+        .getBounds()
+        .intersects(polys[j].getBounds());
+
+        html+="<td>"+(isAdjacent ? 1 : 0)+"</td>";
+
+        }
+
+        }
+
+        html+="</tr>";
+
+        }
+
+        html+="</table>";
+
+        document.getElementById("matrixResult").innerHTML=html;
+
+        }
+
+        /* ================= CENTER ================= */
+
+        function getCenter(points){
+
+        let lat=0;
+        let lng=0;
+
+        points.forEach(p=>{
+        lat+=p[0];
+        lng+=p[1];
+        });
+
+        return{
+        lat:lat/points.length,
+        lng:lng/points.length
+        };
+
+        }
+        function loadUsers(){
+
+        fetch("/User/GetUsers")
+        .then(r=>r.json())
+        .then(data=>{
+
+        let html = `<h2>Quản lý User</h2>`;
+
+        html += `<table border="1">
+        <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Role</th>
+        <th>Approve</th>
+        <th>Active</th>
+        <th>Area</th>
+        <th>Action</th>
+        </tr>`;
+
+        data.forEach(u=>{
+
+        html += `
+        <tr>
+        <td>${u.id}</td>
+        <td>${u.username}</td>
+
+        <td>
+        <select onchange="changeRole(${u.id}, this.value)">
+        <option ${u.role=='Admin'?'selected':''}>Admin</option>
+        <option ${u.role=='Dispatcher'?'selected':''}>Dispatcher</option>
+        <option ${u.role=='Driver'?'selected':''}>Driver</option>
+        </select>
+        </td>
+
+        <td>
+        ${u.isApproved
+        ? '✔'
+        : `<button onclick="approveUser(${u.id})">Approve</button>`}
+        </td>
+
+        <td>
+        <button onclick="toggleActive(${u.id})">
+        ${u.isActive ? 'Active' : 'Deactive'}
+        </button>
+        </td>
+
+        <td>
+        ${u.areaName || "Chưa có"}
+        <br>
+        <button onclick="assignArea(${u.id})">Gán</button>
+        </td>
+
+        <td>
+        <button onclick="viewUser(${u.id})">Xem</button>
+        </td>
+
+        </tr>
+        `;
+
+        });
+
+        html += `</table>`;
+
+        document.getElementById("content-area").innerHTML = html;
+
+        });
+        }
+                function approveUser(id){
+            fetch("/User/Approve",{
+                method:"POST",
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body:"id="+id
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){
+                    loadUsers();
+                }
+            });
+        }
+                function toggleActive(id){
+            fetch("/User/ToggleActive",{
+                method:"POST",
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body:"id="+id
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){
+                    loadUsers();
+                }
+            });
+        }
+                function changeRole(id, role){
+            fetch("/User/ChangeRole",{
+                method:"POST",
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body:`id=${id}&role=${role}`
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){
+                    console.log("Đã đổi role");
+                }
+            });
+        }
+                function viewUser(id){
+            fetch("/User/Detail?id="+id)
+            .then(r=>r.json())
+            .then(u=>{
+                alert(`
+        User: ${u.username}
+        Role: ${u.role}
+        Active: ${u.isActive}
+        Approved: ${u.isApproved}
+        Area: ${u.areaName || "Chưa có"}
+                `);
+            });
+        }
+                function assignArea(id){
+
+            let areaId = prompt("Nhập AreaId:");
+
+            if(!areaId) return;
+
+            fetch("/User/AssignArea",{
+                method:"POST",
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body:`id=${id}&areaId=${areaId}`
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){
+                    loadUsers();
+                }
+            });
+        }
+                        function toggleDriverMenu(){
+
+            var menu = document.getElementById("driverMenu");
+            var arrow = document.getElementById("arrowDriver");
+
+            if(menu.style.display === "block"){
+                menu.style.display = "none";
+                arrow.innerHTML = "▼";
+            } else {
+                menu.style.display = "block";
+                arrow.innerHTML = "▲";
+            }
+        }
+                function loadPage(url){
+            fetch(url)
+            .then(res => res.text())
+            .then(data => {
+                const content = document.getElementById("content-area");
+                content.innerHTML = data;
+
+                // chạy script trong view
+                const scripts = content.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript);
+                });
+
+                // 👇 FIX QUAN TRỌNG NHẤT
+                setTimeout(function(){
+                    if(typeof loadAreas === "function"){
+                        loadAreas();
+                    }
+                }, 100);
+            });
+        }
+                function openCreateVersion(areaId) {
+
+            if (!areaId) {
+                alert("Thiếu AreaId");
+                return;
+            }
+
+            fetch("/ZoneVersion/Create?areaId=" + areaId)
+                .then(res => res.text())
+                .then(html => {
+
+                    // 👉 nếu chưa có modal thì tạo
+                    let modal = document.getElementById("modal");
+
+                    if (!modal) {
+                        modal = document.createElement("div");
+                        modal.id = "modal";
+
+                        modal.style.position = "fixed";
+                        modal.style.top = "50%";
+                        modal.style.left = "50%";
+                        modal.style.transform = "translate(-50%, -50%)";
+                        modal.style.background = "#1e293b";
+                        modal.style.color = "white";
+                        modal.style.padding = "20px";
+                        modal.style.borderRadius = "10px";
+                        modal.style.zIndex = "9999";
+                        modal.style.minWidth = "300px";
+
+                        document.body.appendChild(modal);
+                    }
+
+                    // 👉 gán nội dung form
+                    modal.innerHTML = html;
+
+                    // 👉 hiển thị
+                    modal.style.display = "block";
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Lỗi mở form");
+                });
+        }
+                document.addEventListener("click", function (e) {
+            let modal = document.getElementById("modal");
+
+            if (modal && e.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+                function deleteVersion(id) {
+
+            if (!confirm("Bạn có chắc muốn xoá version này?")) return;
+
+            fetch("/ZoneVersion/Delete?id=" + id)
+                .then(res => res.text())
+                .then(html => {
+
+                    // 👉 reload lại danh sách version
+                    document.getElementById("content-area").innerHTML = html;
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Lỗi khi xoá");
+                });
+        }
+                function setActive(id) {
+
+            fetch("/ZoneVersion/SetActive?id=" + id)
+                .then(res => {
+                    if (!res.ok) throw new Error("Lỗi set active");
+
+                    // 👉 reload lại list version
+                    // lấy lại areaId từ button hiện tại
+                    let areaId = getCurrentAreaId();
+
+                    return fetch("/ZoneVersion/Index?areaId=" + areaId);
+                })
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("content-area").innerHTML = html;
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Lỗi khi active");
+                });
+        }
+                function getCurrentAreaId() {
+
+            // cách đơn giản: lấy từ button "+ Thêm Version"
+            let btn = document.querySelector(".btn-add");
+
+            if (!btn) return 0;
+
+            let onclick = btn.getAttribute("onclick");
+
+            // lấy số trong openCreateVersion(1)
+            let match = onclick.match(/\d+/);
+
+            return match ? match[0] : 0;
+        }
+                        function toggleReportMenu(){
+
+            var menu = document.getElementById("reportMenu");
+            var arrow = document.getElementById("arrowReport");
+
+            if(menu.style.display === "block"){
+                menu.style.display = "none";
+                arrow.innerHTML = "▼";
+            } else {
+                menu.style.display = "block";
+                arrow.innerHTML = "▲";
+            }
+        }
+        function loadDashboard(){
+            fetch("/Report/Dashboard")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("content-area").innerHTML = html;
+            });
+        }
+                function loadReportZone(){
+            alert("Thống kê vùng");
+        }
+
+        function loadReportShipper(){
+            alert("Theo bưu tá");
+        }
+
+        function loadReportOrder(){
+            alert("Đơn hàng");
+        }
+                function changeArea(){
+            let select = document.getElementById("areaSelect");
+
+            currentAreaId = select.value;
+            currentAreaName = select.options[select.selectedIndex].text;
+
+            console.log("AREA CHỌN:", currentAreaName);
+        }
+    </script>
+
+</body>
+</html>

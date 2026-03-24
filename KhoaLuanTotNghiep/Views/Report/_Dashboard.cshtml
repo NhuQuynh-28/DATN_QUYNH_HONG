@@ -1,0 +1,78 @@
+﻿<h2>📊 Dashboard</h2>
+
+<div class="dashboard">
+
+    <div class="card">Khu vực: <span id="totalArea"></span></div>
+    <div class="card">Version: <span id="totalVersion"></span></div>
+    <div class="card">Polygon: <span id="totalZone"></span></div>
+    <div class="card">Shipper: <span id="totalShipper"></span></div>
+
+    <div class="card">Khách hàng: <span id="totalCustomers"></span></div>
+    <div class="card">Đơn hàng: <span id="totalOrders"></span></div>
+
+</div>
+
+<hr />
+
+<canvas id="barChart"></canvas>
+<canvas id="pieChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    loadDashboardData();
+
+    function loadDashboardData(){
+        fetch("/Report/DashboardData")
+        .then(r=>r.json())
+        .then(d=>{
+
+            document.getElementById("totalArea").innerText = d.totalArea;
+            document.getElementById("totalVersion").innerText = d.totalVersion;
+            document.getElementById("totalZone").innerText = d.totalZone;
+            document.getElementById("totalShipper").innerText = d.totalShipper;
+            document.getElementById("totalCustomers").innerText = d.totalCustomers;
+            document.getElementById("totalOrders").innerText = d.totalOrders;
+
+            drawCharts(d);
+        });
+    }
+
+    function drawCharts(data){
+
+        new Chart(document.getElementById("barChart"), {
+            type: 'bar',
+            data: {
+                labels: ['Đơn hàng'],
+                datasets: [{
+                    label: 'Total Orders',
+                    data: [data.totalOrders]
+                }]
+            }
+        });
+
+        new Chart(document.getElementById("pieChart"), {
+            type: 'pie',
+            data: {
+                labels: ['Zone', 'Shipper'],
+                datasets: [{
+                    data: [data.totalZone, data.totalShipper]
+                }]
+            }
+        });
+    }
+</script>
+
+<style>
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 15px;
+    }
+
+    .card {
+        background: #1e293b;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+    }
+</style>

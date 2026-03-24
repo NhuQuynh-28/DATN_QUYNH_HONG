@@ -1,0 +1,36 @@
+﻿@{
+    Layout = null;
+}
+@model List<KhoaLuanTotNghiep.Models.Assignment>
+
+<h2>Thông tin phân công tài xế</h2>
+
+<table border="1" style="width:100%">
+    <tr>
+        <th>Tài xế</th>
+        <th>Người điều phối</th>
+        <th>Khu vực</th>
+        <th>Dự đoán</th>
+        <th>Thực tế</th>
+        <th>Ngày</th>
+    </tr>
+
+    @foreach (var a in Model)
+    {
+        var color = a.ActualOrders < a.PlannedOrders ? "red" : "green";
+
+        <tr>
+            <td>@a.Driver?.DriverName</td>
+            <td>@a.Dispatcher?.Username</td>
+            <td>@a.Area?.Name</td>
+
+            <td>@a.PlannedOrders</td>
+
+            <td style="color:@color">
+                @a.ActualOrders
+            </td>
+
+            <td>@a.Date.ToShortDateString()</td>
+        </tr>
+    }
+</table>

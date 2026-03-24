@@ -1,0 +1,252 @@
+﻿@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<meta charset="utf-8" />
+	<title>Trang chủ hệ thống</title>
+
+	<style>
+
+		body {
+			margin: 0;
+			font-family: 'Poppins',sans-serif;
+		}
+
+		/* ================= NAVBAR ================= */
+
+		.navbar {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			max-width: 1200px;
+			margin: auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 25px 20px;
+			z-index: 10;
+		}
+
+		.logo {
+			font-size: 22px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 40px;
+		}
+
+			.nav-links a {
+				text-decoration: none;
+				color: #333;
+				font-weight: 500;
+				font-size: 16px;
+			}
+
+				.nav-links a:hover {
+					color: #e74c3c;
+				}
+
+		/* ================= BANNER ================= */
+
+		.banner {
+			width: 100%;
+			height: 100vh;
+			background-image: url('/imager/banner.png');
+			background-repeat: no-repeat;
+			background-position: right center;
+			background-size: cover;
+			position: relative;
+		}
+
+		/* text banner */
+
+		.banner-text {
+			position: absolute;
+			top: 50%;
+			left: 120px;
+			transform: translateY(-50%);
+			max-width: 450px;
+		}
+
+			.banner-text h1 {
+				font-size: 46px;
+				margin-bottom: 20px;
+			}
+
+			.banner-text p {
+				font-size: 18px;
+				color: #555;
+				line-height: 1.6;
+			}
+
+		.btn-start {
+			display: inline-block;
+			margin-top: 25px;
+			padding: 14px 28px;
+			background: #e74c3c;
+			color: white;
+			border-radius: 8px;
+			text-decoration: none;
+			font-weight: 600;
+			transition: 0.3s;
+		}
+
+			.btn-start:hover {
+				background: #c0392b;
+			}
+
+		/* ================= FEATURES ================= */
+
+		.features {
+			padding: 100px 40px;
+			text-align: center;
+			background: #f7f7f7;
+		}
+
+			.features h2 {
+				margin-bottom: 40px;
+				font-size: 48px;
+			}
+
+		.feature-container {
+			display: flex;
+			justify-content: center;
+			gap: 40px;
+			flex-wrap: wrap;
+		}
+
+		.feature-box {
+			width: 260px;
+			background: white;
+			padding: 35px;
+			border-radius: 15px;
+			box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+			transition: 0.3s;
+		}
+
+			.feature-box:hover {
+				transform: translateY(-10px);
+				box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+			}
+
+			.feature-box h3 {
+				margin-bottom: 10px;
+			}
+
+		/* ================= FOOTER ================= */
+
+		footer {
+			text-align: center;
+			padding: 20px;
+			background: #eee;
+			color: #555;
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+	<!-- NAVBAR -->
+
+	<div class="navbar">
+
+		<div class="logo">
+			🚚 Delivery Zone
+		</div>
+
+		<div class="nav-links">
+
+			<a href="#">Trang chủ</a>
+
+			<a href="#feature">Chức năng</a>
+
+
+		</div>
+
+	</div>
+
+	<!-- BANNER -->
+
+	<div class="banner">
+
+		<div class="banner-text">
+
+			<h1>Delivery Zone Optimization</h1>
+
+			<p>
+				Hệ thống hỗ trợ phân chia tối ưu vùng hoạt động của bưu tá
+				trong giao nhận hàng thương mại điện tử.
+			</p>
+
+			<a href="/Account/Login" class="btn-start">
+				Bắt đầu sử dụng
+			</a>
+
+		</div>
+
+	</div>
+
+	<!-- FEATURES -->
+	<section id="feature" class="features">
+
+		<h2>Chức năng hệ thống</h2>
+
+		<div class="feature-container">
+
+			<div class="feature-box">
+
+				<h3>🗺️ Quản lý vùng giao hàng</h3>
+
+				<p>
+					Admin có thể vẽ và quản lý các vùng giao hàng trực tiếp trên bản đồ.
+				</p>
+
+			</div>
+
+			<div class="feature-box">
+
+				<h3>📏 Tính khoảng cách</h3>
+
+				<p>
+					Hệ thống tính toán khoảng cách giữa các vùng và xác định vùng kề nhau.
+				</p>
+
+			</div>
+
+			<div class="feature-box">
+
+				<h3>⚙️ Phân chia tối ưu</h3>
+
+				<p>
+					Phân chia các vùng giao hàng cho bưu tá bằng thuật toán tối ưu.
+				</p>
+
+			</div>
+
+		</div>
+
+	</section>
+
+	
+
+	<!-- FOOTER -->
+
+	<footer>
+
+		© 2026 Delivery Zone Optimization System
+
+	</footer>
+
+</body>
+</html>

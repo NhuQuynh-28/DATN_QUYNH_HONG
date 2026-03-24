@@ -1,0 +1,130 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var username = Context.Session.GetString("Username");
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dispatcher</title>
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Segoe UI;
+            background: #0f172a;
+            color: white;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #1e293b;
+            padding: 20px;
+            z-index: 1000;
+            position: relative;
+        }
+
+        .menu-item {
+            padding: 10px;
+            margin: 10px 0;
+            background: #334155;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+            .menu-item:hover {
+                background: #2563eb;
+            }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .topbar {
+            height: 60px;
+            background: #1e293b;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logout-btn {
+            background: red;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .page-body {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .leaflet-pane {
+            z-index: 1 !important;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+
+        .zone-label {
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <div>🚚 Dispatcher</div>
+            <div class="menu-item" onclick="loadMap()">📍 Bản đồ</div>
+            <div class="menu-item" onclick="openPredict()">📊 Nhập dự kiến</div>
+        </div>
+
+        <div class="content">
+
+            <div class="topbar">
+                <span>@username</span>
+                <a href="/Account/Logout" class="logout-btn">Đăng xuất</a>
+            </div>
+
+            <div class="page-body">
+                @RenderBody()
+            </div>
+
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

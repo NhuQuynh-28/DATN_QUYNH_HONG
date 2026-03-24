@@ -1,0 +1,33 @@
+﻿@{
+    Layout = null;
+}
+
+@model List<KhoaLuanTotNghiep.Models.Assignment>
+
+@if (!Model.Any())
+{
+    <p>Không có dữ liệu</p>
+}
+else
+{
+    <table border="1">
+        <tr>
+            <th>Tài xế</th>
+            <th>Khu vực</th>
+            <th>Dự đoán</th>
+            <th>Thực tế</th>
+            <th>Ngày</th>
+        </tr>
+
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.Driver?.DriverName</td>
+                <td>@a.Area?.Name</td>
+                <td>@a.PlannedOrders</td>
+                <td>@a.ActualOrders</td>
+                <td>@a.Date.ToShortDateString()</td>
+            </tr>
+        }
+    </table>
+}

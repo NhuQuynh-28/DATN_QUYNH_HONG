@@ -1,0 +1,99 @@
+﻿@model List<KhoaLuanTotNghiep.Models.ZoneVersion>
+
+<h2>Danh sách Version</h2>
+<button onclick="openCreateVersion(@ViewBag.AreaId)" class="btn-add">
+	+ Thêm Version
+</button>
+<table class="table-area">
+
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Version</th>
+			<th>Ngày tạo</th>
+			<th>Ngày sửa</th>
+			<th>Số polygon</th>
+			<th>Diện tích</th>
+			<th>Active</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<tbody>
+
+		@foreach (var v in Model)
+		{
+			<tr>
+
+				<td>@v.Id</td>
+
+				<td>@v.VersionName</td>
+
+				<td>@(v.CreatedDate?.ToString("dd/MM/yyyy") ?? "")</td>
+
+				<td>@(v.UpdatedDate?.ToString("dd/MM/yyyy") ?? "")</td>
+
+				<td>@(v.SoPolygon ?? 0)</td>
+
+				<td>
+					@((v.DienTichBaoPhu ?? 0) != 0
+									? (v.DienTichBaoPhu ?? 0).ToString("N2") + " m²"
+									: "0")
+				</td>
+
+				<td>
+					@if (v.IsActive == true)
+					{
+						<span style="color:lime">Active</span>
+					}
+					else
+					{
+						<span style="color:gray">Inactive</span>
+					}
+				</td>
+
+				<td>
+					<button onclick="openMap(@v.Id)">
+						Mở bản đồ
+					</button>
+					<button onclick="setActive(@v.Id)">
+						Active
+					</button>
+					<button onclick="deleteVersion(@v.Id)">
+						Xoá
+					</button>
+
+				</td>
+
+			</tr>
+		}
+
+	</tbody>
+
+</table>
+<style>
+	.table-area {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 15px;
+	}
+
+		.table-area th {
+			background: #1e293b;
+			color: white;
+			padding: 10px;
+			text-align: left;
+		}
+
+		.table-area td {
+			background: white;
+			color: black;
+			padding: 10px;
+			border: 1px solid #ddd;
+		}
+
+		.table-area tr:hover {
+			background: #f1f5f9;
+		}
+</style>
+

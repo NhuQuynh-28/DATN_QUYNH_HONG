@@ -1,0 +1,84 @@
+﻿@model List<KhoaLuanTotNghiep.Models.Area>
+
+<h2>Danh sách khu vực</h2>
+
+<button onclick="openCreateArea()" class="btn-add">
+	+ Thêm khu vực
+</button>
+
+<table class="table-area">
+
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Tên khu vực</th>
+			<th>Trạng thái</th>
+			<th>Ngày tạo</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<tbody>
+
+		@foreach (var area in Model)
+		{
+			<tr>
+
+				<td>@area.Id</td>
+
+				<td>@area.Name</td>
+
+				<td>@area.Status</td>
+
+				<td>@area.CreatedDate.ToString("dd/MM/yyyy")</td>
+
+				<td>
+
+					<button onclick="deleteArea(@area.Id)">
+						Xóa
+					</button>
+
+					<button onclick="loadVersion(@area.Id)">
+						Version
+					</button>
+
+				</td>
+
+			</tr>
+		}
+
+	</tbody>
+
+</table>
+
+<style>
+
+	.table-area {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 15px;
+	}
+
+		.table-area th {
+			background: #1e293b;
+			color: white;
+			padding: 10px;
+		}
+
+		.table-area td {
+			background: white;
+			color: black;
+			padding: 8px;
+			border: 1px solid #ddd;
+		}
+
+	.btn-add {
+		background: #2563eb;
+		color: white;
+		border: none;
+		padding: 8px 14px;
+		border-radius: 6px;
+		cursor: pointer;
+	}
+
+</style>

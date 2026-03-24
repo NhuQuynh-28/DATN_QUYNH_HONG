@@ -1,0 +1,71 @@
+﻿@{
+    Layout = null;
+}
+
+<h2>Xem theo tháng</h2>
+
+<!-- FILTER -->
+<div style="display:flex; gap:10px; margin-bottom:15px;">
+
+    <!-- THÁNG -->
+    <select id="monthSelect">
+        <option value="">-- Tháng --</option>
+        @for (int i = 1; i <= 12; i++)
+        {
+            <option value="@i">Tháng @i</option>
+        }
+    </select>
+
+    <!-- KHU VỰC -->
+    <select id="areaSelect">
+        <option value="">-- Khu vực --</option>
+        @* load từ DB *@
+    </select>
+
+    <!-- TÊN TÀI XẾ -->
+    <input type="text" id="driverName" placeholder="Tên tài xế..." />
+
+    <button onclick="loadFilter()">Lọc</button>
+
+</div>
+
+<div id="monthData"></div>
+
+<script>
+    document.getElementById("monthSelect").addEventListener("change", function () {
+        let m = this.value;
+
+        fetch('/Driver/GetByMonth?month=' + m)
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById("monthData").innerHTML = data;
+        });
+    });
+        
+    function loadAreas(){
+        fetch('/Driver/GetAll')
+        .then(res => res.json())
+        .then(data => {
+            let html = '<option value="">-- Khu vực --</option>';
+
+            data.forEach(a => {
+                html += `<option value="${a.id}">${a.areaName}</option>`;
+            });
+
+            document.getElementById("areaSelect").innerHTML = html;
+        });
+    }
+     
+    function loadFilter(){
+        let m = document.getElementById("monthSelect").value;
+        let a = document.getElementById("areaSelect").value;
+        let d = document.getElementById("driverName").value;
+
+        fetch(`/Driver/GetByMonth?month=${m}&areaId=${a}&driverName=${d}`)
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById("monthData").innerHTML = data;
+        });
+    }
+
+</script>

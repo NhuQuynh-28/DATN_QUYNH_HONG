@@ -1,0 +1,262 @@
+﻿<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+
+    .map-container {
+        height: 100%;
+        padding: 20px;
+    }
+
+    #map {
+        width: 100%;
+        height: 650px;
+        border-radius: 10px;
+    }
+
+</style>
+
+
+<div class="map-container">
+
+    <h2>Bản đồ khu vực</h2>
+
+    <div id="map"></div>
+
+</div>
+
+
+<script>
+
+    /* ================= MAP ================= */
+
+        function initMap(){
+
+    var map = L.map('map').setView([21.0285,105.8542],13);
+
+    L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom:19}
+    ).addTo(map);
+
+    setTimeout(()=>map.invalidateSize(),200);
+
+    }
+
+    /* ================= STATE ================= */
+
+    var draw=false;
+    var points=[];
+    var polygon=null;
+    var markers=[];
+    var selectedPolygon=null;
+    var allPolygons=[];
+
+
+    /* ================= VẼ VÙNG ================= */
+
+    function enableDraw(){
+
+    draw=true;
+
+    points=[];
+
+    if(polygon)
+    map.removeLayer(polygon);
+
+    markers.forEach(m=>map.removeLayer(m));
+
+    markers=[];
+
+    }
+
+
+    /* ================= CLICK MAP ================= */
+
+    map.on("click",function(e){
+
+    if(!draw) return;
+
+    var lat=e.latlng.lat;
+    var lng=e.latlng.lng;
+
+    points.push([lat,lng]);
+
+    var marker=L.circleMarker([lat,lng],{
+    radius:5,
+    color:"blue"
+    }).addTo(map);
+
+    markers.push(marker);
+
+    if(polygon)
+    map.removeLayer(polygon);
+
+    polygon=L.polygon(points,{
+    color:"#3b82f6",
+    fillOpacity:0.3
+    }).addTo(map);
+
+    });
+
+
+    /* ================= LƯU VÙNG ================= */
+
+    function saveZone(){
+
+    if(points.length<3){
+    alert("Cần ít nhất 3 điểm");
+    return;
+    }
+
+    var name=prompt("Tên vùng");
+
+    if(!name) return;
+
+    polygon.zoneName=name;
+
+    polygon.on("click",function(){
+
+    if(selectedPolygon){
+    selectedPolygon.setStyle({color:"#3b82f6"});
+    }
+
+    selectedPolygon=this;
+
+    this.setStyle({color:"red"});
+
+    });
+
+    allPolygons.push(polygon);
+
+    alert("Đã lưu vùng");
+
+    points=[];
+    polygon=null;
+    markers=[];
+    draw=false;
+
+    }
+
+
+    /* ================= XÓA VÙNG ================= */
+
+    function deleteSelected(){
+
+    if(!selectedPolygon){
+    alert("Chưa chọn vùng");
+    return;
+    }
+
+    map.removeLayer(selectedPolygon);
+
+    allPolygons = allPolygons.filter(p => p != selectedPolygon);
+
+    selectedPolygon=null;
+
+    }
+
+
+    /* ================= XÓA TẤT ================= */
+
+    function clearAll(){
+
+    allPolygons.forEach(p=>map.removeLayer(p));
+
+    markers.forEach(m=>map.removeLayer(m));
+
+    allPolygons=[];
+
+    markers=[];
+    points=[];
+
+    if(polygon)
+    map.removeLayer(polygon);
+
+    polygon=null;
+
+    }
+
+
+    /* ================= UPDATE VÙNG ================= */
+
+    function updateZone(){
+
+    if(!selectedPolygon){
+    alert("Chọn vùng trước");
+    return;
+    }
+
+    selectedPolygon.editing.enable();
+
+    alert("Kéo các điểm để chỉnh polygon");
+
+    }
+
+
+    /* ================= MA TRẬN KHOẢNG CÁCH ================= */
+
+    function calculateDistances(){
+
+    if(allPolygons.length < 2){
+    alert("Cần ít nhất 2 vùng");
+    return;
+    }
+
+    for(let i=0;i<allPolygons.length;i++){
+
+    for(let j=i+1;j<allPolygons.length;j++){
+
+    var c1 = allPolygons[i].getBounds().getCenter();
+    var c2 = allPolygons[j].getBounds().getCenter();
+
+    var d = map.distance(c1,c2).toFixed(0);
+
+    console.log(
+    "Zone "+(i+1)+" → Zone "+(j+1)+" = "+d+" m"
+    );
+
+    }
+
+    }
+
+    alert("Khoảng cách đã in ra console");
+
+    }
+
+
+    /* ================= MA TRẬN KỀ ================= */
+
+    function checkAdjacency(){
+
+    var threshold = 30;
+
+    for(let i=0;i<allPolygons.length;i++){
+
+    for(let j=i+1;j<allPolygons.length;j++){
+
+    var c1 = allPolygons[i].getBounds().getCenter();
+    var c2 = allPolygons[j].getBounds().getCenter();
+
+    var d = map.distance(c1,c2);
+
+    if(d < threshold){
+
+    allPolygons[i].setStyle({color:"green"});
+    allPolygons[j].setStyle({color:"green"});
+
+    console.log(
+    "Zone "+(i+1)+" kề Zone "+(j+1)
+    );
+
+    }
+
+    }
+
+    }
+
+    }
+
+</script>

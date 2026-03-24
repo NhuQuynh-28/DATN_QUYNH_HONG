@@ -1,0 +1,312 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutDispatcher.cshtml";
+}
+
+<div style="margin-bottom:10px; color:white;">
+    <label>Chọn version:</label>
+    <select id="versionSelect" onchange="changeVersion()"></select>
+</div>
+
+<div id="map" style="height:500px;"></div>
+
+<div id="infoArea">
+    <h3 id="zoneName">Chọn polygon</h3>
+
+    <div style="display:flex; gap:20px;">
+        <div style="flex:1;">
+            <h4 style="color:white;">Orders</h4>
+            <canvas id="orderChart"></canvas>
+        </div>
+        <div style="flex:1;">
+            <h4 style="color:white;">Customers</h4>
+            <canvas id="customerChart"></canvas>
+        </div>
+    </div>
+
+    <table id="historyTable" border="1" style="color:white; margin-top:10px;"></table>
+
+    <div style="margin-top:10px;">
+        <label>Orders dự kiến: </label>
+        <input id="predictOrder" />
+
+        <label>Khách dự kiến: </label>
+        <input id="predictCustomer" />
+
+        <button onclick="saveForecast()">Lưu</button>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+let map, selectedZoneId, orderChart, customerChart;
+let selectedMonth = null;
+let selectedYear = null;
+let currentRoute = null;
+
+// ================= GLOBAL TIME HELPERS =================
+const now = new Date();
+function isPast(month, year){
+    return (year < now.getFullYear()) || (year === now.getFullYear() && month <= now.getMonth()+1);
+}
+function isFuture(month, year){
+    return (year > now.getFullYear()) || (year === now.getFullYear() && month > now.getMonth()+1);
+}
+
+// ================= UTILS =================
+function getLatestForecast(x){
+    if(!x.forecasts || !x.forecasts.length) return null;
+    let sorted = [...x.forecasts].sort((a,b)=> (b.createdYear*12 + b.createdMonth) - (a.createdYear*12 + a.createdMonth));
+    return sorted[0];
+}
+
+// ================= MAP =================
+function loadMap(){
+    map = L.map('map').setView([21.0285,105.8542], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+}
+
+function drawRoute(month, year){
+    fetch(`/Zone/GetRoute?zoneId=${selectedZoneId}&month=${month}&year=${year}`)
+        .then(r => r.json())
+        .then(points => {
+            if(currentRoute) map.removeLayer(currentRoute);
+            if(!points.length) return;
+
+            let past = isPast(month, year);
+            currentRoute = L.polyline(points, {
+                color: past ? 'blue' : 'red',
+                weight: 4,
+                dashArray: past ? null : '5,5'
+            }).addTo(map);
+            map.fitBounds(currentRoute.getBounds());
+        });
+}
+
+// ================= LOAD VERSION =================
+function loadVersions(){
+    fetch("/ZoneVersion/GetByArea?areaId=1")
+        .then(r=>r.json())
+        .then(data=>{
+            let select = document.getElementById("versionSelect");
+            select.innerHTML = "";
+            let selectedId = null;
+
+            data.forEach(v=>{
+                let opt = document.createElement("option");
+                opt.value = v.id;
+                opt.text = v.versionName;
+                if(v.isActive){
+                    opt.selected = true;
+                    selectedId = v.id;
+                }
+                select.appendChild(opt);
+            });
+
+            if(selectedId) loadZones(selectedId);
+        });
+}
+
+function changeVersion(){
+    let id = document.getElementById("versionSelect").value;
+    loadZones(id);
+}
+
+// ================= LOAD ZONES =================
+function loadZones(versionId){
+    map.eachLayer(l => { if(l instanceof L.Polygon) map.removeLayer(l); });
+
+    fetch("/Zone/GetZones?versionId=" + versionId)
+        .then(r=>r.json())
+        .then(data=>{
+            data.forEach(z=>{
+                let pts = JSON.parse(z.points);
+                let poly = L.polygon(pts, { color:'blue', fillOpacity:0.3 }).addTo(map);
+                let center = poly.getBounds().getCenter();
+
+                L.marker(center, {
+                    interactive:false,
+                    icon: L.divIcon({
+                        className:'zone-label',
+                        html:`<div style="background:#2563eb;color:white;padding:3px 6px;border-radius:4px;font-size:12px;">
+                            ${z.zoneName}
+                        </div>`
+                    })
+                }).addTo(map);
+
+                      poly.on("click", function () {
+            selectedZoneId = z.id;
+
+            console.log("CLICK ZONE:", z.id); // 👈 debug
+
+            document.getElementById("zoneName").innerText = z.zoneName;
+
+            loadHistory(z.id);
+            loadPredict(z.id);
+        });
+            });
+        });
+}
+
+// ================= LOAD HISTORY =================
+function loadHistory(zoneId){
+    fetch("/Zone/ZoneHistory?zoneId=" + zoneId)
+        .then(r=>r.json())
+        .then(data=>{
+            if(!data.length) return;
+
+            data.sort((a,b)=> (a.year*12 + a.month) - (b.year*12 + b.month));
+
+            let last = data[data.length-1];
+            selectedMonth = last.month + 1;
+            selectedYear = last.year;
+            if(selectedMonth > 12) { selectedMonth=1; selectedYear++; }
+
+            // ===== CHART DATA =====
+            let labels = data.map(x => x.month + "/" + x.year);
+
+            let orderReal = data.map(x => isPast(x.month,x.year) ? x.ordersReal : null);
+            let orderForecastPast = data.map(x => x.ordersForecast);
+            let orderForecastFuture = data.map(x => isFuture(x.month,x.year) ? x.ordersForecast : null);
+
+            let customerReal = data.map(x => isPast(x.month,x.year) ? x.customersReal : null);
+            let customerForecastPast = data.map(x => x.customersForecast);
+            let customerForecastFuture = data.map(x => isFuture(x.month,x.year) ? x.customersForecast : null);
+
+            // ===== DESTROY OLD CHART =====
+            if(orderChart) orderChart.destroy();
+            if(customerChart) customerChart.destroy();
+
+            // ===== CHART ORDERS =====
+            orderChart = new Chart(document.getElementById("orderChart"), {
+                type:'line',
+                data:{
+                    labels: labels,
+                    datasets:[
+                        { label:'Orders thực tế', data: orderReal, borderColor:'#3b82f6', borderWidth:3, pointRadius:5, tension:0.3 },
+                        { label:'Dự kiến (đã qua)', data: orderForecastPast, borderColor:'rgba(239,68,68,0.6)', borderWidth:2, pointRadius:4, tension:0.3 },
+                        { label:'Dự kiến (tương lai)', data: orderForecastFuture, borderColor:'#ef4444', borderDash:[6,6], borderWidth:2, pointRadius:4, tension:0.3 }
+                    ]
+                },
+                    options:{
+                plugins:{
+                    tooltip:{
+                        callbacks:{
+                            label: function(context){
+
+                                let index = context.dataIndex;
+
+                                let real = orderReal[index];
+                                let forecast = data[index].ordersForecast;
+
+                                if(real != null && forecast){
+                                    let diff = ((real - forecast) / forecast * 100).toFixed(1);
+
+                                    return [
+                                        `Real: ${real}`,
+                                        `Forecast: ${forecast}`,
+                                        `Sai lệch: ${diff}%`
+                                    ];
+                                }
+
+                                return context.dataset.label + ": " + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+            // ===== CHART CUSTOMERS =====
+            customerChart = new Chart(document.getElementById("customerChart"), {
+                type:'line',
+                data:{
+                    labels: labels,
+                    datasets:[
+                        { label:'Khách thực tế', data: customerReal, borderColor:'#22c55e', borderWidth:3, pointRadius:5, tension:0.3 },
+                        { label:'Dự kiến (đã qua)', data: customerForecastPast, borderColor:'rgba(245,158,11,0.6)', borderWidth:2, pointRadius:4, tension:0.3 },
+                        { label:'Dự kiến (tương lai)', data: customerForecastFuture, borderColor:'#f59e0b', borderDash:[6,6], borderWidth:2, pointRadius:4, tension:0.3 }
+                    ]
+                }
+            });
+
+            // ===== TABLE =====
+            renderTable(data);
+        });
+}
+
+// ================= TABLE =================
+function renderTable(data){
+    let table = document.getElementById("historyTable");
+    let html = `
+        <tr>
+            <th>Tháng</th>
+            <th>Orders thực tế</th>
+            <th>Khách thực tế</th>
+            <th>Orders dự kiến</th>
+            <th>Khách dự kiến</th>
+            <th>Sai lệch(%)</th>
+        </tr>`;
+
+    data.forEach(x=>{
+
+            let diff = '';
+
+            if(x.ordersReal != null && x.ordersForecast){
+                diff = ((x.ordersReal - x.ordersForecast) / x.ordersForecast * 100).toFixed(1) + '%';
+            }
+        html += `
+        <tr onclick="selectMonth(${x.month}, ${x.year})">
+            <td>${x.month}/${x.year}</td>
+            <td>${isPast(x.month,x.year) ? x.ordersReal : ''}</td>
+            <td>${isPast(x.month,x.year) ? x.customersReal : ''}</td>
+            <td>${x.ordersForecast ?? ''}</td>
+            <td>${x.customersForecast ?? ''}</td>
+            <td>${diff}</td>
+        </tr>`;
+    });
+    table.innerHTML = html;
+}
+
+// ================= SELECT MONTH =================
+function selectMonth(m,y){
+    selectedMonth = m;
+    selectedYear = y;
+    drawRoute(m,y);
+}
+
+// ================= PREDICT =================
+function loadPredict(zoneId){
+    fetch("/Zone/Predict?zoneId=" + zoneId)
+        .then(r=>r.json())
+        .then(d=>{
+            document.getElementById("predictOrder").value = d.order;
+            document.getElementById("predictCustomer").value = d.customer;
+        });
+}
+
+// ================= SAVE =================
+function saveForecast(){
+    let now = new Date();
+    fetch("/Zone/SaveForecast",{
+        method:"POST",
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+            zoneId: selectedZoneId,
+            targetMonth: selectedMonth,
+            targetYear: selectedYear,
+            createdMonth: now.getMonth()+1,
+            createdYear: now.getFullYear(),
+            ordersForecast: parseInt(document.getElementById("predictOrder").value),
+            customersForecast: parseInt(document.getElementById("predictCustomer").value)
+        })
+    }).then(()=>{ alert("Đã lưu"); loadHistory(selectedZoneId); });
+}
+
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded", ()=>{
+    loadMap();
+    loadVersions();
+});
+
+</script>
+}

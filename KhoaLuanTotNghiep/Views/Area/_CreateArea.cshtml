@@ -1,0 +1,23 @@
+﻿@model KhoaLuanTotNghiep.Models.Area
+
+<h3>Thêm khu vực</h3>
+
+<form method="post" action="/Area/Create">
+
+	<div>
+		<label>Tên khu vực</label>
+		<input type="text" name="Name" required />
+	</div>
+
+	<div>
+		<label>Trạng thái</label>
+		<input type="text" name="Status" />
+	</div>
+
+	<br>
+
+	<button type="submit">
+		Lưu
+	</button>
+
+</form>

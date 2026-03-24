@@ -1,0 +1,5 @@
+SELECT TOP (1000) [Id]
+      ,[Username]
+      ,[Password]
+      ,[Role]
+  FROM [KhoaLuanTotNghiep].[dbo].[Users]

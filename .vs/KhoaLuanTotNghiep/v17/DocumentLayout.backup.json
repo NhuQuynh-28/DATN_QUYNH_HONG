@@ -1,0 +1,657 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\shared\\_adminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\shared\\_adminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\dispatcher\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\dispatcher\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\zonecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\zonecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zonehistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zonehistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zoneroutes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zoneroutes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zonemonthlydata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zonemonthlydata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\shared\\_layoutdispatcher.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\shared\\_layoutdispatcher.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zonestatistic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zonestatistic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zonedistance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zonedistance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\admin\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\admin\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\zoneversioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\zoneversioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zoneversion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zoneversion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\zone\\_zonemap.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\zone\\_zonemap.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\dispatchercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\dispatchercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\drivercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\drivercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\zone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\zone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\report\\_dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\report\\_dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\zoneversion\\_versionlist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\zoneversion\\_versionlist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\zoneversion\\_createversion.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\zoneversion\\_createversion.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\area\\_arealist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\area\\_arealist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\controllers\\areacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\controllers\\areacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\area\\_createarea.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\area\\_createarea.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\zone\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\zone\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\area.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\area.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\driver\\list.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\driver\\list.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\models\\driver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\models\\driver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\driver\\bymonth.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\driver\\bymonth.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\driver\\_bymonthtable.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\driver\\_bymonthtable.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\driver\\indexdriver.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\driver\\indexdriver.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|c:\\khoaluantotnghiep\\khoaluantotnghiep\\khoaluantotnghiep\\views\\driver\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5C9124BE-4DA4-4B79-B3FF-75279E42CB86}|KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj|solutionrelative:khoaluantotnghiep\\views\\driver\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{e8b06f52-6d01-11d2-aa7d-00c04f990343}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Dispatcher\\Index.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Dispatcher\\Index.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Dispatcher\\Index.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Dispatcher\\Index.cshtml",
+              "ViewState": "AgIAAHsAAAAAAAAAAAASwJAAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-20T13:58:31.803Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ZoneRoutes.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneRoutes.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\ZoneRoutes.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneRoutes.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\ZoneRoutes.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T18:15:15.477Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ZoneHistory.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneHistory.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\ZoneHistory.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneHistory.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\ZoneHistory.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAYwBQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T15:12:10.386Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_AdminLayout.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Shared\\_AdminLayout.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Shared\\_AdminLayout.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Shared\\_AdminLayout.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Shared\\_AdminLayout.cshtml",
+              "ViewState": "AgIAAI8CAAAAAAAAAAASwKoCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-18T18:33:23.523Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ZoneController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\ZoneController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\ZoneController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\ZoneController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\ZoneController.cs",
+              "ViewState": "AgIAABUBAAAAAAAAAAAiwC0BAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-19T14:29:35.891Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ZoneStatistic.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneStatistic.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\ZoneStatistic.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneStatistic.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\ZoneStatistic.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA4AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-01T17:28:22.262Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ZoneMonthlyData.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneMonthlyData.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\ZoneMonthlyData.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneMonthlyData.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\ZoneMonthlyData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:31:57.885Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "_LayoutDispatcher.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Shared\\_LayoutDispatcher.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Shared\\_LayoutDispatcher.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Shared\\_LayoutDispatcher.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Shared\\_LayoutDispatcher.cshtml",
+              "ViewState": "AgIAAG4AAAAAAAAAAIAwwFsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-20T13:51:50.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Data\\AppDbContext.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA1wBYAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:34:41.85Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Program.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Program.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Program.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Program.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAgwBoAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T15:30:13.241Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ZoneDistance.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneDistance.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\ZoneDistance.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneDistance.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\ZoneDistance.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-01T17:29:11.01Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ZoneVersionController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\ZoneVersionController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\ZoneVersionController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\ZoneVersionController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\ZoneVersionController.cs",
+              "ViewState": "AgIAAHIAAAAAAAAAAAAYwGUAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T17:41:59.347Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "ZoneVersion.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneVersion.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\ZoneVersion.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\ZoneVersion.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\ZoneVersion.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T17:38:15.618Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Admin\\Index.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Admin\\Index.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Admin\\Index.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Admin\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T15:58:50.606Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAK0AAAAAAAAAAAAmwLUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:54:41.19Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "_ZoneMap.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Zone\\_ZoneMap.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Zone\\_ZoneMap.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Zone\\_ZoneMap.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Zone\\_ZoneMap.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T14:55:10.323Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\_ViewStart.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-20T13:51:10.8Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "DispatcherController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\DispatcherController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\DispatcherController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\DispatcherController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\DispatcherController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAwAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:33:48.873Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "DriverController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\DriverController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\DriverController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\DriverController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\DriverController.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAqwFoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T18:34:00.464Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "UserController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\UserController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\UserController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\UserController.cs",
+              "ViewState": "AgIAAEYAAAAAAAAAAAAiwFMAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:18:27.054Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ReportController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\ReportController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\ReportController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\ReportController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\ReportController.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAYwAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-19T17:36:13.79Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:33:18.395Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\User.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\User.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\User.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\User.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAgwBsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T13:18:09.523Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Zone.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\Zone.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\Zone.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\Zone.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\Zone.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAA3wBgAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-19T14:29:25.764Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "_VersionList.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\ZoneVersion\\_VersionList.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\ZoneVersion\\_VersionList.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\ZoneVersion\\_VersionList.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\ZoneVersion\\_VersionList.cshtml",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAAAGMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T14:55:27.976Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Zone\\Index.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Zone\\Index.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Zone\\Index.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Zone\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T15:57:50.606Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "_CreateVersion.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\ZoneVersion\\_CreateVersion.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\ZoneVersion\\_CreateVersion.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\ZoneVersion\\_CreateVersion.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\ZoneVersion\\_CreateVersion.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T15:45:56.471Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "_Dashboard.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Report\\_Dashboard.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Report\\_Dashboard.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Report\\_Dashboard.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Report\\_Dashboard.cshtml",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAgwE0AAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T17:38:50.507Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "_AreaList.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Area\\_AreaList.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Area\\_AreaList.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Area\\_AreaList.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Area\\_AreaList.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T14:55:16.451Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "_CreateArea.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Area\\_CreateArea.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Area\\_CreateArea.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Area\\_CreateArea.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Area\\_CreateArea.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T15:50:17.64Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "AreaController.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\AreaController.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Controllers\\AreaController.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Controllers\\AreaController.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Controllers\\AreaController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-19T15:51:50.76Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "ByMonth.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\ByMonth.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Driver\\ByMonth.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\ByMonth.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Driver\\ByMonth.cshtml",
+              "ViewState": "AgIAACoAAAAAAAAAAAAgwC0AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-18T18:33:26.65Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "Driver.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\Driver.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\Driver.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\Driver.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\Driver.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-19T03:31:12.195Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "List.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\List.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Driver\\List.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\List.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Driver\\List.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAgwBcAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T02:03:54.185Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "Area.cs",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\Area.cs",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Models\\Area.cs",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Models\\Area.cs",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Models\\Area.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-19T15:11:50.127Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T15:51:13.593Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "_ByMonthTable.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\_ByMonthTable.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Driver\\_ByMonthTable.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\_ByMonthTable.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Driver\\_ByMonthTable.cshtml",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAgwBkAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-18T18:35:14.92Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "IndexDriver.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\IndexDriver.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Driver\\IndexDriver.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\IndexDriver.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Driver\\IndexDriver.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T02:03:52.694Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "Detail.cshtml",
+              "DocumentMoniker": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\Detail.cshtml",
+              "RelativeDocumentMoniker": "KhoaLuanTotNghiep\\Views\\Driver\\Detail.cshtml",
+              "ToolTip": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\Views\\Driver\\Detail.cshtml",
+              "RelativeToolTip": "KhoaLuanTotNghiep\\Views\\Driver\\Detail.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-19T02:03:38.414Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
