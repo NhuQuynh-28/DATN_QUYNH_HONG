@@ -1,62 +1,623 @@
-﻿@{
+@{
     Layout = null;
 }
 @model List<Driver>
+@{
+    var assignmentCounts = ViewBag.AssignmentCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var areas = ViewBag.Areas as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+    int totalDrivers    = ViewBag.TotalDrivers   ?? 0;
+    int activeDrivers   = ViewBag.ActiveDrivers  ?? 0;
+    int inactiveDrivers = ViewBag.InactiveDrivers ?? 0;
+    int now_month = DateTime.Now.Month;
+    int now_year  = DateTime.Now.Year;
+}
 
-<h3>Danh sách tài xế</h3>
+<style>
+/* ===== DRIVER MANAGEMENT ===== */
+.dm-wrap { font-family:'Segoe UI',sans-serif; color:#e2e8f0; }
 
-<form onsubmit="return false;">
-    <input id="name" placeholder="Tên tài xế" />
-    <input id="phone" placeholder="SĐT" />
+/* STATS */
+.dm-stats { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.dm-stat {
+    background:#1e293b; border:1px solid #334155; border-radius:12px;
+    padding:14px 20px; min-width:130px; position:relative; overflow:hidden;
+}
+.dm-stat::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:var(--c,#3b82f6); }
+.dm-stat .val { font-size:24px; font-weight:800; color:var(--c,#3b82f6); }
+.dm-stat .lbl { font-size:11px; color:#64748b; margin-top:2px; font-weight:600; text-transform:uppercase; }
 
-    <select id="status">
-        <option>DangLam</option>
-        <option>NghiLam</option>
-        <option>RoiBo</option>
-    </select>
+/* TABS */
+.dm-tabs { display:flex; gap:4px; margin-bottom:20px; background:#1e293b; border-radius:10px; padding:4px; width:fit-content; }
+.dm-tab {
+    padding:8px 20px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
+    color:#64748b; transition:all .2s; display:flex; align-items:center; gap:6px; border:none; background:none;
+}
+.dm-tab.active { background:#3b82f6; color:white; }
+.dm-tab:hover:not(.active) { color:#e2e8f0; background:#334155; }
 
-    <button type="button" onclick="addDriver()">Thêm</button>
-</form>
+/* PANELS */
+.dm-panel { display:none; }
+.dm-panel.active { display:block; }
 
-<table border="1" width="100%">
-    <tr>
-        <th>Tên</th>
-        <th>SĐT</th>
-        <th>Trạng thái</th>
-    </tr>
+/* TOOLBAR */
+.dm-toolbar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+.dm-search { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:8px 12px; color:#f1f5f9; font-size:13px; outline:none; }
+.dm-search:focus { border-color:#3b82f6; }
+.dm-btn-add { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; border:none; padding:9px 18px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .15s; }
+.dm-btn-add:hover { opacity:.88; }
 
-    @foreach (var d in Model)
-    {
-        <tr>
-            <td>@d.DriverName</td>
-            <td>@d.Phone</td>
-            <td>@d.Status</td>
-        </tr>
-    }
-</table>
-<script>
+/* TABLE */
+.dm-table-wrap { background:#1e293b; border-radius:14px; border:1px solid #334155; overflow:hidden; }
+.dm-table { width:100%; border-collapse:collapse; font-size:13px; }
+.dm-table thead tr { background:#0f172a; }
+.dm-table th { padding:12px 14px; text-align:left; color:#64748b; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid #1e293b55; }
+.dm-table tbody tr { border-bottom:1px solid #0f172a44; transition:background .15s; }
+.dm-table tbody tr:hover { background:#0f172a66; }
+.dm-table td { padding:13px 14px; vertical-align:middle; }
 
-         function addDriver(){
+/* DRIVER CELL */
+.dm-driver-cell { display:flex; align-items:center; gap:10px; }
+.dm-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#6366f1); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; font-weight:700; color:white; }
 
-        let data = {
-            driverName: document.getElementById("name").value,
-            phone: document.getElementById("phone").value,
-            status: document.getElementById("status").value
-        };
+/* STATUS BADGE */
+.dm-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+.dm-badge-active   { background:#16a34a22; color:#4ade80; border:1px solid #16a34a44; }
+.dm-badge-inactive { background:#dc262622; color:#f87171; border:1px solid #dc262644; }
+.dm-badge-leave    { background:#78716c22; color:#a8a29e; border:1px solid #78716c44; }
 
-        fetch('/Driver/Create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'   // ⚠️ QUAN TRỌNG
-            },
-            body: JSON.stringify(data)              // ⚠️ QUAN TRỌNG
-        })
-        .then(res => res.json())
-        .then(d => {
-            if(d.success){
-                alert("Thêm thành công");
-                loadPage('/Driver/List');
+/* ASSIGNMENT CHIP */
+.dm-chip { display:inline-flex; align-items:center; gap:4px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:3px 9px; font-size:11px; color:#94a3b8; }
+
+/* ACTIONS */
+.dm-acts { display:flex; gap:6px; }
+.dm-act { display:inline-flex; align-items:center; gap:4px; padding:6px 11px; border-radius:7px; border:none; font-size:11px; font-weight:700; cursor:pointer; transition:all .15s; }
+.dm-act-edit  { background:#1c3d5a; color:#38bdf8; }
+.dm-act-edit:hover  { background:#0284c7; color:white; }
+.dm-act-del   { background:#3d1c1c; color:#f87171; }
+.dm-act-del:hover   { background:#dc2626; color:white; }
+
+/* FILTER BAR (tab month) */
+.dm-filter { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; background:#1e293b; border-radius:12px; padding:12px 16px; border:1px solid #334155; }
+.dm-filter label { font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; }
+.dm-select { background:#0f172a; border:1px solid #334155; border-radius:7px; padding:7px 10px; color:#f1f5f9; font-size:12px; outline:none; }
+.dm-select:focus { border-color:#3b82f6; }
+.dm-btn-filter { display:inline-flex; align-items:center; gap:6px; background:#334155; color:#e2e8f0; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; }
+.dm-btn-filter:hover { background:#475569; }
+
+/* MONTH SUMMARY CARDS */
+.dm-month-stats { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+.dm-mstat { background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 16px; text-align:center; }
+.dm-mstat .mv { font-size:18px; font-weight:800; color:var(--c,#3b82f6); }
+.dm-mstat .ml { font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; margin-top:2px; }
+
+/* ASSIGNMENT TABLE */
+.dm-at { width:100%; border-collapse:collapse; font-size:12px; }
+.dm-at th { padding:10px 12px; text-align:left; color:#64748b; font-weight:700; font-size:11px; text-transform:uppercase; background:#0f172a; }
+.dm-at td { padding:11px 12px; border-bottom:1px solid #1e293b; color:#e2e8f0; vertical-align:middle; }
+.dm-at tr:hover td { background:#0f172a55; }
+.dm-ok-yes { color:#4ade80; font-weight:700; }
+.dm-ok-no  { color:#f87171; font-weight:700; }
+.dm-progress-bar { background:#1e293b; border-radius:4px; height:6px; overflow:hidden; min-width:60px; }
+.dm-progress-fill { height:100%; border-radius:4px; background:#3b82f6; }
+
+/* EMPTY STATE */
+.dm-empty { text-align:center; padding:60px 20px; }
+.dm-empty i { font-size:42px; color:#334155; display:block; margin-bottom:14px; }
+.dm-empty .et { font-size:16px; font-weight:700; color:#64748b; }
+.dm-empty .es { font-size:13px; color:#475569; margin-top:6px; }
+
+/* MODAL */
+.dm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+.dm-overlay.open { display:flex; }
+.dm-modal { background:#1e293b; border:1px solid #334155; border-radius:16px; padding:28px; min-width:340px; max-width:420px; width:100%; box-shadow:0 24px 64px rgba(0,0,0,.6); }
+.dm-modal h3 { margin:0 0 20px; font-size:16px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:8px; }
+.dm-field { margin-bottom:13px; }
+.dm-field label { display:block; font-size:11px; color:#94a3b8; font-weight:700; margin-bottom:5px; text-transform:uppercase; }
+.dm-input { width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:9px 12px; color:#f1f5f9; font-size:13px; outline:none; box-sizing:border-box; }
+.dm-input:focus { border-color:#3b82f6; }
+.dm-modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid #334155; }
+.dm-btn-cancel { background:#334155; border:none; border-radius:8px; padding:9px 18px; color:#94a3b8; font-size:13px; cursor:pointer; }
+.dm-btn-save { background:linear-gradient(135deg,#3b82f6,#2563eb); border:none; border-radius:8px; padding:9px 22px; color:white; font-size:13px; font-weight:700; cursor:pointer; }
+</style>
+
+<div class="dm-wrap">
+
+    <!-- STATS -->
+    <div class="dm-stats">
+        <div class="dm-stat" style="--c:#3b82f6">
+            <div class="val">@totalDrivers</div><div class="lbl">Tổng tài xế</div>
+        </div>
+        <div class="dm-stat" style="--c:#4ade80">
+            <div class="val">@activeDrivers</div><div class="lbl">Đang làm</div>
+        </div>
+        <div class="dm-stat" style="--c:#f87171">
+            <div class="val">@inactiveDrivers</div><div class="lbl">Không hoạt động</div>
+        </div>
+        <div class="dm-stat" style="--c:#fbbf24">
+            <div class="val" id="statAssignMonth">—</div><div class="lbl">Phân công tháng @now_month</div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="dm-tabs">
+        <button class="dm-tab active" id="tab-list" onclick="switchTab('list')">
+            <i class="fas fa-users"></i> Danh sách tài xế
+        </button>
+        <button class="dm-tab" id="tab-month" onclick="switchTab('month')">
+            <i class="fas fa-calendar-alt"></i> Phân công theo tháng
+        </button>
+        <button class="dm-tab" id="tab-detail" onclick="switchTab('detail')">
+            <i class="fas fa-clipboard-list"></i> Lịch sử phân công
+        </button>
+    </div>
+
+    <!-- PANEL 1: DANH SÁCH TÀI XẾ -->
+    <div class="dm-panel active" id="panel-list">
+        <div class="dm-toolbar">
+            <input class="dm-search" id="driverSearch" placeholder="🔍 Tìm tên tài xế..." oninput="filterDriverTable()" style="width:220px">
+            <select class="dm-select" id="statusFilter" onchange="filterDriverTable()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="DangLam">Đang làm</option>
+                <option value="NghiLam">Nghỉ làm</option>
+                <option value="RoiBo">Rời bỏ</option>
+            </select>
+            <button class="dm-btn-add" onclick="openDriverModal()">
+                <i class="fas fa-plus-circle"></i> Thêm tài xế
+            </button>
+        </div>
+        <div class="dm-table-wrap">
+            <table class="dm-table" id="driverTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tài xế</th>
+                        <th>Số điện thoại</th>
+                        <th>Trạng thái</th>
+                        <th><i class="fas fa-calendar-check"></i> PC tháng @now_month</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="driverTbody">
+                @{ int idx = 0; }
+                @foreach (var d in Model)
+                {
+                    idx++;
+                    int assignCount = assignmentCounts.ContainsKey(d.Id) ? assignmentCounts[d.Id] : 0;
+                    string initial = d.DriverName?.Length > 0 ? d.DriverName[0].ToString().ToUpper() : "?";
+                    string badgeClass = d.Status switch {
+                        "DangLam" => "dm-badge-active",
+                        "NghiLam" => "dm-badge-inactive",
+                        _         => "dm-badge-leave"
+                    };
+                    string statusLabel = d.Status switch {
+                        "DangLam" => "Đang làm",
+                        "NghiLam" => "Nghỉ làm",
+                        "RoiBo"   => "Rời bỏ",
+                        _         => d.Status
+                    };
+                    <tr data-name="@d.DriverName?.ToLower()" data-status="@d.Status">
+                        <td style="color:#475569;font-weight:700">@idx</td>
+                        <td>
+                            <div class="dm-driver-cell">
+                                <div class="dm-avatar">@initial</div>
+                                <div>
+                                    <div style="font-weight:700;color:#f1f5f9">@d.DriverName</div>
+                                    <div style="font-size:11px;color:#475569">ID: @d.Id</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="color:#94a3b8">@d.Phone</td>
+                        <td><span class="dm-badge @badgeClass"><i class="fas fa-circle" style="font-size:7px"></i> @statusLabel</span></td>
+                        <td>
+                            <span class="dm-chip"><i class="fas fa-briefcase"></i> @assignCount lần</span>
+                        </td>
+                        <td style="font-size:12px;color:#64748b">@d.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="dm-acts">
+                                <button class="dm-act dm-act-edit" onclick="editDriver(@d.Id,'@d.DriverName','@d.Phone','@d.Status')">
+                                    <i class="fas fa-pen"></i> Sửa
+                                </button>
+                                <button class="dm-act dm-act-del" onclick="deleteDriver(@d.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            @if (!Model.Any())
+            {
+                <div class="dm-empty">
+                    <i class="fas fa-truck"></i>
+                    <div class="et">Chưa có tài xế nào</div>
+                    <div class="es">Nhấn "Thêm tài xế" để bắt đầu</div>
+                </div>
             }
-        });
-    }
+        </div>
+    </div>
+
+    <!-- PANEL 2: PHÂN CÔNG THEO THÁNG -->
+    <div class="dm-panel" id="panel-month">
+        <!-- FILTER -->
+        <div class="dm-filter">
+            <div>
+                <label>Tháng</label>
+                <select class="dm-select" id="mf-month">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        if (i == now_month)
+                        { <option value="@i" selected>Tháng @i</option> }
+                        else
+                        { <option value="@i">Tháng @i</option> }
+                    }
+                </select>
+            </div>
+            <div>
+                <label>Năm</label>
+                <select class="dm-select" id="mf-year">
+                    @for (int y = now_year; y >= now_year - 2; y--)
+                    {
+                        if (y == now_year)
+                        { <option value="@y" selected>@y</option> }
+                        else
+                        { <option value="@y">@y</option> }
+                    }
+                </select>
+            </div>
+            <div>
+                <label>Khu vực</label>
+                <select class="dm-select" id="mf-area">
+                    <option value="">Tất cả</option>
+                    @foreach (dynamic a in areas)
+                    {
+                        <option value="@a.Id">@a.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label>Tài xế</label>
+                <input class="dm-search" id="mf-driver" placeholder="Tên tài xế..." style="width:170px">
+            </div>
+            <button class="dm-btn-filter" onclick="loadMonthData()">
+                <i class="fas fa-search"></i> Lọc
+            </button>
+        </div>
+
+        <!-- SUMMARY CARDS (sẽ load bằng JS) -->
+        <div class="dm-month-stats" id="monthSummary"></div>
+
+        <!-- ASSIGNMENT TABLE -->
+        <div class="dm-table-wrap">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tài xế</th>
+                        <th>Khu vực</th>
+                        <th>Điều phối bởi</th>
+                        <th>Dự kiến</th>
+                        <th>Thực tế</th>
+                        <th>Hoàn thành</th>
+                        <th>Ngày</th>
+                    </tr>
+                </thead>
+                <tbody id="monthTbody">
+                    <tr><td colspan="8" style="text-align:center;padding:40px;color:#475569">Chọn tháng và bấm Lọc để xem dữ liệu</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- PANEL 3: LỊCH SỬ PHÂN CÔNG -->
+    <div class="dm-panel" id="panel-detail">
+        <!-- FILTER -->
+        <div class="dm-filter">
+            <div>
+                <label>Tài xế</label>
+                <input class="dm-search" id="df-driver" placeholder="Tên tài xế..." style="width:160px">
+            </div>
+            <div>
+                <label>Khu vực</label>
+                <select class="dm-select" id="df-area">
+                    <option value="">Tất cả</option>
+                    @foreach (dynamic a in areas)
+                    {
+                        <option value="@a.Id">@a.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label>Kết quả</label>
+                <select class="dm-select" id="df-status">
+                    <option value="">Tất cả</option>
+                    <option value="ok">✅ Đạt chỉ tiêu</option>
+                    <option value="fail">❌ Chưa đạt</option>
+                </select>
+            </div>
+            <button class="dm-btn-filter" onclick="loadDetailData()">
+                <i class="fas fa-search"></i> Lọc
+            </button>
+            <button class="dm-btn-filter" onclick="clearDetailFilter()" style="background:#475569">
+                <i class="fas fa-times"></i> Xóa lọc
+            </button>
+        </div>
+
+        <!-- DETAIL SUMMARY -->
+        <div id="detailSummary" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"></div>
+
+        <!-- TABLE -->
+        <div class="dm-table-wrap">
+            <table class="dm-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tài xế</th>
+                        <th>Khu vực</th>
+                        <th>Điều phối</th>
+                        <th>Tháng/Năm</th>
+                        <th>Dự kiến</th>
+                        <th>Thực tế</th>
+                        <th>Tiến độ</th>
+                        <th>Ngày</th>
+                    </tr>
+                </thead>
+                <tbody id="detailTbody">
+                    <tr><td colspan="9" style="text-align:center;padding:40px;color:#475569">
+                        <i class="fas fa-clipboard-list" style="font-size:28px;display:block;margin-bottom:10px"></i>
+                        Nhấn "Lọc" để xem dữ liệu phân công
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+<div class="dm-overlay" id="driverOverlay" onclick="if(event.target===this)closeDriverModal()">
+    <div class="dm-modal">
+        <h3 id="modalTitle"><i class="fas fa-user-plus" style="color:#3b82f6"></i> Thêm tài xế</h3>
+        <input type="hidden" id="editId">
+        <div class="dm-field">
+            <label>Họ tên <span style="color:#ef4444">*</span></label>
+            <input class="dm-input" id="f-name" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="dm-field">
+            <label>Số điện thoại</label>
+            <input class="dm-input" id="f-phone" placeholder="0912345678">
+        </div>
+        <div class="dm-field">
+            <label>Trạng thái</label>
+            <select class="dm-input" id="f-status">
+                <option value="DangLam">Đang làm</option>
+                <option value="NghiLam">Nghỉ làm</option>
+                <option value="RoiBo">Rời bỏ</option>
+            </select>
+        </div>
+        <div class="dm-modal-footer">
+            <button class="dm-btn-cancel" onclick="closeDriverModal()">Hủy</button>
+            <button class="dm-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Lưu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ===== TABS ===== */
+function switchTab(tab) {
+    document.querySelectorAll('.dm-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.dm-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'month') loadMonthData();
+}
+
+/* ===== FILTER DRIVER TABLE ===== */
+function filterDriverTable() {
+    let q = document.getElementById('driverSearch').value.toLowerCase();
+    let s = document.getElementById('statusFilter').value;
+    document.querySelectorAll('#driverTbody tr').forEach(tr => {
+        let name   = tr.dataset.name   || '';
+        let status = tr.dataset.status || '';
+        let show = name.includes(q) && (!s || status === s);
+        tr.style.display = show ? '' : 'none';
+    });
+}
+
+/* ===== LOAD MONTH DATA ===== */
+function loadMonthData() {
+    let m = document.getElementById('mf-month').value;
+    let y = document.getElementById('mf-year').value;
+    let a = document.getElementById('mf-area').value;
+    let d = document.getElementById('mf-driver').value;
+
+    // Load summary
+    fetch(`/Driver/GetMonthlySummary?month=${m}&year=${y}`)
+    .then(r => r.json())
+    .then(s => {
+        let rate = s.completionRate || 0;
+        document.getElementById('monthSummary').innerHTML = `
+            <div class="dm-mstat" style="--c:#3b82f6"><div class="mv">${s.totalAssignments}</div><div class="ml">Tổng phân công</div></div>
+            <div class="dm-mstat" style="--c:#f59e0b"><div class="mv">${s.totalPlanned}</div><div class="ml">Đơn dự kiến</div></div>
+            <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${s.totalActual}</div><div class="ml">Đơn thực tế</div></div>
+            <div class="dm-mstat" style="--c:${rate>=80?'#4ade80':rate>=50?'#f59e0b':'#f87171'}"><div class="mv">${rate}%</div><div class="ml">Tỉ lệ hoàn thành</div></div>
+        `;
+        document.getElementById('statAssignMonth').textContent = s.totalAssignments;
+    });
+
+    // Load assignments
+    fetch(`/Driver/GetByMonth?month=${m}&year=${y}&areaId=${a}&driverName=${encodeURIComponent(d)}`)
+    .then(r => r.json())
+    .then(data => {
+        let tbody = document.getElementById('monthTbody');
+        if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#475569"><i class="fas fa-inbox" style="font-size:28px;display:block;margin-bottom:10px"></i>Không có dữ liệu phân công</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.map((a, i) => {
+            let pct = a.plannedOrders > 0 ? Math.min(100, Math.round(a.actualOrders / a.plannedOrders * 100)) : 0;
+            let color = a.isOk ? '#4ade80' : '#f87171';
+            return `<tr>
+                <td style="color:#475569;font-weight:700">${i+1}</td>
+                <td>
+                    <div style="font-weight:700;color:#f1f5f9">${a.driverName}</div>
+                    <div style="font-size:11px;color:#475569">${a.driverPhone}</div>
+                </td>
+                <td style="color:#94a3b8">${a.areaName}</td>
+                <td style="color:#64748b;font-size:12px">${a.dispatcher}</td>
+                <td style="font-weight:700;color:#60a5fa">${a.plannedOrders}</td>
+                <td style="font-weight:700;color:${color}">${a.actualOrders}</td>
+                <td>
+                    <div class="dm-progress-bar"><div class="dm-progress-fill" style="width:${pct}%;background:${color}"></div></div>
+                    <div style="font-size:10px;color:${color};margin-top:3px">${pct}%</div>
+                </td>
+                <td style="font-size:12px;color:#64748b">${a.date}</td>
+            </tr>`;
+        }).join('');
+    });
+}
+
+/* ===== DRIVER MODAL ===== */
+function openDriverModal() {
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus" style="color:#3b82f6"></i> Thêm tài xế';
+    document.getElementById('editId').value = '';
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-phone').value = '';
+    document.getElementById('f-status').value = 'DangLam';
+    document.getElementById('driverOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('f-name').focus(), 100);
+}
+function editDriver(id, name, phone, status) {
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen" style="color:#f59e0b"></i> Chỉnh sửa tài xế';
+    document.getElementById('editId').value = id;
+    document.getElementById('f-name').value = name;
+    document.getElementById('f-phone').value = phone;
+    document.getElementById('f-status').value = status;
+    document.getElementById('driverOverlay').classList.add('open');
+}
+function closeDriverModal() {
+    document.getElementById('driverOverlay').classList.remove('open');
+}
+function saveDriver() {
+    let id     = document.getElementById('editId').value;
+    let name   = document.getElementById('f-name').value.trim();
+    let phone  = document.getElementById('f-phone').value.trim();
+    let status = document.getElementById('f-status').value;
+
+    if (!name) { showToast('Vui lòng nhập họ tên tài xế!', 'error'); return; }
+
+    let url    = id ? '/Driver/Update' : '/Driver/Create';
+    let body   = id ? { id: parseInt(id), driverName: name, phone, status }
+                    : { driverName: name, phone, status };
+
+    fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            closeDriverModal();
+            showToast(id ? 'Đã cập nhật tài xế!' : 'Đã thêm tài xế mới!', 'success');
+            loadPage('/Driver/List');
+        } else {
+            showToast(d.message || 'Có lỗi xảy ra!', 'error');
+        }
+    })
+    .catch(() => showToast('Lỗi kết nối server!', 'error'));
+}
+function deleteDriver(id) {
+    if (!confirm('Xác nhận xóa tài xế này?')) return;
+    fetch('/Driver/Delete', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'id='+id })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) { showToast('Đã xóa tài xế!', 'info'); loadPage('/Driver/List'); }
+        else showToast(d.message || 'Không thể xóa!', 'error');
+    });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDriverModal();
+    if (e.key === 'Enter' && document.getElementById('driverOverlay').classList.contains('open')) saveDriver();
+});
+
+/* ===== SWITCH TAB (override - 3 tabs) ===== */
+function switchTab(tab) {
+    document.querySelectorAll('.dm-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.dm-panel').forEach(p => p.classList.remove('active'));
+    let tabEl   = document.getElementById('tab-' + tab);
+    let panelEl = document.getElementById('panel-' + tab);
+    if (tabEl)   tabEl.classList.add('active');
+    if (panelEl) panelEl.classList.add('active');
+    if (tab === 'month')  loadMonthData();
+    if (tab === 'detail') loadDetailData();
+}
+
+/* ===== LOAD DETAIL DATA ===== */
+function loadDetailData() {
+    let driver = document.getElementById('df-driver')?.value || '';
+    let area   = document.getElementById('df-area')?.value   || '';
+    let status = document.getElementById('df-status')?.value || '';
+
+    let url = `/Driver/GetAllAssignments?driverName=${encodeURIComponent(driver)}&areaId=${area}&status=${status}`;
+
+    fetch(url)
+    .then(r => r.json())
+    .then(data => {
+        // Summary cards
+        let total   = data.length;
+        let ok      = data.filter(x => x.isOk).length;
+        let fail    = total - ok;
+        let sumPlan = data.reduce((s, x) => s + x.plannedOrders, 0);
+        let sumAct  = data.reduce((s, x) => s + x.actualOrders, 0);
+        let rate    = total > 0 ? Math.round(ok / total * 100) : 0;
+
+        document.getElementById('detailSummary').innerHTML = `
+            <div class="dm-mstat" style="--c:#3b82f6"><div class="mv">${total}</div><div class="ml">Tổng phân công</div></div>
+            <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${ok}</div><div class="ml">Đạt chỉ tiêu</div></div>
+            <div class="dm-mstat" style="--c:#f87171"><div class="mv">${fail}</div><div class="ml">Chưa đạt</div></div>
+            <div class="dm-mstat" style="--c:#f59e0b"><div class="mv">${sumPlan}</div><div class="ml">Tổng đơn dự kiến</div></div>
+            <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${sumAct}</div><div class="ml">Tổng đơn thực tế</div></div>
+            <div class="dm-mstat" style="--c:${rate>=80?'#4ade80':rate>=50?'#f59e0b':'#f87171'}">
+                <div class="mv">${rate}%</div><div class="ml">Tỉ lệ hoàn thành</div>
+            </div>
+        `;
+
+        // Table
+        let tbody = document.getElementById('detailTbody');
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#475569">
+                <i class="fas fa-inbox" style="font-size:28px;display:block;margin-bottom:10px"></i>
+                Không có dữ liệu phân công phù hợp
+            </td></tr>`;
+            return;
+        }
+        tbody.innerHTML = data.map((a, i) => {
+            let pct   = a.plannedOrders > 0 ? Math.min(100, Math.round(a.actualOrders / a.plannedOrders * 100)) : 0;
+            let color = a.isOk ? '#4ade80' : '#f87171';
+            let icon  = a.isOk ? '✅' : '❌';
+            return `<tr>
+                <td style="color:#475569;font-weight:700">${i+1}</td>
+                <td>
+                    <div style="font-weight:700;color:#f1f5f9">${icon} ${a.driverName}</div>
+                    <div style="font-size:11px;color:#475569">${a.driverPhone}</div>
+                </td>
+                <td><span class="dm-chip"><i class="fas fa-map-marker-alt"></i> ${a.areaName}</span></td>
+                <td style="color:#64748b;font-size:12px">${a.dispatcher || '—'}</td>
+                <td style="color:#64748b;font-size:12px">T${a.month}/${a.year}</td>
+                <td style="font-weight:700;color:#60a5fa">${a.plannedOrders}</td>
+                <td style="font-weight:700;color:${color}">${a.actualOrders}</td>
+                <td>
+                    <div class="dm-progress-bar"><div class="dm-progress-fill" style="width:${pct}%;background:${color}"></div></div>
+                    <div style="font-size:10px;color:${color};margin-top:3px">${pct}%</div>
+                </td>
+                <td style="font-size:12px;color:#64748b">${a.date}</td>
+            </tr>`;
+        }).join('');
+    })
+    .catch(() => showToast('Lỗi khi tải dữ liệu phân công!', 'error'));
+}
+
+function clearDetailFilter() {
+    document.getElementById('df-driver').value = '';
+    document.getElementById('df-area').value   = '';
+    document.getElementById('df-status').value = '';
+    loadDetailData();
+}
 </script>

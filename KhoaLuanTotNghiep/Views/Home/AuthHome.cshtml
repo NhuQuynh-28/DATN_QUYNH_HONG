@@ -1,252 +1,484 @@
-﻿@{
-	Layout = null;
+@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    var username = Context.Session.GetString("Username");
+    var role = Context.Session.GetString("Role");
 }
-
 <!DOCTYPE html>
-
-<html>
+<html lang="vi">
 <head>
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-	<meta charset="utf-8" />
-	<title>Trang chủ hệ thống</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Delivery Zone — Hệ thống Tối ưu Vùng Giao Hàng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
 
-	<style>
+    body {
+        font-family:'Inter',sans-serif;
+        background:#060b18;
+        color:#e2e8f0;
+        overflow-x:hidden;
+    }
 
-		body {
-			margin: 0;
-			font-family: 'Poppins',sans-serif;
-		}
+    /* ===== NAVBAR ===== */
+    .nav {
+        position:fixed; top:0; left:0; right:0; z-index:100;
+        padding:0 60px;
+        height:70px;
+        display:flex; align-items:center; justify-content:space-between;
+        background:rgba(6,11,24,.85);
+        backdrop-filter:blur(16px);
+        border-bottom:1px solid rgba(255,255,255,.06);
+        transition:background .3s;
+    }
+    .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .nav-brand .ni {
+        width:38px;height:38px;border-radius:11px;
+        background:linear-gradient(135deg,#3b82f6,#6366f1);
+        display:flex;align-items:center;justify-content:center;font-size:18px;
+        
+    }
+    .nav-brand .nt { font-size:17px;font-weight:800;color:#f1f5f9;letter-spacing:-.3px; }
+    .nav-links { display:flex; align-items:center; gap:8px; }
+    .nav-links a {
+        padding:8px 16px; border-radius:8px;
+        font-size:13px; font-weight:600; color:#94a3b8;
+        text-decoration:none; transition:all .2s;
+    }
+    .nav-links a:hover { color:#f1f5f9; background:rgba(255,255,255,.06); }
+    .nav-btn {
+        padding:9px 20px !important;
+        background:linear-gradient(135deg,#3b82f6,#2563eb) !important;
+        color:white !important;
+        border-radius:9px !important;
+        
+    }
+    .nav-btn:hover { opacity:.9; transform:translateY(-1px); }
 
-		/* ================= NAVBAR ================= */
+    /* ===== HERO ===== */
+    .hero {
+        min-height:100vh;
+        display:flex; align-items:center;
+        padding:120px 60px 80px;
+        position:relative;
+        overflow:hidden;
+    }
+    /* Animated gradient background */
+    .hero::before {
+        content:'';
+        position:absolute; inset:0;
+        background:
+            radial-gradient(ellipse at 20% 50%, rgba(59,130,246,.12) 0%, transparent 60%),
+            radial-gradient(ellipse at 80% 20%, rgba(99,102,241,.10) 0%, transparent 50%),
+            radial-gradient(ellipse at 60% 80%, rgba(6,182,212,.08) 0%, transparent 50%);
+        animation:bgPulse 8s ease-in-out infinite alternate;
+    }
+    @@keyframes bgPulse {
+        0% { opacity:.7; }
+        100% { opacity:1; }
+    }
+    /* Grid lines */
+    .hero::after {
+        content:'';
+        position:absolute; inset:0;
+        background-image:
+            linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
+        background-size:60px 60px;
+        pointer-events:none;
+    }
 
-		.navbar {
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			max-width: 1200px;
-			margin: auto;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 25px 20px;
-			z-index: 10;
-		}
+    .hero-inner {
+        max-width:1200px; margin:auto; width:100%;
+        display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;
+        position:relative; z-index:2;
+    }
 
-		.logo {
-			font-size: 22px;
-			font-weight: bold;
-			color: #333;
-		}
+    /* LEFT CONTENT */
+    .hero-badge {
+        display:inline-flex; align-items:center; gap:8px;
+        background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.25);
+        border-radius:20px; padding:6px 16px;
+        font-size:12px; font-weight:700; color:#60a5fa;
+        margin-bottom:24px; letter-spacing:.05em;
+    }
+    .hero-badge .dot { width:6px;height:6px;border-radius:50%;background:#3b82f6;animation:blink 1.5s infinite; }
+    @@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
 
-		.nav-links {
-			display: flex;
-			gap: 40px;
-		}
+    .hero-title {
+        font-size:56px; font-weight:900; line-height:1.1;
+        color:#f1f5f9; margin-bottom:22px;
+        letter-spacing:-1.5px;
+    }
+    .hero-title .hl {
+        background:linear-gradient(135deg,#3b82f6,#6366f1 50%,#06b6d4);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        background-clip:text;
+    }
 
-			.nav-links a {
-				text-decoration: none;
-				color: #333;
-				font-weight: 500;
-				font-size: 16px;
-			}
+    .hero-desc { font-size:17px; color:#64748b; line-height:1.75; margin-bottom:40px; max-width:480px; }
 
-				.nav-links a:hover {
-					color: #e74c3c;
-				}
+    .hero-btns { display:flex; gap:14px; flex-wrap:wrap; }
+    .btn-primary {
+        display:inline-flex; align-items:center; gap:8px;
+        padding:14px 28px; border-radius:12px;
+        background:linear-gradient(135deg,#3b82f6,#2563eb);
+        color:white; font-size:15px; font-weight:700; text-decoration:none;
+        
+        transition:all .25s;
+    }
+    .btn-primary:hover { transform:translateY(-2px);  }
+    .btn-secondary {
+        display:inline-flex; align-items:center; gap:8px;
+        padding:14px 28px; border-radius:12px;
+        background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12);
+        color:#e2e8f0; font-size:15px; font-weight:600; text-decoration:none;
+        transition:all .25s;
+    }
+    .btn-secondary:hover { background:rgba(255,255,255,.1); transform:translateY(-2px); }
 
-		/* ================= BANNER ================= */
+    /* MINI STATS */
+    .hero-stats { display:flex; gap:28px; margin-top:48px; }
+    .stat-item .sv { font-size:28px; font-weight:800; color:#f1f5f9; }
+    .stat-item .sl { font-size:12px; color:#475569; font-weight:600; margin-top:2px; }
 
-		.banner {
-			width: 100%;
-			height: 100vh;
-			background-image: url('/imager/banner.png');
-			background-repeat: no-repeat;
-			background-position: right center;
-			background-size: cover;
-			position: relative;
-		}
+    /* RIGHT — DASHBOARD CARD MOCKUP */
+    .hero-visual { position:relative; }
+    .hero-card {
+        background:#0f172a;
+        border:1px solid rgba(255,255,255,.08);
+        border-radius:20px;
+        padding:24px;
+        
+        animation:floatCard 4s ease-in-out infinite;
+    }
+    @@keyframes floatCard {
+        0%,100% { transform:translateY(0); }
+        50%      { transform:translateY(-12px); }
+    }
+    .hc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .hc-title { font-size:14px; font-weight:700; color:#f1f5f9; }
+    .hc-badge { background:#16a34a22; border:1px solid #16a34a44; color:#4ade80; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; }
+    .hc-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+    .hc-metric { background:#1e293b; border-radius:12px; padding:14px; border:1px solid #334155; }
+    .hm-val { font-size:22px; font-weight:800; }
+    .hm-lbl { font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; margin-top:4px; }
+    .hc-bars { display:flex; flex-direction:column; gap:8px; }
+    .hc-bar-row { display:grid; grid-template-columns:80px 1fr 40px; align-items:center; gap:10px; }
+    .hcb-label { font-size:11px; color:#64748b; font-weight:600; }
+    .hcb-track { background:#1e293b; border-radius:4px; height:7px; overflow:hidden; }
+    .hcb-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#3b82f6,#6366f1); }
+    .hcb-pct  { font-size:11px; color:#94a3b8; font-weight:700; text-align:right; }
 
-		/* text banner */
+    /* Floating badges on card */
+    .float-badge {
+        position:absolute; background:#1e293b; border:1px solid #334155;
+        border-radius:12px; padding:10px 14px;
+        display:flex; align-items:center; gap:8px;
+        
+        animation:floatCard 4s ease-in-out infinite;
+    }
+    .fb1 { top:-20px; right:-10px; animation-delay:.5s; }
+    .fb2 { bottom:-15px; left:-10px; animation-delay:1.5s; }
+    .fb-icon { font-size:18px; }
+    .fb-val  { font-size:13px; font-weight:700; color:#f1f5f9; }
+    .fb-lbl  { font-size:10px; color:#64748b; }
 
-		.banner-text {
-			position: absolute;
-			top: 50%;
-			left: 120px;
-			transform: translateY(-50%);
-			max-width: 450px;
-		}
+    /* ===== FEATURES SECTION ===== */
+    .features {
+        padding:100px 60px;
+        background:#080d1a;
+        position:relative;
+    }
+    .features::before {
+        content:''; position:absolute; top:0; left:0; right:0; height:1px;
+        background:linear-gradient(90deg,transparent,rgba(59,130,246,.4),transparent);
+    }
+    .sec-label { text-align:center;font-size:12px;font-weight:700;color:#3b82f6;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px; }
+    .sec-title { text-align:center;font-size:38px;font-weight:800;color:#f1f5f9;margin-bottom:14px; }
+    .sec-sub   { text-align:center;font-size:15px;color:#64748b;max-width:500px;margin:0 auto 60px; }
 
-			.banner-text h1 {
-				font-size: 46px;
-				margin-bottom: 20px;
-			}
+    .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:1100px; margin:auto; }
+    .feat-card {
+        background:#0f172a;
+        border:1px solid #1e293b;
+        border-radius:18px;
+        padding:32px;
+        transition:border-color .3s, transform .3s, opacity .5s;
+        position:relative;
+        overflow:hidden;
+    }
+    .feat-card.card-hidden {
+        opacity:0;
+        transform:translateY(30px);
+    }
+    .feat-card::before {
+        content:'';
+        position:absolute; top:0; left:0; right:0; height:3px;
+        background:var(--accent,linear-gradient(90deg,#3b82f6,#6366f1));
+        opacity:0; transition:.3s;
+    }
+    .feat-card:hover { border-color:#334155; transform:translateY(-6px);  }
+    .feat-card:hover::before { opacity:1; }
+    .fc-icon {
+        width:52px; height:52px; border-radius:14px;
+        background:var(--bg,#1e293b);
+        display:flex; align-items:center; justify-content:center;
+        font-size:24px; margin-bottom:20px;
+        border:1px solid rgba(255,255,255,.06);
+    }
+    .fc-title { font-size:17px; font-weight:700; color:#f1f5f9; margin-bottom:10px; }
+    .fc-desc  { font-size:13px; color:#64748b; line-height:1.7; }
 
-			.banner-text p {
-				font-size: 18px;
-				color: #555;
-				line-height: 1.6;
-			}
+    /* ===== CTA ===== */
+    .cta {
+        padding:100px 60px;
+        text-align:center;
+        background:linear-gradient(135deg,#0f172a 0%,#1a1f3a 100%);
+        position:relative; overflow:hidden;
+    }
+    .cta::before {
+        content:'';
+        position:absolute; inset:0;
+        background:radial-gradient(ellipse at 50% 50%,rgba(59,130,246,.12) 0%,transparent 70%);
+    }
+    .cta h2 { font-size:40px;font-weight:900;color:#f1f5f9;margin-bottom:14px;position:relative; }
+    .cta p  { font-size:16px;color:#64748b;margin-bottom:36px;position:relative; }
+    .cta .btn-primary { position:relative; font-size:16px; padding:16px 36px; }
 
-		.btn-start {
-			display: inline-block;
-			margin-top: 25px;
-			padding: 14px 28px;
-			background: #e74c3c;
-			color: white;
-			border-radius: 8px;
-			text-decoration: none;
-			font-weight: 600;
-			transition: 0.3s;
-		}
-
-			.btn-start:hover {
-				background: #c0392b;
-			}
-
-		/* ================= FEATURES ================= */
-
-		.features {
-			padding: 100px 40px;
-			text-align: center;
-			background: #f7f7f7;
-		}
-
-			.features h2 {
-				margin-bottom: 40px;
-				font-size: 48px;
-			}
-
-		.feature-container {
-			display: flex;
-			justify-content: center;
-			gap: 40px;
-			flex-wrap: wrap;
-		}
-
-		.feature-box {
-			width: 260px;
-			background: white;
-			padding: 35px;
-			border-radius: 15px;
-			box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-			transition: 0.3s;
-		}
-
-			.feature-box:hover {
-				transform: translateY(-10px);
-				box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-			}
-
-			.feature-box h3 {
-				margin-bottom: 10px;
-			}
-
-		/* ================= FOOTER ================= */
-
-		footer {
-			text-align: center;
-			padding: 20px;
-			background: #eee;
-			color: #555;
-		}
-
-	</style>
-
+    /* ===== FOOTER ===== */
+    footer {
+        background:#060b18;
+        border-top:1px solid #1e293b;
+        padding:30px 60px;
+        display:flex; justify-content:space-between; align-items:center;
+        font-size:13px; color:#475569;
+    }
+    footer a { color:#475569; text-decoration:none; }
+    footer a:hover { color:#94a3b8; }
+    </style>
 </head>
-
 <body>
 
-	<!-- NAVBAR -->
+<!-- NAVBAR -->
+<nav class="nav">
+    <a href="#" class="nav-brand">
+        <div class="ni">🚚</div>
+        <div class="nt">Delivery Zone</div>
+    </a>
+    <div class="nav-links">
+        <a href="/">Trang chủ</a>
+        <a href="#features" style="margin-right:12px">Tính năng</a>
+        @if (string.IsNullOrEmpty(username))
+        {
+            <a href="/Account/Login" class="nav-btn"><i class="fas fa-right-to-bracket"></i> Đăng nhập</a>
+        }
+        else
+        {
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);padding:6px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.1)">
+                <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white">
+                    @(username.Substring(0, 1).ToUpper())
+                </div>
+                <div style="display:flex;flex-direction:column">
+                    <span style="font-size:12px;font-weight:700;color:#f1f5f9;line-height:1.2">@username</span>
+                    <span style="font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px">@role</span>
+                </div>
+                <div style="width:1px;height:24px;background:rgba(255,255,255,.12);margin:0 4px"></div>
+                <a href="/Account/Logout" title="Đăng xuất" style="color:#fca5a5;font-size:16px;padding:4px"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        }
+    </div>
+</nav>
 
-	<div class="navbar">
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <!-- LEFT -->
+        <div>
+            <div class="hero-badge">
+                <div class="dot"></div>
+                HỆ THỐNG QUẢN LÝ GIAO HÀNG
+            </div>
+            <h1 class="hero-title">
+                Tối ưu hóa<br>
+                <span class="hl">Vùng Giao Hàng</span><br>
+                thông minh
+            </h1>
+            <p class="hero-desc">
+                Hệ thống hỗ trợ phân chia tối ưu vùng hoạt động của bưu tá trong giao nhận hàng thương mại điện tử — nhanh hơn, hiệu quả hơn.
+            </p>
+            <div class="hero-btns">
+                <a href="/Account/Login" class="btn-primary">
+                    <i class="fas fa-rocket"></i> Bắt đầu sử dụng
+                </a>
+                <a href="#features" class="btn-secondary">
+                    <i class="fas fa-play-circle"></i> Xem tính năng
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="sv">99%</div>
+                    <div class="sl">Tỉ lệ giao đúng</div>
+                </div>
+                <div class="stat-item">
+                    <div class="sv">3x</div>
+                    <div class="sl">Nhanh hơn thủ công</div>
+                </div>
+                <div class="stat-item">
+                    <div class="sv">24/7</div>
+                    <div class="sl">Theo dõi trực tiếp</div>
+                </div>
+            </div>
+        </div>
 
-		<div class="logo">
-			🚚 Delivery Zone
-		</div>
+        <!-- RIGHT — VISUAL -->
+        <div class="hero-visual">
+            <!-- Dashboard Card Mockup -->
+            <div class="hero-card">
+                <div class="hc-header">
+                    <div class="hc-title">📊 Dashboard Tháng 3/2026</div>
+                    <div class="hc-badge">● Trực tiếp</div>
+                </div>
+                <div class="hc-metrics">
+                    <div class="hc-metric">
+                        <div class="hm-val" style="color:#3b82f6">12</div>
+                        <div class="hm-lbl">Khu vực</div>
+                    </div>
+                    <div class="hc-metric">
+                        <div class="hm-val" style="color:#4ade80">48</div>
+                        <div class="hm-lbl">Tài xế</div>
+                    </div>
+                    <div class="hc-metric">
+                        <div class="hm-val" style="color:#f59e0b">2.4k</div>
+                        <div class="hm-lbl">Đơn hàng</div>
+                    </div>
+                </div>
+                <div class="hc-bars">
+                    <div class="hc-bar-row">
+                        <div class="hcb-label">Hà Nội</div>
+                        <div class="hcb-track"><div class="hcb-fill" style="width:88%;background:linear-gradient(90deg,#3b82f6,#6366f1)"></div></div>
+                        <div class="hcb-pct">88%</div>
+                    </div>
+                    <div class="hc-bar-row">
+                        <div class="hcb-label">HCM</div>
+                        <div class="hcb-track"><div class="hcb-fill" style="width:76%;background:linear-gradient(90deg,#4ade80,#22c55e)"></div></div>
+                        <div class="hcb-pct">76%</div>
+                    </div>
+                    <div class="hc-bar-row">
+                        <div class="hcb-label">Đà Nẵng</div>
+                        <div class="hcb-track"><div class="hcb-fill" style="width:63%;background:linear-gradient(90deg,#f59e0b,#f97316)"></div></div>
+                        <div class="hcb-pct">63%</div>
+                    </div>
+                    <div class="hc-bar-row">
+                        <div class="hcb-label">Hải Phòng</div>
+                        <div class="hcb-track"><div class="hcb-fill" style="width:91%;background:linear-gradient(90deg,#06b6d4,#3b82f6)"></div></div>
+                        <div class="hcb-pct">91%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-		<div class="nav-links">
+<!-- FEATURES -->
+<section id="features" class="features">
+    <div class="sec-label">Tính năng nổi bật</div>
+    <h2 class="sec-title">Mọi thứ bạn cần</h2>
+    <p class="sec-sub">Giải pháp toàn diện cho quản lý vùng giao hàng và theo dõi hiệu suất bưu tá</p>
 
-			<a href="#">Trang chủ</a>
+    <div class="feat-grid">
+        <div class="feat-card" style="--accent:linear-gradient(90deg,#3b82f6,#6366f1)">
+            <div class="fc-icon" style="--bg:rgba(59,130,246,.1)">🗺️</div>
+            <div class="fc-title">Quản lý Vùng trên Bản đồ</div>
+            <div class="fc-desc">Vẽ, phân chia và quản lý các vùng giao hàng trực tiếp trên Leaflet map với đầy đủ công cụ.</div>
+        </div>
+        <div class="feat-card" style="--accent:linear-gradient(90deg,#4ade80,#22c55e)">
+            <div class="fc-icon" style="--bg:rgba(74,222,128,.1)">🚴</div>
+            <div class="fc-title">Quản lý Tài xế</div>
+            <div class="fc-desc">Theo dõi trạng thái, phân công lịch làm việc, và đánh giá hiệu suất hoàn thành chỉ tiêu.</div>
+        </div>
+        <div class="feat-card" style="--accent:linear-gradient(90deg,#f59e0b,#f97316)">
+            <div class="fc-icon" style="--bg:rgba(245,158,11,.1)">📊</div>
+            <div class="fc-title">Thống kê & Báo cáo</div>
+            <div class="fc-desc">Dashboard tổng quan, báo cáo theo tháng, biểu đồ tỉ lệ hoàn thành đơn hàng theo khu vực.</div>
+        </div>
+        <div class="feat-card" style="--accent:linear-gradient(90deg,#06b6d4,#3b82f6)">
+            <div class="fc-icon" style="--bg:rgba(6,182,212,.1)">📏</div>
+            <div class="fc-title">Tính Khoảng Cách</div>
+            <div class="fc-desc">Hệ thống tự động tính toán khoảng cách giữa các vùng và xác định vùng kề nhau tối ưu.</div>
+        </div>
+        <div class="feat-card" style="--accent:linear-gradient(90deg,#a78bfa,#6366f1)">
+            <div class="fc-icon" style="--bg:rgba(167,139,250,.1)">⚙️</div>
+            <div class="fc-title">Phân chia Tối ưu</div>
+            <div class="fc-desc">Thuật toán phân vùng thông minh, tối ưu hóa tuyến đường và phân công bưu tá hiệu quả.</div>
+        </div>
+        <div class="feat-card" style="--accent:linear-gradient(90deg,#f87171,#ec4899)">
+            <div class="fc-icon" style="--bg:rgba(248,113,113,.1)">👥</div>
+            <div class="fc-title">Quản lý Người dùng</div>
+            <div class="fc-desc">Phân quyền Admin/Dispatcher/Driver, duyệt tài khoản, theo dõi hoạt động và CCCD xác thực.</div>
+        </div>
+    </div>
+</section>
 
-			<a href="#feature">Chức năng</a>
+<!-- CTA -->
+<section class="cta">
+    <h2>Sẵn sàng bắt đầu?</h2>
+    <p>Đăng nhập để quản lý toàn bộ hệ thống giao hàng của bạn</p>
+    <a href="/Account/Login" class="btn-primary">
+        <i class="fas fa-right-to-bracket"></i> Đăng nhập ngay
+    </a>
+</section>
 
+<!-- FOOTER -->
+<footer>
+    <div>© 2026 <strong>Delivery Zone Optimization System</strong></div>
+    <div>
+        <a href="/Account/Login">Đăng nhập</a> ·
+        <a href="/Account/Register">Đăng ký</a>
+    </div>
+</footer>
 
-		</div>
+<script>
+// Smooth navbar background on scroll
+window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.nav');
+    nav.style.background = window.scrollY > 20
+        ? 'rgba(6,11,24,.95)'
+        : 'rgba(6,11,24,.85)';
+});
 
-	</div>
+// Animate elements on scroll
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.classList.remove('card-hidden');
+        }
+    });
+}, { threshold: .05 });
 
-	<!-- BANNER -->
+document.querySelectorAll('.feat-card').forEach((card, i) => {
+    card.classList.add('card-hidden');
+    card.style.transitionDelay = `${i * 0.1}s`;
+    observer.observe(card);
+});
 
-	<div class="banner">
+// Fallback: nếu IntersectionObserver không kích hoạt sau 1.5s thì hiện tất cả
+setTimeout(() => {
+    document.querySelectorAll('.feat-card.card-hidden').forEach(c => {
+        c.classList.remove('card-hidden');
+    });
+}, 1500);
 
-		<div class="banner-text">
-
-			<h1>Delivery Zone Optimization</h1>
-
-			<p>
-				Hệ thống hỗ trợ phân chia tối ưu vùng hoạt động của bưu tá
-				trong giao nhận hàng thương mại điện tử.
-			</p>
-
-			<a href="/Account/Login" class="btn-start">
-				Bắt đầu sử dụng
-			</a>
-
-		</div>
-
-	</div>
-
-	<!-- FEATURES -->
-	<section id="feature" class="features">
-
-		<h2>Chức năng hệ thống</h2>
-
-		<div class="feature-container">
-
-			<div class="feature-box">
-
-				<h3>🗺️ Quản lý vùng giao hàng</h3>
-
-				<p>
-					Admin có thể vẽ và quản lý các vùng giao hàng trực tiếp trên bản đồ.
-				</p>
-
-			</div>
-
-			<div class="feature-box">
-
-				<h3>📏 Tính khoảng cách</h3>
-
-				<p>
-					Hệ thống tính toán khoảng cách giữa các vùng và xác định vùng kề nhau.
-				</p>
-
-			</div>
-
-			<div class="feature-box">
-
-				<h3>⚙️ Phân chia tối ưu</h3>
-
-				<p>
-					Phân chia các vùng giao hàng cho bưu tá bằng thuật toán tối ưu.
-				</p>
-
-			</div>
-
-		</div>
-
-	</section>
-
-	
-
-	<!-- FOOTER -->
-
-	<footer>
-
-		© 2026 Delivery Zone Optimization System
-
-	</footer>
-
+// Bfcache fix: nếu trang này được restore từ bfcache (Back button)
+// trong khi người dùng đang đăng nhập → reload để server redirect về dashboard
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html>

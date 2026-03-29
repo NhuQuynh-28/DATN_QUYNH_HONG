@@ -24,8 +24,15 @@ namespace KhoaLuanTotNghiep.Controllers
             ViewBag.Role = HttpContext.Session.GetString("Role");
             return View();
         }
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None, Duration = 0)]
         public ActionResult AuthHome()
         {
+            // Nếu là Admin hoặc Dispatcher -> Chuyển về Dashboard tương ứng
+            var role = HttpContext.Session.GetString("Role");
+            if (role == "Admin")       return RedirectToAction("Index", "Admin");
+            if (role == "Dispatcher")  return RedirectToAction("Index", "Dispatcher");
+
+            // Nếu là Driver hoặc chưa phân quyền thì dừng lại ở trang Landing Page (AuthHome)
             return View();
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

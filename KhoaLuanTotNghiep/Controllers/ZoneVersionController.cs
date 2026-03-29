@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using KhoaLuanTotNghiep.Data;
 using System.Linq;
 using KhoaLuanTotNghiep.Models;
@@ -21,7 +21,8 @@ namespace KhoaLuanTotNghiep.Controllers
                 .Where(v => v.AreaId == areaId)
                 .ToList();
 
-            ViewBag.AreaId = areaId;
+            ViewBag.AreaId   = areaId;
+            ViewBag.AreaName = _context.Areas.Find(areaId)?.Name ?? "";
 
             return PartialView("_VersionList", versions);
         }
@@ -61,7 +62,8 @@ namespace KhoaLuanTotNghiep.Controllers
                 .Where(v => v.AreaId == version.AreaId)
                 .ToList();
 
-            ViewBag.AreaId = version.AreaId;
+            ViewBag.AreaId   = version.AreaId;
+            ViewBag.AreaName = _context.Areas.Find(version.AreaId)?.Name ?? "";
 
             return PartialView("_VersionList", list);
         }
@@ -103,7 +105,8 @@ namespace KhoaLuanTotNghiep.Controllers
                     .Where(v => v.AreaId == areaId)
                     .ToList();
 
-                ViewBag.AreaId = areaId;
+                ViewBag.AreaId   = areaId;
+                ViewBag.AreaName = _context.Areas.Find(areaId)?.Name ?? "";
 
                 return PartialView("_VersionList", list);
             }

@@ -1,0 +1,415 @@
+CREATE DATABASE KhoaLuanTotNghiep;
+GO
+USE [KhoaLuanTotNghiep]
+GO
+/****** Object:  Table [dbo].[__EFMigrationsHistory]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[__EFMigrationsHistory](
+	[MigrationId] [nvarchar](150) NOT NULL,
+	[ProductVersion] [nvarchar](32) NOT NULL,
+ CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY CLUSTERED 
+(
+	[MigrationId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Areas]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Areas](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](100) NULL,
+	[Status] [nvarchar](50) NULL,
+	[CreatedDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Assignments]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Assignments](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[DriverId] [int] NULL,
+	[DispatcherId] [int] NULL,
+	[AreaId] [int] NULL,
+	[Date] [datetime] NULL,
+	[PlannedOrders] [int] NULL,
+	[ActualOrders] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Drivers]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Drivers](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[DriverName] [nvarchar](200) NULL,
+	[Phone] [nvarchar](20) NULL,
+	[Status] [nvarchar](50) NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TaiKhoans]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TaiKhoans](
+	[TenDangNhap] [nvarchar](450) NOT NULL,
+	[MatKhau] [nvarchar](max) NOT NULL,
+	[VaiTro] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_TaiKhoans] PRIMARY KEY CLUSTERED 
+(
+	[TenDangNhap] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Users](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Username] [nvarchar](max) NOT NULL,
+	[Password] [nvarchar](max) NOT NULL,
+	[Role] [nvarchar](max) NOT NULL,
+	[Email] [nvarchar](100) NULL,
+	[ResetCode] [nvarchar](10) NULL,
+	[IsApproved] [bit] NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[AreaId] [int] NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ZoneDistances]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ZoneDistances](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ZoneId1] [int] NOT NULL,
+	[ZoneId2] [int] NOT NULL,
+	[Distance] [float] NOT NULL,
+	[IsAdjacent] [bit] NOT NULL,
+ CONSTRAINT [PK_ZoneDistances] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ZoneHistories]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ZoneHistories](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ZoneId] [int] NOT NULL,
+	[Month] [int] NOT NULL,
+	[Year] [int] NOT NULL,
+	[OrdersReal] [int] NULL,
+	[CustomersReal] [int] NULL,
+	[OrdersForecast] [int] NULL,
+	[CustomersForecast] [int] NULL,
+	[CreatedDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ZoneMonthlyDatas]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ZoneMonthlyDatas](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ZoneId] [int] NOT NULL,
+	[Month] [int] NOT NULL,
+	[Year] [int] NOT NULL,
+	[OrdersForecast] [int] NULL,
+	[CustomersForecast] [int] NULL,
+	[OrdersReal] [int] NULL,
+	[CustomersReal] [int] NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ZoneRoutes]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ZoneRoutes](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ZoneId] [int] NOT NULL,
+	[Month] [int] NOT NULL,
+	[Year] [int] NOT NULL,
+	[Lat] [float] NOT NULL,
+	[Lng] [float] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Zones]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Zones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ZoneName] [nvarchar](max) NULL,
+	[AreaName] [nvarchar](max) NULL,
+	[Points] [nvarchar](max) NULL,
+	[CenterLat] [float] NOT NULL,
+	[CenterLng] [float] NOT NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+	[AvgPerDay] [int] NOT NULL,
+	[AvgPerWeek] [int] NOT NULL,
+	[Customers] [int] NOT NULL,
+	[Order] [int] NOT NULL,
+	[ClusterId] [int] NOT NULL,
+	[VersionId] [int] NULL,
+	[Area] [float] NOT NULL,
+ CONSTRAINT [PK_Zones] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ZoneStatistics]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ZoneStatistics](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ZoneId] [int] NOT NULL,
+	[Orders] [int] NOT NULL,
+	[Customers] [int] NOT NULL,
+	[Date] [datetime2](7) NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+ CONSTRAINT [PK_ZoneStatistics] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ZoneVersions]    Script Date: 24/03/2026 23:43:44 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ZoneVersions](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[AreaId] [int] NULL,
+	[VersionName] [nvarchar](100) NULL,
+	[CreatedDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[SoPolygon] [int] NULL,
+	[DienTichBaoPhu] [float] NULL,
+	[UpdatedDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20260301173133_InitSystem', N'8.0.24')
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20260305052402_UpdateZoneInfo', N'8.0.24')
+INSERT [dbo].[__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES (N'20260305114438_AddClusterId', N'8.0.24')
+GO
+SET IDENTITY_INSERT [dbo].[Areas] ON 
+
+INSERT [dbo].[Areas] ([Id], [Name], [Status], [CreatedDate]) VALUES (1, N'Hà Nội', N'Active', CAST(N'2026-03-13T17:12:12.930' AS DateTime))
+INSERT [dbo].[Areas] ([Id], [Name], [Status], [CreatedDate]) VALUES (2, N'Hồ Chí Minh', N'Active', CAST(N'2026-03-13T17:12:12.930' AS DateTime))
+INSERT [dbo].[Areas] ([Id], [Name], [Status], [CreatedDate]) VALUES (3, N'Đà Nẵng', N'Active', CAST(N'2026-03-13T17:12:12.930' AS DateTime))
+INSERT [dbo].[Areas] ([Id], [Name], [Status], [CreatedDate]) VALUES (4, N'Hải Phòng', N'Active', CAST(N'2026-03-15T08:54:36.847' AS DateTime))
+SET IDENTITY_INSERT [dbo].[Areas] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Assignments] ON 
+
+INSERT [dbo].[Assignments] ([Id], [DriverId], [DispatcherId], [AreaId], [Date], [PlannedOrders], [ActualOrders]) VALUES (1, 1, 1, 1, CAST(N'2026-03-19T01:31:05.710' AS DateTime), 50, 45)
+INSERT [dbo].[Assignments] ([Id], [DriverId], [DispatcherId], [AreaId], [Date], [PlannedOrders], [ActualOrders]) VALUES (2, 2, 1, 2, CAST(N'2026-03-19T01:31:05.710' AS DateTime), 60, 70)
+SET IDENTITY_INSERT [dbo].[Assignments] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Drivers] ON 
+
+INSERT [dbo].[Drivers] ([Id], [DriverName], [Phone], [Status], [CreatedAt]) VALUES (1, N'Nguyễn Văn A', N'0912345678', N'DangLam', CAST(N'2026-03-13T17:13:49.097' AS DateTime))
+INSERT [dbo].[Drivers] ([Id], [DriverName], [Phone], [Status], [CreatedAt]) VALUES (2, N'Trần Văn B', N'0988888888', N'DangLam', CAST(N'2026-03-13T17:13:49.097' AS DateTime))
+INSERT [dbo].[Drivers] ([Id], [DriverName], [Phone], [Status], [CreatedAt]) VALUES (3, N'Lê Văn C', N'0977777777', N'NghiLam', CAST(N'2026-03-13T17:13:49.097' AS DateTime))
+INSERT [dbo].[Drivers] ([Id], [DriverName], [Phone], [Status], [CreatedAt]) VALUES (9, N'Bùi Thị Như Quỳnh', N'0357821378', N'DangLam', CAST(N'2026-03-19T10:34:46.647' AS DateTime))
+SET IDENTITY_INSERT [dbo].[Drivers] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Users] ON 
+
+INSERT [dbo].[Users] ([Id], [Username], [Password], [Role], [Email], [ResetCode], [IsApproved], [IsActive], [AreaId]) VALUES (1, N'admin', N'1234', N'Admin', N'buithinhuquynh553@gmail.com', N'199845', 1, 1, NULL)
+INSERT [dbo].[Users] ([Id], [Username], [Password], [Role], [Email], [ResetCode], [IsApproved], [IsActive], [AreaId]) VALUES (2, N'dispatcher', N'123', N'Dispatcher', NULL, NULL, 1, 1, NULL)
+INSERT [dbo].[Users] ([Id], [Username], [Password], [Role], [Email], [ResetCode], [IsApproved], [IsActive], [AreaId]) VALUES (3, N'driver', N'123', N'Driver', NULL, NULL, 1, 0, NULL)
+INSERT [dbo].[Users] ([Id], [Username], [Password], [Role], [Email], [ResetCode], [IsApproved], [IsActive], [AreaId]) VALUES (4, N'admin2', N'12345', N'Admin', NULL, NULL, 1, 1, NULL)
+INSERT [dbo].[Users] ([Id], [Username], [Password], [Role], [Email], [ResetCode], [IsApproved], [IsActive], [AreaId]) VALUES (5, N'admin', N'123', N'Dispatcher', NULL, NULL, 1, 1, NULL)
+SET IDENTITY_INSERT [dbo].[Users] OFF
+GO
+SET IDENTITY_INSERT [dbo].[ZoneHistories] ON 
+
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (1, 33, 1, 2026, 65, 38, 241, 148, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (2, 33, 2, 2026, 70, 41, 247, 152, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (3, 33, 3, 2026, 75, 44, 253, 156, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (4, 33, 4, 2026, NULL, NULL, 259, 160, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (5, 33, 5, 2026, NULL, NULL, 265, 164, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (6, 33, 6, 2026, NULL, NULL, 271, 168, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (7, 33, 7, 2026, NULL, NULL, 277, 172, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (8, 33, 8, 2026, NULL, NULL, 283, 176, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (9, 33, 9, 2026, NULL, NULL, 289, 180, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (10, 33, 10, 2026, NULL, NULL, 295, 184, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (11, 33, 11, 2026, NULL, NULL, 301, 188, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (12, 33, 12, 2026, NULL, NULL, 307, 192, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (13, 34, 1, 2026, 75, 43, 256, 156, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (14, 34, 2, 2026, 80, 46, 262, 160, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (15, 34, 3, 2026, 85, 49, 268, 164, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (16, 34, 4, 2026, NULL, NULL, 274, 168, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (17, 34, 5, 2026, NULL, NULL, 280, 172, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (18, 34, 6, 2026, NULL, NULL, 286, 176, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (19, 34, 7, 2026, NULL, NULL, 292, 180, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (20, 34, 8, 2026, NULL, NULL, 298, 184, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (21, 34, 9, 2026, NULL, NULL, 304, 188, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (22, 34, 10, 2026, NULL, NULL, 310, 192, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (23, 34, 11, 2026, NULL, NULL, 316, 196, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (24, 34, 12, 2026, NULL, NULL, 322, 200, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (25, 3, 1, 2026, 85, 48, 111, 68, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (26, 3, 2, 2026, 90, 51, 117, 72, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (27, 3, 3, 2026, 95, 54, 123, 76, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (28, 3, 4, 2026, NULL, NULL, 129, 80, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (29, 3, 5, 2026, NULL, NULL, 135, 84, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (30, 3, 6, 2026, NULL, NULL, 141, 88, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (31, 3, 7, 2026, NULL, NULL, 147, 92, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (32, 3, 8, 2026, NULL, NULL, 153, 96, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (33, 3, 9, 2026, NULL, NULL, 159, 100, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (34, 3, 10, 2026, NULL, NULL, 165, 104, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (35, 3, 11, 2026, NULL, NULL, 171, 108, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (36, 3, 12, 2026, NULL, NULL, 177, 112, CAST(N'2026-03-21T22:31:32.103' AS DateTime))
+INSERT [dbo].[ZoneHistories] ([Id], [ZoneId], [Month], [Year], [OrdersReal], [CustomersReal], [OrdersForecast], [CustomersForecast], [CreatedDate]) VALUES (37, 33, 0, 0, NULL, NULL, 170, 102, CAST(N'2026-03-22T12:43:09.780' AS DateTime))
+SET IDENTITY_INSERT [dbo].[ZoneHistories] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Zones] ON 
+
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (16, N'HN-1', N'HaNoi', N'[[21.04437689140457,105.80647706778248],[21.044056467047046,105.80960876537114],[21.042529935945694,105.80949782556331],[21.04281031017018,105.80645084381105]]', 0, 0, CAST(N'2026-03-06T14:34:40.5344982' AS DateTime2), 0, 0, 10, 3, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (17, N'HN-2', N'HaNoi', N'[[21.04281481614964,105.80645561779902],[21.040912266465554,105.80690606745219],[21.041072482112934,105.8095015154537],[21.042514415183724,105.80945861548675]]', 0, 0, CAST(N'2026-03-06T14:34:55.6372006' AS DateTime2), 0, 0, 0, 0, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (18, N'HN-3', N'HaNoi', N'[[21.043936307735237,105.80963021535462],[21.04555845026416,105.81130331406635],[21.043655935630603,105.81346976239819],[21.04196918591323,105.81258773803711],[21.042329668319333,105.80947639864576]]', 0, 0, CAST(N'2026-03-06T14:35:17.8475333' AS DateTime2), 0, 0, 3, 2, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (19, N'HN-4', N'HaNoi', N'[[21.04196918591323,105.81256628036499],[21.04073202365626,105.8129335128111],[21.04094781435775,105.8095193370559],[21.042329668319333,105.8094763832685]]', 0, 0, CAST(N'2026-03-06T14:35:44.0232673' AS DateTime2), 0, 0, 0, 0, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (20, N'HN-5', N'HaNoi', N'[[21.04367145627361,105.81351043331551],[21.04281481614964,105.81445646163846],[21.041628729506336,105.81413255203425],[21.0407275176138,105.8129525261518],[21.04128827232117,105.81278087246346],[21.041929132258705,105.812577020734]]', 0, 0, CAST(N'2026-03-06T14:36:00.9487342' AS DateTime2), 0, 0, 0, 0, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (21, N'HN-1', N'HaNoi', N'[[21.051039058421534,105.78970025067352],[21.051840080455285,105.79759384459551],[21.04639304563212,105.79828024406703],[21.044292279445216,105.79550700046671],[21.044630726994207,105.790386650145]]', 0, 0, CAST(N'2026-03-12T09:39:59.6138532' AS DateTime2), 0, 0, 0, 0, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (22, N'HN-1', N'HaNoi', N'[[21.05119926317311,105.79793888960376],[21.051439569977195,105.80377328511136],[21.048395655129767,105.80445968458282],[21.046553255383145,105.7980246895377]]', 0, 0, CAST(N'2026-03-13T01:47:52.1808136' AS DateTime2), 0, 0, 0, 0, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (25, N'HN-3', N'1', N'[[21.045111293499595,105.78277856305729],[21.046073250079452,105.79204495592225],[21.036453404666574,105.79444735407246],[21.03275425357172,105.78924142171698],[21.035651722837862,105.78192056371792]]', 0, 0, CAST(N'2026-03-13T22:07:41.6386736' AS DateTime2), 0, 0, 0, 0, 0, 1, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (26, N'HN-1', NULL, N'[[21.034715293181335,105.78169359022516],[21.046090649135117,105.78238035380627],[21.044808962318605,105.79062151677894],[21.036637949558735,105.79010644409311]]', 0, 0, CAST(N'2026-03-15T22:30:19.0829512' AS DateTime2), 0, 0, 0, 0, 0, 1, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (27, N'HN-4', NULL, N'[[21.055222348342824,105.76864508218509],[21.05313972941243,105.7760277906815],[21.04689169779321,105.77465426351937],[21.047051907007692,105.76469619159403]]', 0, 0, CAST(N'2026-03-15T22:31:27.7793886' AS DateTime2), 0, 0, 0, 0, 0, 1, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (28, N'HN-5', NULL, N'[[21.036860255224262,105.80821406271367],[21.036940365248643,105.81430908949557],[21.032374025109117,105.81319309867634],[21.032694474597033,105.80761314458027]]', 0, 0, CAST(N'2026-03-15T23:00:56.7850256' AS DateTime2), 0, 0, 0, 0, 0, 1, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (29, N'HN-6', NULL, N'[[21.039815285294782,105.84035792121298],[21.04281932212896,105.84022915304153],[21.04245884090805,105.84280451647048],[21.040295935259838,105.84241821195614]]', 0, 0, CAST(N'2026-03-15T23:29:01.1274141' AS DateTime2), 0, 0, 0, 0, 0, NULL, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (33, NULL, NULL, N'[[21.05250292305125,105.79786775282466],[21.05656602271235,105.79765567778034],[21.056988546804547,105.80082888943836],[21.056085425269313,105.80452331359089],[21.051039058421534,105.80460915903853],[21.048475758949404,105.79834244136137]]', 21.053609622534733, 105.80063787233904, CAST(N'2026-03-16T12:44:55.0158686' AS DateTime2), 0, 0, 0, 0, 0, 4, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (34, NULL, NULL, N'[[21.042467852888088,105.7986866644238],[21.048577891379175,105.7987689971924],[21.04977944267775,105.80160139515297],[21.050900881807053,105.8046054840088],[21.044069984871896,105.80546845478672]]', 21.047159210724793, 105.80182619911292, CAST(N'2026-03-16T13:06:28.7360713' AS DateTime2), 0, 0, 0, 0, 0, 4, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (35, NULL, NULL, N'[[21.04615273068239,105.79027226084449],[21.041426457856154,105.79070148808268],[21.042307638741754,105.79885680560768],[21.048315551267024,105.79885680560768]]', 21.044550594636831, 105.79467184003563, CAST(N'2026-03-16T13:08:12.7951593' AS DateTime2), 0, 0, 0, 0, 0, 4, 0)
+INSERT [dbo].[Zones] ([Id], [ZoneName], [AreaName], [Points], [CenterLat], [CenterLng], [CreatedAt], [AvgPerDay], [AvgPerWeek], [Customers], [Order], [ClusterId], [VersionId], [Area]) VALUES (36, NULL, NULL, N'[[21.056396812600756,105.78997406730814],[21.04630392894462,105.79036037182252],[21.048226435730186,105.79821523028085],[21.056316713043618,105.7975713894236]]', 21.051810972579794, 105.79403026470877, CAST(N'2026-03-17T13:28:30.8150861' AS DateTime2), 0, 0, 0, 0, 0, 4, 0)
+SET IDENTITY_INSERT [dbo].[Zones] OFF
+GO
+SET IDENTITY_INSERT [dbo].[ZoneVersions] ON 
+
+INSERT [dbo].[ZoneVersions] ([Id], [AreaId], [VersionName], [CreatedDate], [IsActive], [SoPolygon], [DienTichBaoPhu], [UpdatedDate]) VALUES (1, 1, N'Version 1', NULL, 0, NULL, NULL, CAST(N'2026-03-24T22:16:48.723' AS DateTime))
+INSERT [dbo].[ZoneVersions] ([Id], [AreaId], [VersionName], [CreatedDate], [IsActive], [SoPolygon], [DienTichBaoPhu], [UpdatedDate]) VALUES (2, 1, N'Version 2', NULL, 0, NULL, NULL, CAST(N'2026-03-24T16:50:00.160' AS DateTime))
+INSERT [dbo].[ZoneVersions] ([Id], [AreaId], [VersionName], [CreatedDate], [IsActive], [SoPolygon], [DienTichBaoPhu], [UpdatedDate]) VALUES (3, 2, N'Version 1', NULL, 1, NULL, NULL, NULL)
+INSERT [dbo].[ZoneVersions] ([Id], [AreaId], [VersionName], [CreatedDate], [IsActive], [SoPolygon], [DienTichBaoPhu], [UpdatedDate]) VALUES (4, 1, N'Version3', CAST(N'2026-03-15T18:54:40.503' AS DateTime), 1, 4, 0, CAST(N'2026-03-24T22:16:50.187' AS DateTime))
+INSERT [dbo].[ZoneVersions] ([Id], [AreaId], [VersionName], [CreatedDate], [IsActive], [SoPolygon], [DienTichBaoPhu], [UpdatedDate]) VALUES (6, 1, N'Version4', CAST(N'2026-03-19T23:03:05.043' AS DateTime), 0, 0, 0, CAST(N'2026-03-19T23:10:23.930' AS DateTime))
+SET IDENTITY_INSERT [dbo].[ZoneVersions] OFF
+GO
+ALTER TABLE [dbo].[Areas] ADD  DEFAULT (getdate()) FOR [CreatedDate]
+GO
+ALTER TABLE [dbo].[Drivers] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ((0)) FOR [IsApproved]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[ZoneHistories] ADD  DEFAULT ((0)) FOR [OrdersReal]
+GO
+ALTER TABLE [dbo].[ZoneHistories] ADD  DEFAULT ((0)) FOR [CustomersReal]
+GO
+ALTER TABLE [dbo].[ZoneHistories] ADD  DEFAULT ((0)) FOR [OrdersForecast]
+GO
+ALTER TABLE [dbo].[ZoneHistories] ADD  DEFAULT ((0)) FOR [CustomersForecast]
+GO
+ALTER TABLE [dbo].[ZoneHistories] ADD  DEFAULT (getdate()) FOR [CreatedDate]
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas] ADD  DEFAULT ((0)) FOR [OrdersForecast]
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas] ADD  DEFAULT ((0)) FOR [CustomersForecast]
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas] ADD  DEFAULT ((0)) FOR [OrdersReal]
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas] ADD  DEFAULT ((0)) FOR [CustomersReal]
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Zones] ADD  DEFAULT ((0)) FOR [AvgPerDay]
+GO
+ALTER TABLE [dbo].[Zones] ADD  DEFAULT ((0)) FOR [AvgPerWeek]
+GO
+ALTER TABLE [dbo].[Zones] ADD  DEFAULT ((0)) FOR [Customers]
+GO
+ALTER TABLE [dbo].[Zones] ADD  DEFAULT ((0)) FOR [Order]
+GO
+ALTER TABLE [dbo].[Zones] ADD  DEFAULT ((0)) FOR [ClusterId]
+GO
+ALTER TABLE [dbo].[Zones] ADD  DEFAULT ((0)) FOR [Area]
+GO
+ALTER TABLE [dbo].[ZoneVersions] ADD  CONSTRAINT [DF_ZoneVersions_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate]
+GO
+ALTER TABLE [dbo].[ZoneVersions] ADD  DEFAULT ((0)) FOR [SoPolygon]
+GO
+ALTER TABLE [dbo].[ZoneVersions] ADD  DEFAULT ((0)) FOR [DienTichBaoPhu]
+GO
+ALTER TABLE [dbo].[Assignments]  WITH CHECK ADD FOREIGN KEY([AreaId])
+REFERENCES [dbo].[Areas] ([Id])
+GO
+ALTER TABLE [dbo].[Assignments]  WITH CHECK ADD FOREIGN KEY([DispatcherId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Assignments]  WITH CHECK ADD FOREIGN KEY([DriverId])
+REFERENCES [dbo].[Drivers] ([Id])
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas]  WITH CHECK ADD  CONSTRAINT [FK_ZoneMonthly_Zone] FOREIGN KEY([ZoneId])
+REFERENCES [dbo].[Zones] ([Id])
+GO
+ALTER TABLE [dbo].[ZoneMonthlyDatas] CHECK CONSTRAINT [FK_ZoneMonthly_Zone]
+GO
+ALTER TABLE [dbo].[ZoneVersions]  WITH CHECK ADD FOREIGN KEY([AreaId])
+REFERENCES [dbo].[Areas] ([Id])
+GO

@@ -1,312 +1,1472 @@
-﻿@{
+@{
     Layout = "~/Views/Shared/_LayoutDispatcher.cshtml";
 }
 
-<div style="margin-bottom:10px; color:white;">
-    <label>Chọn version:</label>
-    <select id="versionSelect" onchange="changeVersion()"></select>
+<style>
+/* ===== DISPATCHER DASHBOARD ===== */
+.dp-section { display:none; }
+.dp-section.active { display:block; }
+
+/* STATS ROW */
+.dp-stats { display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap; }
+.dp-stat {
+    background:#1e293b; border:1px solid #334155; border-radius:14px;
+    padding:18px 22px; min-width:160px; flex:1; position:relative; overflow:hidden;
+}
+.dp-stat::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:var(--c,#3b82f6); }
+.dp-stat .val { font-size:28px; font-weight:800; color:var(--c,#3b82f6); line-height:1; }
+.dp-stat .lbl { font-size:11px; color:#64748b; margin-top:6px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+
+/* FILTER BAR */
+.dp-filter {
+    display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
+    background:#1e293b; border-radius:12px; padding:14px 18px; border:1px solid #334155;
+}
+.dp-filter label { font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-right:4px; }
+.dp-select {
+    background:#0f172a; border:1px solid #334155; border-radius:8px;
+    padding:8px 12px; color:#f1f5f9; font-size:13px; outline:none; font-family:inherit;
+}
+.dp-select:focus { border-color:#f59e0b; }
+.dp-btn-filter {
+    display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(135deg,#f59e0b,#d97706); color:white;
+    border:none; padding:9px 18px; border-radius:9px; font-size:12px; font-weight:700;
+    cursor:pointer; transition:opacity .15s; font-family:inherit;
+}
+.dp-btn-filter:hover { opacity:.88; }
+.dp-btn-outline {
+    display:inline-flex; align-items:center; gap:6px;
+    background:#334155; color:#e2e8f0; border:none; padding:9px 16px;
+    border-radius:9px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;
+}
+.dp-btn-save {
+    background:#22c55e; color:white; border:none; padding:8px 16px; border-radius:10px;
+    font-size:12px; font-weight:700; cursor:pointer; transition:.2s; display:flex; align-items:center; gap:8px;
+}
+.dp-btn-save:hover { background:#16a34a; transform:translateY(-1px); box-shadow:0 4px 12px rgba(34,197,94,.3); }
+.dp-btn-save:disabled { background:#334155; color:#64748b; cursor:not-allowed; }
+.dp-btn-outline:hover { background:#475569; }
+
+/* MAP */
+.dp-map-wrap {
+    background:#1e293b; border-radius:14px; border:1px solid #334155;
+    overflow:hidden; margin-bottom:22px;
+}
+.dp-map-header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; border-bottom:1px solid #334155;
+}
+.dp-map-title { font-size:14px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:8px; }
+.dp-legend { display:flex; gap:14px; }
+.dp-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:#94a3b8; }
+.dp-legend-dot { width:10px; height:10px; border-radius:3px; }
+
+/* TABLE */
+.dp-table-wrap {
+    background:#1e293b; border-radius:14px; border:1px solid #334155;
+    overflow:hidden; margin-bottom:22px;
+}
+.dp-table-header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; border-bottom:1px solid #334155;
+}
+.dp-table-title { font-size:14px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:8px; }
+.dp-table { width:100%; border-collapse:collapse; font-size:13px; }
+.dp-table thead tr { background:#0f172a; }
+.dp-table th {
+    padding:12px 14px; text-align:left; color:#64748b; font-weight:700;
+    font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+    border-bottom:1px solid #334155; white-space:nowrap;
+}
+.dp-table tbody tr {
+    border-bottom:1px solid #0f172a44; transition:background .15s; cursor:pointer;
+}
+.dp-table tbody tr:hover { background:#0f172a88; }
+.dp-table tbody tr.selected { background:#f59e0b11; border-left:3px solid #f59e0b; }
+.dp-table td { padding:12px 14px; vertical-align:middle; color:#e2e8f0; }
+
+/* BADGE */
+.dp-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700;
+}
+.dp-badge-ok { background:#16a34a22; color:#4ade80; border:1px solid #16a34a44; }
+.dp-badge-miss { background:#dc262622; color:#f87171; border:1px solid #dc262644; }
+
+/* INLINE INPUT */
+.dp-inline-input {
+    background:#0f172a; border:1px solid #334155; border-radius:6px;
+    padding:5px 8px; color:#f1f5f9; font-size:12px; outline:none;
+    width:80px; text-align:center; font-family:inherit;
+}
+.dp-inline-input:focus { border-color:#f59e0b; }
+
+/* DETAIL PANEL */
+.dp-detail {
+    background:#1e293b; border-radius:14px; border:1px solid #334155;
+    padding:24px; margin-bottom:22px; display:none;
+    animation: slideIn .3s ease;
+}
+.dp-detail.show { display:block; }
+@@keyframes slideIn {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:translateY(0); }
+}
+.dp-detail-header {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #334155;
+}
+.dp-detail-title { font-size:18px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:10px; }
+.dp-detail-close {
+    background:#334155; border:none; border-radius:8px; padding:8px 12px;
+    color:#94a3b8; cursor:pointer; font-size:13px;
+}
+.dp-detail-close:hover { background:#475569; color:white; }
+
+/* CHARTS */
+.dp-charts { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.dp-chart-box {
+    background:#0f172a; border-radius:12px; padding:16px;
+    border:1px solid #334155;
+}
+.dp-chart-title { font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:10px; }
+
+/* FORECAST FORM */
+.dp-forecast-form {
+    display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;
+    background:#0f172a; border-radius:12px; padding:18px; border:1px solid #334155;
+}
+.dp-form-group { display:flex; flex-direction:column; gap:5px; }
+.dp-form-label { font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase; }
+.dp-form-input {
+    background:#1e293b; border:1px solid #334155; border-radius:8px;
+    padding:10px 14px; color:#f1f5f9; font-size:14px; font-weight:600;
+    outline:none; width:160px; font-family:inherit;
+}
+.dp-form-input:focus { border-color:#f59e0b; }
+.dp-form-hint { font-size:10px; color:#475569; font-style:italic; }
+.dp-btn-save {
+    display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(135deg,#22c55e,#16a34a); border:none;
+    border-radius:9px; padding:10px 22px; color:white; font-size:13px;
+    font-weight:700; cursor:pointer; font-family:inherit;
+}
+.dp-btn-save:hover { opacity:.88; }
+.dp-btn-predict {
+    display:inline-flex; align-items:center; gap:6px;
+    background:#1c3d5a; color:#38bdf8; border:none;
+    border-radius:9px; padding:10px 16px; font-size:12px;
+    font-weight:700; cursor:pointer; font-family:inherit;
+}
+.dp-btn-predict:hover { background:#0284c7; color:white; }
+
+/* HISTORY TABLE */
+.dp-hist-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:16px; }
+.dp-hist-table th {
+    padding:10px 12px; text-align:left; color:#64748b; font-weight:700;
+    font-size:10px; text-transform:uppercase; background:#0f172a; letter-spacing:.03em;
+}
+.dp-hist-table td { padding:10px 12px; border-bottom:1px solid #1e293b44; color:#e2e8f0; }
+.dp-hist-table tr:hover td { background:#0f172a55; }
+
+/* EMPTY STATE */
+.dp-empty { text-align:center; padding:50px 20px; }
+.dp-empty i { font-size:42px; color:#334155; display:block; margin-bottom:14px; }
+.dp-empty .t { font-size:15px; font-weight:700; color:#64748b; }
+.dp-empty .s { font-size:12px; color:#475569; margin-top:6px; }
+
+/* SECTION HEADER */
+.dp-section-header {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:20px;
+}
+.dp-section-title { font-size:20px; font-weight:800; color:#f1f5f9; display:flex; align-items:center; gap:10px; }
+
+/* Pulse animation for missing zones */
+@@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+/* SUGGEST DROPDOWN ITEMS */
+.dp-suggest-item {
+    padding:10px 14px; font-size:12px; color:#e2e8f0; cursor:pointer;
+    transition:background .12s; border-bottom:1px solid #1e293b;
+}
+.dp-suggest-item:last-child { border-bottom:none; }
+.dp-suggest-item:hover { background:#1e293b; color:#f59e0b; }
+
+/* Form input full width override */
+.dp-form-input { width:100%; box-sizing:border-box; }
+</style>
+
+<!-- ==================== SECTION: DASHBOARD ==================== -->
+<div class="dp-section active" id="secDashboard">
+
+    <div class="dp-section-header">
+        <div class="dp-section-title"><i class="fas fa-chart-pie" style="color:#f59e0b"></i> Tổng quan dự kiến</div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="dp-filter">
+        <div>
+            <label>Tháng</label>
+            <select class="dp-select" id="fMonth"></select>
+        </div>
+        <div>
+            <label>Năm</label>
+            <select class="dp-select" id="fYear"></select>
+        </div>
+        <div>
+            <label>Khu vực</label>
+            <select class="dp-select" id="fArea">
+                <option value="">Tất cả</option>
+            </select>
+        </div>
+        <div>
+            <label>Trạng thái</label>
+            <select class="dp-select" id="fStatus">
+                <option value="">Tất cả</option>
+                <option value="missing">⚠ Chưa nhập</option>
+                <option value="entered">✅ Đã nhập</option>
+            </select>
+        </div>
+        <button class="dp-btn-filter" onclick="loadDashboard()">
+            <i class="fas fa-search"></i> Lọc
+        </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="dp-stats" id="dashStats"></div>
+
+    <!-- MAP -->
+    <div class="dp-map-wrap">
+        <div class="dp-map-header">
+            <div class="dp-map-title"><i class="fas fa-map" style="color:#f59e0b"></i> Bản đồ vùng giao hàng</div>
+            <div class="dp-legend">
+                <div class="dp-legend-item"><div class="dp-legend-dot" style="background:#22c55e"></div> Đã nhập</div>
+                <div class="dp-legend-item"><div class="dp-legend-dot" style="background:#ef4444"></div> Chưa nhập</div>
+            </div>
+        </div>
+        <div id="map" style="height:420px;"></div>
+    </div>
+
+    <!-- ZONE TABLE -->
+    <div class="dp-table-wrap">
+        <div class="dp-table-header">
+            <div class="dp-table-title"><i class="fas fa-layer-group" style="color:#3b82f6"></i> Danh sách vùng</div>
+            <button class="dp-btn-outline" id="btnBatchSave" onclick="saveBatch()" style="display:none">
+                <i class="fas fa-save"></i> Lưu tất cả
+            </button>
+        </div>
+        <table class="dp-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Vùng</th>
+                    <th>Khu vực</th>
+                    <th>Order dự kiến</th>
+                    <th>Khách dự kiến</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="zoneTbody"></tbody>
+        </table>
+    </div>
+
+    <!-- ZONE DETAIL PANEL (appears when clicking a zone) -->
+    <div class="dp-detail" id="zoneDetail"></div>
+
 </div>
 
-<div id="map" style="height:500px;"></div>
-
-<div id="infoArea">
-    <h3 id="zoneName">Chọn polygon</h3>
-
-    <div style="display:flex; gap:20px;">
-        <div style="flex:1;">
-            <h4 style="color:white;">Orders</h4>
-            <canvas id="orderChart"></canvas>
+<!-- ==================== SECTION: FORECAST ==================== -->
+<div class="dp-section" id="secForecast">
+    <div class="dp-section-header">
+        <div class="dp-section-title"><i class="fas fa-edit" style="color:#f59e0b"></i> Nhập dự kiến hàng loạt</div>
+    </div>
+    <div class="dp-filter">
+        <div>
+            <label>Tháng</label>
+            <select class="dp-select" id="bfMonth"></select>
         </div>
-        <div style="flex:1;">
-            <h4 style="color:white;">Customers</h4>
-            <canvas id="customerChart"></canvas>
+        <div>
+            <label>Năm</label>
+            <select class="dp-select" id="bfYear"></select>
+        </div>
+        <div>
+            <label>Khu vực</label>
+            <select class="dp-select" id="bfArea">
+                <option value="">Tất cả</option>
+            </select>
+        </div>
+        <button class="dp-btn-filter" onclick="loadBatchForecast()">
+            <i class="fas fa-search"></i> Tải danh sách
+        </button>
+        <button class="dp-btn-outline" onclick="autoFillAll()">
+            <i class="fas fa-magic"></i> Auto-fill dự đoán
+        </button>
+        <button class="dp-btn-save" id="btnBatchSave2" onclick="saveBatchForecast()">
+            <i class="fas fa-save"></i> Lưu tất cả
+        </button>
+    </div>
+    <div class="dp-table-wrap">
+        <table class="dp-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Vùng</th>
+                    <th>Khu vực</th>
+                    <th>Order dự kiến</th>
+                    <th>Khách dự kiến</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody id="batchTbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== SECTION: MAP ==================== -->
+<div class="dp-section" id="secMap">
+    <div class="dp-section-header">
+        <div class="dp-section-title"><i class="fas fa-map-marked-alt" style="color:#f59e0b"></i> Bản đồ chi tiết</div>
+    </div>
+    <div class="dp-filter">
+        <div>
+            <label>Khu vực</label>
+            <select class="dp-select" id="mapArea" onchange="loadFullMap()">
+                <option value="">Tất cả</option>
+            </select>
+        </div>
+    </div>
+    <div class="dp-map-wrap">
+        <div id="mapFull" style="height:calc(100vh - 260px); min-height:400px;"></div>
+    </div>
+</div>
+
+<!-- ==================== SECTION: AUTO-ASSIGN ==================== -->
+<div class="dp-section" id="secAssign">
+    <div class="dp-section-header">
+        <div class="dp-section-title"><i class="fas fa-user-check" style="color:#22c55e"></i> Phân công tự động</div>
+    </div>
+
+    <!-- Config Panel -->
+    <div class="dp-filter" style="margin-bottom:16px;">
+        <div>
+            <label>Khu vực</label>
+            <select class="dp-select" id="aaArea"><option value="">-- Chọn khu vực --</option></select>
+        </div>
+        <div>
+            <label>Tháng (dự báo)</label>
+            <select class="dp-select" id="aaMonth"></select>
+        </div>
+        <div>
+            <label>Năm</label>
+            <select class="dp-select" id="aaYear"></select>
+        </div>
+        <div>
+            <label>Số tài xế</label>
+            <input class="dp-select" type="number" id="aaDriverCount" value="10" min="1" max="30" style="width:70px;">
+        </div>
+        <div>
+            <label>Đơn tối đa trên 1 tài xế </label>
+            <input class="dp-select" type="number" id="aaMaxOrders" value="999999" min="1" style="width:90px;">
+        </div>
+        <div>
+            <label>MKhách hàng trên 1 tài xế </label>
+            <input class="dp-select" type="number" id="aaMaxCustomers" value="999999" min="1" style="width:90px;">
+        </div>
+        <button class="dp-btn-filter" onclick="runAutoAssign()" id="btnAutoAssign">
+            <i class="fas fa-robot"></i> Chạy phân công
+        </button>
+    </div>
+
+    <!-- Metrics / Progress Row -->
+    <div id="aaMetrics" style="display:none; margin-bottom:16px;">
+        <div class="dp-stats">
+            <div class="dp-stat" style="--c:#f59e0b">
+                <div class="val" id="aaGreedyObj">-</div>
+                <div class="lbl">Greedy Objective</div>
+            </div>
+            <div class="dp-stat" style="--c:#22c55e">
+                <div class="val" id="aaBestObj">-</div>
+                <div class="lbl">Best Objective (ALNS)</div>
+            </div>
+            <div class="dp-stat" style="--c:#3b82f6">
+                <div class="val" id="aaImprove">-</div>
+                <div class="lbl">Cải thiện (%)</div>
+            </div>
+            <div class="dp-stat" style="--c:#8b5cf6">
+                <div class="val" id="aaTime">-</div>
+                <div class="lbl">Thời gian chạy</div>
+            </div>
+            <div class="dp-stat" style="--c:#ec4899">
+                <div class="val" id="aaCompact">-</div>
+                <div class="lbl">Tính nhỏ gọn</div>
+            </div>
         </div>
     </div>
 
-    <table id="historyTable" border="1" style="color:white; margin-top:10px;"></table>
+    <!-- Result Table -->
+    <div class="dp-table-wrap" id="aaResultWrap" style="display:none;">
+        <div class="dp-table-header">
+            <div class="dp-table-title"><i class="fas fa-table"></i> Kết quả phân công</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="font-size:11px;color:#64748b" id="aaPhaseLabel"></div>
+                <button class="dp-btn-save" onclick="saveAutoAssignResults()" id="btnSaveAutoAssign">
+                    <i class="fas fa-save"></i> Lưu kết quả này
+                </button>
+            </div>
+        </div>
+        <table class="dp-table" id="aaTable">
+            <thead><tr>
+                <th>#</th>
+                <th>Tài xế</th>
+                <th>Số vùng</th>
+                <th>Tổng đơn dự báo (ARIMA)</th>
+                <th>Tổng KH dự báo (ARIMA)</th>
+                <th>Danh sách vùng</th>
+            </tr></thead>
+            <tbody id="aaTbody"></tbody>
+        </table>
+    </div>
 
-    <div style="margin-top:10px;">
-        <label>Orders dự kiến: </label>
-        <input id="predictOrder" />
-
-        <label>Khách dự kiến: </label>
-        <input id="predictCustomer" />
-
-        <button onclick="saveForecast()">Lưu</button>
+    <!-- Loading Indicator -->
+    <div id="aaLoading" style="display:none;text-align:center;padding:40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#f59e0b;"></i>
+        <div style="margin-top:12px;color:#94a3b8;font-size:14px;">Greedy → Local Search → ALNS đang chạy...</div>
+        <div style="margin-top:6px;color:#475569;font-size:11px;">Có thể mất vài giây tùy theo số vùng</div>
     </div>
 </div>
 
 @section Scripts {
 <script>
-let map, selectedZoneId, orderChart, customerChart;
-let selectedMonth = null;
-let selectedYear = null;
-let currentRoute = null;
+// ===================== GLOBAL STATE =====================
+let dashMap = null;
+let fullMap = null;
+let selectedZoneId = null;
+let orderChart = null;
+let customerChart = null;
+let zonesData = [];
+let mapPolygons = {};
+let currentAssignmentResults = null;
 
-// ================= GLOBAL TIME HELPERS =================
 const now = new Date();
-function isPast(month, year){
-    return (year < now.getFullYear()) || (year === now.getFullYear() && month <= now.getMonth()+1);
-}
-function isFuture(month, year){
-    return (year > now.getFullYear()) || (year === now.getFullYear() && month > now.getMonth()+1);
-}
+const curMonth = now.getMonth() + 1;
+const curYear = now.getFullYear();
 
-// ================= UTILS =================
-function getLatestForecast(x){
-    if(!x.forecasts || !x.forecasts.length) return null;
-    let sorted = [...x.forecasts].sort((a,b)=> (b.createdYear*12 + b.createdMonth) - (a.createdYear*12 + a.createdMonth));
-    return sorted[0];
-}
-
-// ================= MAP =================
-function loadMap(){
-    map = L.map('map').setView([21.0285,105.8542], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-}
-
-function drawRoute(month, year){
-    fetch(`/Zone/GetRoute?zoneId=${selectedZoneId}&month=${month}&year=${year}`)
-        .then(r => r.json())
-        .then(points => {
-            if(currentRoute) map.removeLayer(currentRoute);
-            if(!points.length) return;
-
-            let past = isPast(month, year);
-            currentRoute = L.polyline(points, {
-                color: past ? 'blue' : 'red',
-                weight: 4,
-                dashArray: past ? null : '5,5'
-            }).addTo(map);
-            map.fitBounds(currentRoute.getBounds());
-        });
-}
-
-// ================= LOAD VERSION =================
-function loadVersions(){
-    fetch("/ZoneVersion/GetByArea?areaId=1")
-        .then(r=>r.json())
-        .then(data=>{
-            let select = document.getElementById("versionSelect");
-            select.innerHTML = "";
-            let selectedId = null;
-
-            data.forEach(v=>{
-                let opt = document.createElement("option");
-                opt.value = v.id;
-                opt.text = v.versionName;
-                if(v.isActive){
-                    opt.selected = true;
-                    selectedId = v.id;
-                }
-                select.appendChild(opt);
-            });
-
-            if(selectedId) loadZones(selectedId);
-        });
-}
-
-function changeVersion(){
-    let id = document.getElementById("versionSelect").value;
-    loadZones(id);
-}
-
-// ================= LOAD ZONES =================
-function loadZones(versionId){
-    map.eachLayer(l => { if(l instanceof L.Polygon) map.removeLayer(l); });
-
-    fetch("/Zone/GetZones?versionId=" + versionId)
-        .then(r=>r.json())
-        .then(data=>{
-            data.forEach(z=>{
-                let pts = JSON.parse(z.points);
-                let poly = L.polygon(pts, { color:'blue', fillOpacity:0.3 }).addTo(map);
-                let center = poly.getBounds().getCenter();
-
-                L.marker(center, {
-                    interactive:false,
-                    icon: L.divIcon({
-                        className:'zone-label',
-                        html:`<div style="background:#2563eb;color:white;padding:3px 6px;border-radius:4px;font-size:12px;">
-                            ${z.zoneName}
-                        </div>`
-                    })
-                }).addTo(map);
-
-                      poly.on("click", function () {
-            selectedZoneId = z.id;
-
-            console.log("CLICK ZONE:", z.id); // 👈 debug
-
-            document.getElementById("zoneName").innerText = z.zoneName;
-
-            loadHistory(z.id);
-            loadPredict(z.id);
-        });
-            });
-        });
-}
-
-// ================= LOAD HISTORY =================
-function loadHistory(zoneId){
-    fetch("/Zone/ZoneHistory?zoneId=" + zoneId)
-        .then(r=>r.json())
-        .then(data=>{
-            if(!data.length) return;
-
-            data.sort((a,b)=> (a.year*12 + a.month) - (b.year*12 + b.month));
-
-            let last = data[data.length-1];
-            selectedMonth = last.month + 1;
-            selectedYear = last.year;
-            if(selectedMonth > 12) { selectedMonth=1; selectedYear++; }
-
-            // ===== CHART DATA =====
-            let labels = data.map(x => x.month + "/" + x.year);
-
-            let orderReal = data.map(x => isPast(x.month,x.year) ? x.ordersReal : null);
-            let orderForecastPast = data.map(x => x.ordersForecast);
-            let orderForecastFuture = data.map(x => isFuture(x.month,x.year) ? x.ordersForecast : null);
-
-            let customerReal = data.map(x => isPast(x.month,x.year) ? x.customersReal : null);
-            let customerForecastPast = data.map(x => x.customersForecast);
-            let customerForecastFuture = data.map(x => isFuture(x.month,x.year) ? x.customersForecast : null);
-
-            // ===== DESTROY OLD CHART =====
-            if(orderChart) orderChart.destroy();
-            if(customerChart) customerChart.destroy();
-
-            // ===== CHART ORDERS =====
-            orderChart = new Chart(document.getElementById("orderChart"), {
-                type:'line',
-                data:{
-                    labels: labels,
-                    datasets:[
-                        { label:'Orders thực tế', data: orderReal, borderColor:'#3b82f6', borderWidth:3, pointRadius:5, tension:0.3 },
-                        { label:'Dự kiến (đã qua)', data: orderForecastPast, borderColor:'rgba(239,68,68,0.6)', borderWidth:2, pointRadius:4, tension:0.3 },
-                        { label:'Dự kiến (tương lai)', data: orderForecastFuture, borderColor:'#ef4444', borderDash:[6,6], borderWidth:2, pointRadius:4, tension:0.3 }
-                    ]
-                },
-                    options:{
-                plugins:{
-                    tooltip:{
-                        callbacks:{
-                            label: function(context){
-
-                                let index = context.dataIndex;
-
-                                let real = orderReal[index];
-                                let forecast = data[index].ordersForecast;
-
-                                if(real != null && forecast){
-                                    let diff = ((real - forecast) / forecast * 100).toFixed(1);
-
-                                    return [
-                                        `Real: ${real}`,
-                                        `Forecast: ${forecast}`,
-                                        `Sai lệch: ${diff}%`
-                                    ];
-                                }
-
-                                return context.dataset.label + ": " + context.raw;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-            // ===== CHART CUSTOMERS =====
-            customerChart = new Chart(document.getElementById("customerChart"), {
-                type:'line',
-                data:{
-                    labels: labels,
-                    datasets:[
-                        { label:'Khách thực tế', data: customerReal, borderColor:'#22c55e', borderWidth:3, pointRadius:5, tension:0.3 },
-                        { label:'Dự kiến (đã qua)', data: customerForecastPast, borderColor:'rgba(245,158,11,0.6)', borderWidth:2, pointRadius:4, tension:0.3 },
-                        { label:'Dự kiến (tương lai)', data: customerForecastFuture, borderColor:'#f59e0b', borderDash:[6,6], borderWidth:2, pointRadius:4, tension:0.3 }
-                    ]
-                }
-            });
-
-            // ===== TABLE =====
-            renderTable(data);
-        });
-}
-
-// ================= TABLE =================
-function renderTable(data){
-    let table = document.getElementById("historyTable");
-    let html = `
-        <tr>
-            <th>Tháng</th>
-            <th>Orders thực tế</th>
-            <th>Khách thực tế</th>
-            <th>Orders dự kiến</th>
-            <th>Khách dự kiến</th>
-            <th>Sai lệch(%)</th>
-        </tr>`;
-
-    data.forEach(x=>{
-
-            let diff = '';
-
-            if(x.ordersReal != null && x.ordersForecast){
-                diff = ((x.ordersReal - x.ordersForecast) / x.ordersForecast * 100).toFixed(1) + '%';
-            }
-        html += `
-        <tr onclick="selectMonth(${x.month}, ${x.year})">
-            <td>${x.month}/${x.year}</td>
-            <td>${isPast(x.month,x.year) ? x.ordersReal : ''}</td>
-            <td>${isPast(x.month,x.year) ? x.customersReal : ''}</td>
-            <td>${x.ordersForecast ?? ''}</td>
-            <td>${x.customersForecast ?? ''}</td>
-            <td>${diff}</td>
-        </tr>`;
-    });
-    table.innerHTML = html;
-}
-
-// ================= SELECT MONTH =================
-function selectMonth(m,y){
-    selectedMonth = m;
-    selectedYear = y;
-    drawRoute(m,y);
-}
-
-// ================= PREDICT =================
-function loadPredict(zoneId){
-    fetch("/Zone/Predict?zoneId=" + zoneId)
-        .then(r=>r.json())
-        .then(d=>{
-            document.getElementById("predictOrder").value = d.order;
-            document.getElementById("predictCustomer").value = d.customer;
-        });
-}
-
-// ================= SAVE =================
-function saveForecast(){
-    let now = new Date();
-    fetch("/Zone/SaveForecast",{
-        method:"POST",
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({
-            zoneId: selectedZoneId,
-            targetMonth: selectedMonth,
-            targetYear: selectedYear,
-            createdMonth: now.getMonth()+1,
-            createdYear: now.getFullYear(),
-            ordersForecast: parseInt(document.getElementById("predictOrder").value),
-            customersForecast: parseInt(document.getElementById("predictCustomer").value)
-        })
-    }).then(()=>{ alert("Đã lưu"); loadHistory(selectedZoneId); });
-}
-
-// ================= INIT =================
-document.addEventListener("DOMContentLoaded", ()=>{
-    loadMap();
-    loadVersions();
+// ===================== INIT =====================
+document.addEventListener("DOMContentLoaded", () => {
+    initFilters();
+    loadAreas();
+    initDashMap();
+    
+    // Nếu là Driver -> Tự động chuyển sang TAB Bản đồ
+    var currentRole = '@Context.Session.GetString("Role")';
+    if(currentRole === 'Driver') {
+        onMenuSwitch('map');
+    } else {
+        loadDashboard();
+    }
 });
 
+function initFilters(){
+    // Month selects
+    ['fMonth','bfMonth'].forEach(id => {
+        let sel = document.getElementById(id);
+        for(let i=1;i<=12;i++){
+            let o = document.createElement('option');
+            o.value = i; o.text = 'Tháng ' + i;
+            if(i === curMonth) o.selected = true;
+            sel.appendChild(o);
+        }
+    });
+    // Year selects
+    ['fYear','bfYear'].forEach(id => {
+        let sel = document.getElementById(id);
+        for(let y=curYear+1; y >= curYear-2; y--){
+            let o = document.createElement('option');
+            o.value = y; o.text = y;
+            if(y === curYear) o.selected = true;
+            sel.appendChild(o);
+        }
+    });
+}
+
+function loadAreas(){
+    fetch('/Dispatcher/GetAllAreas')
+    .then(r=>r.json())
+    .then(areas => {
+        ['fArea','bfArea','mapArea'].forEach(id => {
+            let sel = document.getElementById(id);
+            if(!sel) return;
+            // Keep first option
+            areas.forEach(a => {
+                let o = document.createElement('option');
+                o.value = a.id; o.text = a.name;
+                sel.appendChild(o);
+            });
+        });
+    });
+}
+
+// ===================== MENU SWITCH =====================
+function onMenuSwitch(menu){
+    document.querySelectorAll('.dp-section').forEach(s => s.classList.remove('active'));
+    if(menu === 'dashboard'){
+        document.getElementById('secDashboard').classList.add('active');
+        setTimeout(() => { if(dashMap) dashMap.invalidateSize(); }, 100);
+    } else if(menu === 'forecast'){
+        document.getElementById('secForecast').classList.add('active');
+        loadBatchForecast();
+    } else if(menu === 'map'){
+        document.getElementById('secMap').classList.add('active');
+        setTimeout(() => {
+            if(!fullMap) initFullMap();
+            else fullMap.invalidateSize();
+            loadFullMap();
+        }, 100);
+    } else if(menu === 'assign'){
+        document.getElementById('secAssign').classList.add('active');
+        initAssignFilters();
+    }
+}
+
+// ===================== DASH MAP =====================
+function initDashMap(){
+    dashMap = L.map('map').setView([21.0285, 105.8542], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(dashMap);
+}
+
+function initFullMap(){
+    fullMap = L.map('mapFull').setView([21.0285, 105.8542], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(fullMap);
+}
+
+// ===================== LOAD DASHBOARD =====================
+function loadDashboard(){
+    let mEl = document.getElementById('fMonth');
+    let yEl = document.getElementById('fYear');
+    let aEl = document.getElementById('fArea');
+    let sEl = document.getElementById('fStatus');
+
+    if(!mEl || !yEl) return;
+
+    let m = mEl.value || curMonth;
+    let y = yEl.value || curYear;
+    let a = aEl?.value || "";
+    let s = sEl?.value || "";
+
+    fetch(`/Dispatcher/GetForecastStatus?month=${m}&year=${y}&areaId=${a}&filter=${s}`)
+    .then(r => r.json())
+    .then(data => {
+        zonesData = data.zones;
+        renderStats(data.summary, m, y);
+        renderMap(data.zones);
+        renderTable(data.zones);
+    })
+    .catch(err => {
+        console.error("Fetch error:", err);
+        dpToast("Lỗi khi tải dữ liệu!", "error");
+    });
+}
+
+function renderStats(s, m, y){
+    document.getElementById('dashStats').innerHTML = `
+        <div class="dp-stat" style="--c:#3b82f6">
+            <div class="val">${s.total}</div><div class="lbl">Tổng vùng</div>
+        </div>
+        <div class="dp-stat" style="--c:#22c55e">
+            <div class="val">${s.entered}</div><div class="lbl">Đã nhập T${m}</div>
+        </div>
+        <div class="dp-stat" style="--c:#ef4444">
+            <div class="val">${s.missing}</div><div class="lbl">Chưa nhập</div>
+        </div>
+        <div class="dp-stat" style="--c:#f59e0b">
+            <div class="val">${s.totalOrders.toLocaleString()}</div><div class="lbl">Tổng order dự kiến</div>
+        </div>
+        <div class="dp-stat" style="--c:#8b5cf6">
+            <div class="val">${s.totalCustomers.toLocaleString()}</div><div class="lbl">Tổng khách dự kiến</div>
+        </div>
+    `;
+}
+
+function renderMap(zones){
+    // Clear old polygons
+    dashMap.eachLayer(l => {
+        if(l instanceof L.Polygon || l instanceof L.Marker) dashMap.removeLayer(l);
+    });
+    // Keep tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(dashMap);
+
+    mapPolygons = {};
+    let bounds = [];
+
+    zones.forEach(z => {
+        if(!z.points) return;
+        try {
+            let pts = JSON.parse(z.points);
+            let color = z.hasForecast ? '#22c55e' : '#ef4444';
+            let fillOp = z.hasForecast ? 0.25 : 0.35;
+
+            let poly = L.polygon(pts, {
+                color: color, weight: 2, fillOpacity: fillOp,
+                dashArray: z.hasForecast ? null : '6,4'
+            }).addTo(dashMap);
+
+            mapPolygons[z.zoneId] = poly;
+
+            let center = poly.getBounds().getCenter();
+            bounds.push(center);
+
+            L.marker(center, {
+                interactive: false,
+                icon: L.divIcon({
+                    className: 'zone-label',
+                    html: `<div style="
+                        background:${z.hasForecast ? '#16a34a' : '#dc2626'};
+                        color:white; padding:3px 8px; border-radius:6px;
+                        font-size:11px; font-weight:700; white-space:nowrap;
+                        box-shadow:0 2px 8px rgba(0,0,0,.3);
+                    ">${z.zoneName} ${z.hasForecast ? '✅' : '⚠'}</div>`
+                })
+            }).addTo(dashMap);
+
+            poly.on('click', () => openZoneDetail(z.zoneId));
+        } catch(e){}
+    });
+
+    if(bounds.length > 0){
+        dashMap.fitBounds(bounds, { padding:[30,30] });
+    }
+}
+
+function renderTable(zones){
+    let tbody = document.getElementById('zoneTbody');
+    if(!zones.length){
+        tbody.innerHTML = `<tr><td colspan="7"><div class="dp-empty">
+            <i class="fas fa-inbox"></i>
+            <div class="t">Không có dữ liệu</div>
+            <div class="s">Thay đổi bộ lọc để xem vùng khác</div>
+        </div></td></tr>`;
+        return;
+    }
+
+    let hasMissing = zones.some(z => !z.hasForecast);
+    document.getElementById('btnBatchSave').style.display = hasMissing ? '' : 'none';
+
+    tbody.innerHTML = zones.map((z, i) => `
+        <tr onclick="openZoneDetail(${z.zoneId})" id="row-${z.zoneId}" data-zone="${z.zoneId}">
+            <td style="color:#475569;font-weight:700">${i+1}</td>
+            <td>
+                <div style="font-weight:700;color:#f1f5f9">${z.zoneName}</div>
+                <div style="font-size:10px;color:#475569">ID: ${z.zoneId}</div>
+            </td>
+            <td style="color:#94a3b8">${z.areaName}</td>
+            <td>
+                ${z.hasForecast
+                    ? `<span style="font-weight:700;color:#60a5fa">${z.ordersForecast}</span>`
+                    : `<input class="dp-inline-input" type="number" id="io-${z.zoneId}" placeholder="0" onclick="event.stopPropagation()">`
+                }
+            </td>
+            <td>
+                ${z.hasForecast
+                    ? `<span style="font-weight:700;color:#a78bfa">${z.customersForecast}</span>`
+                    : `<input class="dp-inline-input" type="number" id="ic-${z.zoneId}" placeholder="0" onclick="event.stopPropagation()">`
+                }
+            </td>
+            <td>
+                ${z.hasForecast
+                    ? `<span class="dp-badge dp-badge-ok"><i class="fas fa-check-circle" style="font-size:9px"></i> Đã nhập</span>`
+                    : `<span class="dp-badge dp-badge-miss"><i class="fas fa-exclamation-circle" style="font-size:9px"></i> Chưa nhập</span>`
+                }
+            </td>
+            <td>
+                <button class="dp-btn-predict" style="font-size:11px;padding:5px 10px" onclick="event.stopPropagation();openZoneDetail(${z.zoneId})">
+                    <i class="fas fa-chart-line"></i> Chi tiết
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ===================== BATCH SAVE FROM TABLE =====================
+function saveBatch(){
+    let m = parseInt(document.getElementById('fMonth').value);
+    let y = parseInt(document.getElementById('fYear').value);
+    let items = [];
+
+    zonesData.filter(z => !z.hasForecast).forEach(z => {
+        let oEl = document.getElementById('io-' + z.zoneId);
+        let cEl = document.getElementById('ic-' + z.zoneId);
+        let o = parseInt(oEl?.value) || 0;
+        let c = parseInt(cEl?.value) || 0;
+        if(o > 0 || c > 0) items.push({ zoneId: z.zoneId, ordersForecast: o, customersForecast: c });
+    });
+
+    if(!items.length){ dpToast('Chưa nhập giá trị nào!', 'error'); return; }
+
+    fetch('/Dispatcher/SaveBatchForecast', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ month:m, year:y, items })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success){
+            dpToast(`Đã lưu ${d.count} vùng thành công!`, 'success');
+            loadDashboard();
+        }
+    });
+}
+
+// ===================== ZONE DETAIL =====================
+function openZoneDetail(zoneId){
+    selectedZoneId = zoneId;
+    let z = zonesData.find(x => x.zoneId === zoneId);
+    if(!z) return;
+
+    // Highlight row
+    document.querySelectorAll('.dp-table tbody tr').forEach(r => r.classList.remove('selected'));
+    let row = document.getElementById('row-' + zoneId);
+    if(row) row.classList.add('selected');
+
+    // Highlight polygon
+    Object.values(mapPolygons).forEach(p => p.setStyle({ weight:2 }));
+    if(mapPolygons[zoneId]){
+        mapPolygons[zoneId].setStyle({ weight:5, color:'#f59e0b' });
+        dashMap.fitBounds(mapPolygons[zoneId].getBounds(), { padding:[60,60] });
+    }
+
+    let m = document.getElementById('fMonth').value;
+    let y = document.getElementById('fYear').value;
+
+    // Build detail panel
+    let panel = document.getElementById('zoneDetail');
+    panel.innerHTML = `
+        <div class="dp-detail-header">
+            <div class="dp-detail-title">
+                <i class="fas fa-map-pin" style="color:#f59e0b"></i>
+                ${z.zoneName}
+                <span style="font-size:12px;color:#64748b;font-weight:400;margin-left:6px">${z.areaName}</span>
+            </div>
+            <button class="dp-detail-close" onclick="closeDetail()">
+                <i class="fas fa-times"></i> Đóng
+            </button>
+        </div>
+
+        <!-- Charts -->
+        <div class="dp-charts">
+            <div class="dp-chart-box">
+                <div class="dp-chart-title"><i class="fas fa-box-open"></i> Lịch sử Orders</div>
+                <canvas id="cOrders"></canvas>
+            </div>
+            <div class="dp-chart-box">
+                <div class="dp-chart-title"><i class="fas fa-users"></i> Lịch sử Khách hàng</div>
+                <canvas id="cCustomers"></canvas>
+            </div>
+        </div>
+
+        <!-- ===== CASCADING FORECAST SECTION ===== -->
+        <div style="margin-bottom:16px;">
+
+          <!-- ROW 1: Tháng hiện tại (cơ sở) -->
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;margin-bottom:10px;position:relative;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="background:#334155;color:#94a3b8;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;">CƠ SỞ</span>
+              <span style="font-size:13px;font-weight:700;color:#f1f5f9;">Tháng ${m}/${y} — Dữ liệu thực tế</span>
+            </div>
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+              <!-- Orders -->
+              <div style="flex:1;position:relative;">
+                <div style="font-size:11px;color:#64748b;margin-bottom:4px;">Order thực tế T${m}</div>
+                <div style="position:relative;">
+                  <input class="dp-form-input" type="number" id="curOrder"
+                    placeholder="Nhập hoặc chọn gợi ý..."
+                    oninput="onCurChanged(${zoneId})"
+                    style="width:100%;padding-right:36px;">
+                  <button onclick="toggleSuggest('suggestOrder')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;">▾</button>
+                </div>
+                <div id="suggestOrder" style="display:none;position:absolute;z-index:99;left:0;right:0;background:#0f172a;border:1px solid #334155;border-radius:8px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden;">
+                  <div style="padding:6px 8px;font-size:10px;color:#475569;border-bottom:1px solid #1e293b;">Chọn cách tính gợi ý</div>
+                  <div class="dp-suggest-item" onclick="applySuggest('curOrder','wmaOrder','suggestOrder')">📊 Bình quân gia quyền 3 tháng (WMA)</div>
+                  <div class="dp-suggest-item" onclick="applySuggest('curOrder','prevOrder','suggestOrder')">↩ Bằng tháng trước</div>
+                  <div class="dp-suggest-item" onclick="applySuggest('curOrder','lastFcOrder','suggestOrder')">📋 Dự kiến cũ của T${m}</div>
+                </div>
+              </div>
+              <!-- Customers -->
+              <div style="flex:1;position:relative;">
+                <div style="font-size:11px;color:#64748b;margin-bottom:4px;">Khách thực tế T${m}</div>
+                <div style="position:relative;">
+                  <input class="dp-form-input" type="number" id="curCustomer"
+                    placeholder="Nhập hoặc chọn gợi ý..."
+                    oninput="onCurChanged(${zoneId})"
+                    style="width:100%;padding-right:36px;">
+                  <button onclick="toggleSuggest('suggestCustomer')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;">▾</button>
+                </div>
+                <div id="suggestCustomer" style="display:none;position:absolute;z-index:99;left:0;right:0;background:#0f172a;border:1px solid #334155;border-radius:8px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden;">
+                  <div style="padding:6px 8px;font-size:10px;color:#475569;border-bottom:1px solid #1e293b;">Chọn cách tính gợi ý</div>
+                  <div class="dp-suggest-item" onclick="applySuggest('curCustomer','wmaCustomer','suggestCustomer')">📊 Bình quân gia quyền 3 tháng (WMA)</div>
+                  <div class="dp-suggest-item" onclick="applySuggest('curCustomer','prevCustomer','suggestCustomer')">↩ Bằng tháng trước</div>
+                  <div class="dp-suggest-item" onclick="applySuggest('curCustomer','lastFcCustomer','suggestCustomer')">📋 Dự kiến cũ của T${m}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ARROW between rows -->
+          <div style="text-align:center;margin:4px 0;color:#22c55e;font-size:18px;animation:pulse 2s infinite;">↓</div>
+
+          <!-- ROW 2: Tháng kế tiếp (kế hoạch) -->
+          <div style="background:#0f2b1a;border:1px solid #166534;border-radius:12px;padding:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="background:#166534;color:#4ade80;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;">KẾ HOẠCH</span>
+                <span style="font-size:13px;font-weight:700;color:#4ade80;">Tháng ${(parseInt(m)===12?1:parseInt(m)+1)}/${(parseInt(m)===12?parseInt(y)+1:parseInt(y))} — Dự báo</span>
+              </div>
+              <div id="nextPredictBadge" style="font-size:11px;color:#64748b;">Nhập T${m} để xem dự báo</div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:flex-end;">
+              <div style="flex:1;">
+                <div style="font-size:11px;color:#64748b;margin-bottom:4px;">Order dự kiến T${(parseInt(m)===12?1:parseInt(m)+1)}</div>
+                <input class="dp-form-input" type="number" id="detailOrder" placeholder="—"
+                  style="border-color:#166534;background:#0a1f12;">
+                <div id="hintOrder" style="font-size:10px;color:#4ade80;margin-top:4px;"></div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:11px;color:#64748b;margin-bottom:4px;">Khách dự kiến T${(parseInt(m)===12?1:parseInt(m)+1)}</div>
+                <input class="dp-form-input" type="number" id="detailCustomer" placeholder="—"
+                  style="border-color:#166534;background:#0a1f12;">
+                <div id="hintCustomer" style="font-size:10px;color:#4ade80;margin-top:4px;"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <button class="dp-btn-predict" onclick="autoPredict(${zoneId})" style="height:36px;padding:0 14px;font-size:12px;">
+                  <i class="fas fa-robot"></i> Auto-fill
+                </button>
+                <button class="dp-btn-save" onclick="saveZoneForecast(${zoneId})" style="height:36px;padding:0 14px;font-size:12px;">
+                  <i class="fas fa-save"></i> Lưu KH
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- History Table -->
+        <div style="font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:10px">
+            <i class="fas fa-clock-rotate-left" style="color:#3b82f6"></i> Lịch sử theo tháng
+        </div>
+        <div class="dp-table-wrap" style="margin-bottom:0">
+            <table class="dp-hist-table" id="histTable">
+                <thead><tr>
+                    <th>Tháng</th><th>Order thực tế</th><th>Khách thực tế</th>
+                    <th>Order dự kiến</th><th>Khách dự kiến</th><th>Sai lệch</th>
+                </tr></thead>
+                <tbody id="histTbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:#475569">Đang tải...</td></tr></tbody>
+            </table>
+        </div>
+    `;
+
+    panel.classList.add('show');
+
+    // Scroll to detail
+    setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+
+    // Load history + charts
+    loadZoneHistory(zoneId);
+
+    // Load auto-predict hint
+    loadPredictHint(zoneId);
+}
+
+function closeDetail(){
+    document.getElementById('zoneDetail').classList.remove('show');
+    document.querySelectorAll('.dp-table tbody tr').forEach(r => r.classList.remove('selected'));
+    Object.values(mapPolygons).forEach(p => {
+        let z = zonesData.find(x => x.zoneId == p._zoneId);
+        // Reset style
+    });
+    selectedZoneId = null;
+}
+
+// ===================== ZONE HISTORY + CHARTS =====================
+function loadZoneHistory(zoneId){
+    fetch('/Dispatcher/GetZoneHistory?zoneId=' + zoneId)
+    .then(r => r.json())
+    .then(data => {
+        renderHistoryTable(data);
+        renderCharts(data);
+    });
+}
+
+function isPast(month, year){
+    return (year < curYear) || (year === curYear && month <= curMonth);
+}
+
+function renderHistoryTable(data){
+    let tbody = document.getElementById('histTbody');
+    // Filter out invalid records (month=0 or year=0)
+    let validData = data.filter(x => x.month > 0 && x.year > 0);
+    if(!validData.length){
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#475569">Chưa có lịch sử</td></tr>';
+        return;
+    }
+    tbody.innerHTML = validData.map(x => {
+        let diff = '';
+        if(x.ordersReal != null && x.ordersForecast > 0){
+            let d = ((x.ordersReal - x.ordersForecast) / x.ordersForecast * 100).toFixed(1);
+            let color = Math.abs(d) < 10 ? '#4ade80' : Math.abs(d) < 20 ? '#f59e0b' : '#f87171';
+            diff = `<span style="color:${color};font-weight:700">${d > 0 ? '+' : ''}${d}%</span>`;
+        }
+        return `<tr>
+            <td style="font-weight:600">${x.month}/${x.year}</td>
+            <td style="color:#60a5fa;font-weight:700">${isPast(x.month,x.year) && x.ordersReal != null ? x.ordersReal : '—'}</td>
+            <td style="color:#a78bfa;font-weight:700">${isPast(x.month,x.year) && x.customersReal != null ? x.customersReal : '—'}</td>
+            <td>${x.ordersForecast || '—'}</td>
+            <td>${x.customersForecast || '—'}</td>
+            <td>${diff || '—'}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderCharts(data){
+    if(orderChart) orderChart.destroy();
+    if(customerChart) customerChart.destroy();
+
+    // Filter out invalid records (month=0 or year=0)
+    let validData = data.filter(x => x.month > 0 && x.year > 0);
+    if(!validData.length) return;
+
+    let labels = validData.map(x => x.month + '/' + x.year);
+    let oReal = validData.map(x => isPast(x.month,x.year) ? x.ordersReal : null);
+    let oFc   = validData.map(x => x.ordersForecast || null);
+    let cReal = validData.map(x => isPast(x.month,x.year) ? x.customersReal : null);
+    let cFc   = validData.map(x => x.customersForecast || null);
+
+    let chartOpts = {
+        responsive: true,
+        plugins: { legend: { labels: { color:'#94a3b8', font:{size:11} } } },
+        scales: {
+            x: { ticks:{color:'#64748b',font:{size:10}}, grid:{color:'#1e293b'} },
+            y: { ticks:{color:'#64748b',font:{size:10}}, grid:{color:'#1e293b'} }
+        }
+    };
+
+    orderChart = new Chart(document.getElementById('cOrders'), {
+        type:'line',
+        data:{
+            labels,
+            datasets:[
+                { label:'Thực tế', data:oReal, borderColor:'#3b82f6', borderWidth:3, pointRadius:4, tension:.3, spanGaps:false },
+                { label:'Dự kiến', data:oFc, borderColor:'#f59e0b', borderWidth:2, borderDash:[5,5], pointRadius:3, tension:.3 }
+            ]
+        },
+        options: chartOpts
+    });
+
+    customerChart = new Chart(document.getElementById('cCustomers'), {
+        type:'line',
+        data:{
+            labels,
+            datasets:[
+                { label:'Thực tế', data:cReal, borderColor:'#22c55e', borderWidth:3, pointRadius:4, tension:.3, spanGaps:false },
+                { label:'Dự kiến', data:cFc, borderColor:'#f59e0b', borderWidth:2, borderDash:[5,5], pointRadius:3, tension:.3 }
+            ]
+        },
+        options: chartOpts
+    });
+}
+
+// ===================== PREDICT HINT + CASCADING LOGIC =====================
+let rowPredictions = {};
+let suggestValues = {}; // stores wma/prev/lastFc values for dropdowns
+
+function loadPredictHint(zoneId){
+    let m = parseInt(document.getElementById('fMonth').value);
+    let y = parseInt(document.getElementById('fYear').value);
+
+    // Load WMA prediction (used as default for next month)
+    fetch('/Dispatcher/PredictForecast?zoneId=' + zoneId)
+    .then(r => r.json())
+    .then(d => {
+        rowPredictions[zoneId] = d;
+        // Pre-populate suggest values with WMA
+        suggestValues['wmaOrder']    = d.order;
+        suggestValues['wmaCustomer'] = d.customer;
+    });
+
+    // Load history to get prev month + lastFc values
+    fetch('/Dispatcher/GetZoneHistory?zoneId=' + zoneId)
+    .then(r => r.json())
+    .then(hist => {
+        // Find entry for the current month (m/y)
+        let cur  = hist.find(h => h.month == m && h.year == y);
+        // Find entry for previous month
+        let pm = m == 1 ? 12 : m - 1;
+        let py = m == 1 ? y - 1 : y;
+        let prev = hist.find(h => h.month == pm && h.year == py);
+
+        suggestValues['prevOrder']    = prev?.ordersReal    ?? prev?.ordersForecast    ?? 0;
+        suggestValues['prevCustomer'] = prev?.customersReal ?? prev?.customersForecast ?? 0;
+        suggestValues['lastFcOrder']    = cur?.ordersForecast    ?? 0;
+        suggestValues['lastFcCustomer'] = cur?.customersForecast ?? 0;
+
+        // If the current month already has real data, pre-fill cur inputs
+        if(cur?.ordersReal){
+            let el = document.getElementById('curOrder');
+            if(el && !el.value) el.value = cur.ordersReal;
+        }
+        if(cur?.customersReal){
+            let el = document.getElementById('curCustomer');
+            if(el && !el.value) el.value = cur.customersReal;
+        }
+        // Trigger cascade update
+        onCurChanged(zoneId);
+    });
+}
+
+function toggleSuggest(id){
+    let el = document.getElementById(id);
+    if(!el) return;
+    let visible = el.style.display !== 'none';
+    // Close all
+    ['suggestOrder','suggestCustomer'].forEach(s => {
+        let se = document.getElementById(s);
+        if(se) se.style.display = 'none';
+    });
+    if(!visible) el.style.display = 'block';
+}
+
+function applySuggest(inputId, valueKey, dropdownId){
+    let val = suggestValues[valueKey] || 0;
+    let el  = document.getElementById(inputId);
+    if(el){ el.value = val; }
+    let dd = document.getElementById(dropdownId);
+    if(dd) dd.style.display = 'none';
+    // Trigger cascade recalc
+    if(selectedZoneId) onCurChanged(selectedZoneId);
+}
+
+// Called whenever T_current inputs change → recalculate T_next prediction
+function onCurChanged(zoneId){
+    let oEl = document.getElementById('curOrder');
+    let cEl = document.getElementById('curCustomer');
+    let curO = parseInt(oEl?.value) || 0;
+    let curC = parseInt(cEl?.value) || 0;
+
+    if(curO <= 0 && curC <= 0){
+        document.getElementById('nextPredictBadge').textContent = 'Nhập T hiện tại để xem dự báo';
+        return;
+    }
+
+    // Simple cascade: next month ≈ 0.5*cur + 0.3*prev + 0.2*wma
+    let wmaO = suggestValues['wmaOrder']    || curO;
+    let wmaC = suggestValues['wmaCustomer'] || curC;
+    let prvO = suggestValues['prevOrder']   || curO;
+    let prvC = suggestValues['prevCustomer']|| curC;
+
+    let nextO = Math.round(curO * 0.5 + prvO * 0.3 + wmaO * 0.2);
+    let nextC = Math.round(curC * 0.5 + prvC * 0.3 + wmaC * 0.2);
+
+    // Auto-fill next month inputs (only if empty or previously auto-filled)
+    let nextOEl = document.getElementById('detailOrder');
+    let nextCEl = document.getElementById('detailCustomer');
+    if(nextOEl) nextOEl.value = nextO;
+    if(nextCEl) nextCEl.value = nextC;
+
+    let m = parseInt(document.getElementById('fMonth').value);
+    let targetM = m == 12 ? 1 : m + 1;
+    document.getElementById('nextPredictBadge').innerHTML =
+        `<span style="color:#4ade80;">✓ Dự báo T${targetM}: <b>${nextO}</b> đơn / <b>${nextC}</b> KH</span>`;
+
+    // Add growth badge
+    if(curO > 0){
+        let growth = (((nextO - curO) / curO) * 100).toFixed(1);
+        let color  = growth >= 0 ? '#4ade80' : '#f87171';
+        let sign   = growth >= 0 ? '+' : '';
+        let hO = document.getElementById('hintOrder');
+        let hC = document.getElementById('hintCustomer');
+        if(hO) hO.innerHTML = `Tăng trưởng dự kiến: <b style="color:${color};">${sign}${growth}%</b>`;
+        if(hC){
+            let gC = curC > 0 ? (((nextC-curC)/curC)*100).toFixed(1) : 0;
+            let cC = gC >= 0 ? '#4ade80' : '#f87171';
+            hC.innerHTML = `Tăng trưởng dự kiến: <b style="color:${cC};">${gC >= 0 ? '+' : ''}${gC}%</b>`;
+        }
+    }
+}
+
+// ===================== AUTO PREDICT =====================
+function autoPredict(zoneId){
+    // Auto-fill cur row from WMA, then cascade
+    let wmaO = suggestValues['wmaOrder']    || 0;
+    let wmaC = suggestValues['wmaCustomer'] || 0;
+    if(wmaO > 0){
+        let oEl = document.getElementById('curOrder');
+        let cEl = document.getElementById('curCustomer');
+        if(oEl) oEl.value = wmaO;
+        if(cEl) cEl.value = wmaC;
+        onCurChanged(zoneId);
+        dpToast('Đã auto-fill từ WMA và cập nhật dự báo tháng sau!', 'info');
+    } else {
+        fetch('/Dispatcher/PredictForecast?zoneId=' + zoneId)
+        .then(r => r.json())
+        .then(data => {
+            if(data.order > 0){
+                let oEl = document.getElementById('curOrder');
+                let cEl = document.getElementById('curCustomer');
+                if(oEl) oEl.value = data.order;
+                if(cEl) cEl.value = data.customer;
+                onCurChanged(zoneId);
+                dpToast('Đã tự động điền dự đoán!', 'info');
+            } else {
+                dpToast('Chưa đủ dữ liệu để dự đoán', 'error');
+            }
+        });
+    }
+}
+
+// ===================== SAVE FORECAST =====================
+function saveZoneForecast(zoneId){
+    let mView = parseInt(document.getElementById('fMonth').value);
+    let yView = parseInt(document.getElementById('fYear').value);
+    
+    // Calculate target month (next month)
+    let m = mView + 1;
+    let y = yView;
+    if(m > 12){ m = 1; y++; }
+
+    let o = parseInt(document.getElementById('detailOrder').value) || 0;
+    let c = parseInt(document.getElementById('detailCustomer').value) || 0;
+    
+    if(o <= 0 && c <= 0){ dpToast('Vui lòng nhập giá trị dự kiến!', 'error'); return; }
+
+    fetch('/Dispatcher/SaveForecast', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ zoneId, month:m, year:y, ordersForecast:o, customersForecast:c })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success){
+            dpToast(`Đã lưu dự kiến cho "${d.zoneName}"!`, 'success');
+            loadDashboard();
+            // Re-open detail with new data
+            setTimeout(() => openZoneDetail(zoneId), 300);
+        }
+    });
+}
+
+// ===================== BATCH FORECAST (Tab 2) =====================
+function loadBatchForecast(){
+    let mView = parseInt(document.getElementById('fMonth').value);
+    let yView = parseInt(document.getElementById('fYear').value);
+    let a = document.getElementById('bfArea').value;
+
+    // Target is NEXT MONTH
+    let m = mView + 1;
+    let y = yView;
+    if(m > 12){ m = 1; y++; }
+
+    // Update title/label if exists
+    let titleEl = document.querySelector('#forecast .dp-section-title');
+    if(titleEl) titleEl.innerHTML = `<i class="fas fa-edit"></i> Lập kế hoạch tháng tới: <span style="color:#22c55e">${m}/${y}</span>`;
+
+    fetch(`/Dispatcher/GetForecastStatus?month=${m}&year=${y}&areaId=${a}&filter=`)
+    .then(r => r.json())
+    .then(data => {
+        let tbody = document.getElementById('batchTbody');
+        if(!data.zones.length){
+            tbody.innerHTML = '<tr><td colspan="6"><div class="dp-empty"><i class="fas fa-inbox"></i><div class="t">Không có vùng</div></div></td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.zones.map((z,i) => `
+            <tr data-zone="${z.zoneId}">
+                <td style="color:#475569;font-weight:700">${i+1}</td>
+                <td style="font-weight:700;color:#f1f5f9">${z.zoneName}</td>
+                <td style="color:#94a3b8">${z.areaName}</td>
+                <td><input class="dp-inline-input" type="number" id="bo-${z.zoneId}" value="${z.ordersForecast||''}" placeholder="0"></td>
+                <td><input class="dp-inline-input" type="number" id="bc-${z.zoneId}" value="${z.customersForecast||''}" placeholder="0"></td>
+                <td>${z.hasForecast
+                    ? '<span class="dp-badge dp-badge-ok"><i class="fas fa-check-circle" style="font-size:9px"></i> Đã lập KH</span>'
+                    : '<span class="dp-badge dp-badge-miss"><i class="fas fa-exclamation-circle" style="font-size:9px"></i> Chưa lập</span>'
+                }</td>
+            </tr>
+        `).join('');
+    });
+}
+
+function autoFillAll(){
+    let rows = document.querySelectorAll('#batchTbody tr[data-zone]');
+    let promises = [];
+    rows.forEach(row => {
+        let zid = row.dataset.zone;
+        promises.push(
+            fetch('/Dispatcher/PredictForecast?zoneId=' + zid)
+            .then(r => r.json())
+            .then(d => {
+                let oEl = document.getElementById('bo-' + zid);
+                let cEl = document.getElementById('bc-' + zid);
+                if(oEl && (!oEl.value || oEl.value === '0') && d.order > 0) oEl.value = d.order;
+                if(cEl && (!cEl.value || cEl.value === '0') && d.customer > 0) cEl.value = d.customer;
+            })
+        );
+    });
+    Promise.all(promises).then(() => dpToast('Đã auto-fill dự đoán cho tất cả vùng!', 'info'));
+}
+
+function saveBatchForecast(){
+    let mView = parseInt(document.getElementById('fMonth').value);
+    let yView = parseInt(document.getElementById('fYear').value);
+    
+    // Target is NEXT MONTH
+    let m = mView + 1;
+    let y = yView;
+    if(m > 12){ m = 1; y++; }
+    
+    let items = [];
+
+    document.querySelectorAll('#batchTbody tr[data-zone]').forEach(row => {
+        let zid = parseInt(row.dataset.zone);
+        let o = parseInt(document.getElementById('bo-' + zid)?.value) || 0;
+        let c = parseInt(document.getElementById('bc-' + zid)?.value) || 0;
+        if(o > 0 || c > 0) items.push({ zoneId:zid, ordersForecast:o, customersForecast:c });
+    });
+
+    if(!items.length){ dpToast('Chưa nhập giá trị nào!', 'error'); return; }
+
+    fetch('/Dispatcher/SaveBatchForecast', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ month:m, year:y, items })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.success){
+            dpToast(`Đã lưu ${d.count} vùng thành công!`, 'success');
+            loadBatchForecast();
+        }
+    });
+}
+
+// ===================== FULL MAP =====================
+function loadFullMap(){
+    if(!fullMap) return;
+    let a = document.getElementById('mapArea').value;
+
+    // Clear
+    fullMap.eachLayer(l => { if(l instanceof L.Polygon || l instanceof L.Marker) fullMap.removeLayer(l); });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(fullMap);
+
+    // Load zones for area
+    let url = a ? `/Dispatcher/GetZonesByArea?areaId=${a}` : '/Dispatcher/GetForecastStatus?month='+curMonth+'&year='+curYear+'&areaId=&filter=';
+
+    fetch(url)
+    .then(r => r.json())
+    .then(data => {
+        let zonesList = data.zones || [];
+        let bounds = [];
+
+        zonesList.forEach(z => {
+            let pts;
+            try { pts = JSON.parse(z.points); } catch(e){ return; }
+            let poly = L.polygon(pts, { color:'#3b82f6', fillOpacity:0.3 }).addTo(fullMap);
+            let center = poly.getBounds().getCenter();
+            bounds.push(center);
+
+            L.marker(center, {
+                interactive:false,
+                icon: L.divIcon({
+                    className:'zone-label',
+                    html:`<div style="background:#2563eb;color:white;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3)">${z.zoneName}</div>`
+                })
+            }).addTo(fullMap);
+        });
+
+        if(bounds.length) fullMap.fitBounds(bounds, { padding:[30,30] });
+    });
+}
+
+// Assuming onMenuSwitch exists elsewhere in the full document
+// function onMenuSwitch(menu){
+//     document.querySelectorAll('.dp-section').forEach(s => s.style.display = 'none');
+//     switch(menu){
+//         case 'dashboard': secDash.style.display = 'block'; loadDashboard(); break;
+//         case 'forecast': secForecast.style.display = 'block'; loadBatchForecast(); break;
+//         case 'map': secMap.style.display = 'block'; loadFullMap(); break;
+//         case 'assign': secAssign.style.display = 'block'; initAssignFilters(); break; // Added this line
+//     }
+// }
+
+// ===================== AUTO-ASSIGN SECTION =====================
+function initAssignFilters(){
+    // Populate month
+    let aaM = document.getElementById('aaMonth');
+    if(!aaM.options.length){
+        for(let i=1;i<=12;i++){
+            let o = document.createElement('option');
+            o.value=i; o.text='Tháng '+i;
+            if(i===curMonth) o.selected=true;
+            aaM.appendChild(o);
+        }
+    }
+    // Populate year
+    let aaY = document.getElementById('aaYear');
+    if(!aaY.options.length){
+        for(let y=curYear+1;y>=curYear-2;y--){
+            let o = document.createElement('option');
+            o.value=y; o.text=y;
+            if(y===curYear) o.selected=true;
+            aaY.appendChild(o);
+        }
+    }
+    // Populate area
+    let aaA = document.getElementById('aaArea');
+    if(aaA.options.length <= 1){
+        fetch('/Dispatcher/GetAllAreas')
+        .then(r=>r.json())
+        .then(areas=>{
+            areas.forEach(a=>{
+                let o = document.createElement('option');
+                o.value=a.id; o.text=a.name;
+                aaA.appendChild(o);
+            });
+        });
+    }
+}
+
+function runAutoAssign(){
+    let areaId   = document.getElementById('aaArea').value;
+    let month    = parseInt(document.getElementById('aaMonth').value);
+    let year     = parseInt(document.getElementById('aaYear').value);
+    let drivers  = parseInt(document.getElementById('aaDriverCount').value)||10;
+    let maxO     = parseInt(document.getElementById('aaMaxOrders').value)||999999;
+    let maxC     = parseInt(document.getElementById('aaMaxCustomers').value)||999999;
+
+    if(!areaId){ dpToast('Vui lòng chọn khu vực!', 'error'); return; }
+
+    // Show loading
+    document.getElementById('aaLoading').style.display = 'block';
+    document.getElementById('aaMetrics').style.display = 'none';
+    document.getElementById('aaResultWrap').style.display = 'none';
+    document.getElementById('btnAutoAssign').disabled = true;
+
+    fetch('/Dispatcher/AutoAssign', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+            areaId,
+            month,
+            year,
+            driverCount: drivers,
+            maxOrdersPerDriver: maxO,
+            maxCustomersPerDriver: maxC
+        })
+    })
+    .then(r=>r.json())
+    .then(data=>{
+        document.getElementById('aaLoading').style.display = 'none';
+        document.getElementById('btnAutoAssign').disabled = false;
+
+        if(!data.success){
+            dpToast(data.message || 'Lỗi khi chạy phân công!', 'error');
+            return;
+        }
+
+        // Show metrics
+        document.getElementById('aaMetrics').style.display = 'block';
+        document.getElementById('aaGreedyObj').textContent  = data.greedyObjective.toFixed(2);
+        document.getElementById('aaBestObj').textContent    = data.bestObjective.toFixed(2);
+        document.getElementById('aaImprove').textContent    = data.improvementPct.toFixed(1) + '%';
+        document.getElementById('aaTime').textContent       = data.elapsedMs + 'ms';
+        document.getElementById('aaCompact').textContent    = data.metrics.compactness.toFixed(4);
+
+        // Show table
+        document.getElementById('aaResultWrap').style.display = 'block';
+        document.getElementById('aaPhaseLabel').textContent = `Phase: ${data.bestPhase} | Iter: ${data.bestIteration}`;
+
+        let tbody = document.getElementById('aaTbody');
+        tbody.innerHTML = data.slots.map((s,i) => {
+            let zoneList = s.zones.map(z =>
+                `<span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:5px;font-size:10px;margin:2px;display:inline-block;">`
+                + `<b style="color:#f1f5f9">${z.zoneName}</b> (${z.orders}ð¦/${z.customers}KH)</span>`
+            ).join('');
+
+            let penColor = (s.totalOrders > maxO || s.totalCustomers > maxC) ? '#f87171' : '#4ade80';
+            return `
+            <tr>
+                <td style="color:#475569;font-weight:700">${i+1}</td>
+                <td style="font-weight:700;color:#f1f5f9">
+                    <i class="fas fa-user" style="color:#f59e0b"></i> ${s.driverName}
+                </td>
+                <td style="color:#3b82f6;font-weight:700">${s.zoneCount}</td>
+                <td><span style="font-size:16px;font-weight:800;color:${penColor}">${s.totalOrders}</span>
+                    ${s.totalOrders > maxO ? '<span style="color:#f87171;font-size:10px"> ⚠ Vượt tải</span>':''}
+                </td>
+                <td><span style="font-size:16px;font-weight:800;color:${penColor}">${s.totalCustomers}</span>
+                    ${s.totalCustomers > maxC ? '<span style="color:#f87171;font-size:10px"> ⚠ Vượt tải</span>':''}
+                </td>
+                <td style="max-width:340px">${zoneList}</td>
+            </tr>`;
+        }).join('');
+
+        // Store results globally for saving
+        currentAssignmentResults = data;
+        
+        dpToast(`Phân công hoàn tất! Cải thiện ${data.improvementPct.toFixed(1)}% so với Greedy`, 'success');
+    })
+    .catch(err=>{
+        document.getElementById('aaLoading').style.display = 'none';
+        document.getElementById('btnAutoAssign').disabled = false;
+        dpToast('Lỗi kết nối: ' + err.message, 'error');
+    });
+}
+
+function saveAutoAssignResults(){
+    if(!currentAssignmentResults || !currentAssignmentResults.success){
+        dpToast('Không có kết quả phân công nào để lưu!', 'error');
+        return;
+    }
+
+    let areaId = document.getElementById('aaArea').value;
+    let month  = parseInt(document.getElementById('aaMonth').value);
+    let year   = parseInt(document.getElementById('aaYear').value);
+
+    let btn = document.getElementById('btnSaveAutoAssign');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+    let payload = {
+        areaId: parseInt(areaId),
+        month: month,
+        year: year,
+        items: currentAssignmentResults.slots.map(s => ({
+            driverId: s.driverId,
+            totalOrders: s.totalOrders,
+            totalCustomers: s.totalCustomers,
+            totalDistance: s.totalDistance || 0, 
+            zoneIds: s.zones.map(z => z.zoneId)
+        }))
+    };
+
+    fetch('/Dispatcher/SaveAssignments', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Lưu kết quả này';
+        
+        if(data.success){
+            dpToast(data.message, 'success');
+        } else {
+            dpToast(data.message, 'error');
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Lưu kết quả này';
+        dpToast('Lỗi: ' + err.message, 'error');
+    });
+}
 </script>
 }

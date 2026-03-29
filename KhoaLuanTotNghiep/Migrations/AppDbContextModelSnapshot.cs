@@ -69,8 +69,23 @@ namespace KhoaLuanTotNghiep.Migrations
                     b.Property<int>("DriverId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlannedCustomers")
+                        .HasColumnType("int");
+
                     b.Property<int>("PlannedOrders")
                         .HasColumnType("int");
+
+                    b.Property<double>("TotalDistance")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ZoneIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -137,8 +152,20 @@ namespace KhoaLuanTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("AreaId")
                         .HasColumnType("int");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Cccd")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -153,12 +180,18 @@ namespace KhoaLuanTotNghiep.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ResetCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -250,6 +283,42 @@ namespace KhoaLuanTotNghiep.Migrations
                     b.ToTable("ZoneDistances");
                 });
 
+            modelBuilder.Entity("KhoaLuanTotNghiep.Models.ZoneHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomersForecast")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CustomersReal")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrdersForecast")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrdersReal")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ZoneId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("ZoneHistories");
+                });
+
             modelBuilder.Entity("KhoaLuanTotNghiep.Models.ZoneMonthlyData", b =>
                 {
                     b.Property<int>("Id")
@@ -258,17 +327,45 @@ namespace KhoaLuanTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ActualCustomers")
+                    b.Property<int?>("CustomersForecast")
                         .HasColumnType("int");
 
-                    b.Property<int>("ActualOrders")
+                    b.Property<int?>("CustomersReal")
                         .HasColumnType("int");
 
-                    b.Property<int>("ExpectedCustomers")
+                    b.Property<int>("Month")
                         .HasColumnType("int");
 
-                    b.Property<int>("ExpectedOrders")
+                    b.Property<int?>("OrdersForecast")
                         .HasColumnType("int");
+
+                    b.Property<int?>("OrdersReal")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ZoneId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ZoneMonthlyDatas");
+                });
+
+            modelBuilder.Entity("KhoaLuanTotNghiep.Models.ZoneRoute", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Lat")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Lng")
+                        .HasColumnType("float");
 
                     b.Property<int>("Month")
                         .HasColumnType("int");
@@ -281,7 +378,7 @@ namespace KhoaLuanTotNghiep.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ZoneMonthlyDatas");
+                    b.ToTable("ZoneRoutes");
                 });
 
             modelBuilder.Entity("KhoaLuanTotNghiep.Models.ZoneStatistic", b =>
@@ -392,6 +489,17 @@ namespace KhoaLuanTotNghiep.Migrations
                         .HasForeignKey("VersionId");
 
                     b.Navigation("Version");
+                });
+
+            modelBuilder.Entity("KhoaLuanTotNghiep.Models.ZoneHistory", b =>
+                {
+                    b.HasOne("KhoaLuanTotNghiep.Models.Zone", "Zone")
+                        .WithMany()
+                        .HasForeignKey("ZoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zone");
                 });
 
             modelBuilder.Entity("KhoaLuanTotNghiep.Models.ZoneVersion", b =>

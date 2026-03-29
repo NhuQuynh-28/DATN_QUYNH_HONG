@@ -1,170 +1,385 @@
-﻿@{
-	Layout = null;
+    @{
+    Layout = null;
 }
-
 <!DOCTYPE html>
-
-<html>
+<html lang="vi">
 <head>
-	<meta charset="utf-8" />
-	<title>Đăng nhập</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- Prevent browser from serving this page from cache after login -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Đăng nhập — Delivery Zone</title>
+    <!-- ── Chặn giật view: Ẩn body mặc định để server kiểm tra redirect xong mới vẽ ── -->
+    <style>body { visibility: hidden; opacity: 0; }</style>
+    <script>
+        // Nếu server chưa kịp redirect (do cache), force reload ngay tắp lự
+        if (performance.navigation.type === 2) { // Back button
+            window.location.reload();
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
-	<!-- icon -->
+    body {
+        font-family:'Inter',sans-serif;
+        min-height:100vh;
+        display:flex;
+        background:#0b1120;
+        overflow:hidden;
+    }
 
-	<link rel="stylesheet"
-		  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    /* ===== LEFT PANEL ===== */
+    .lp-left {
+        flex:1;
+        background:linear-gradient(135deg,#1a1f3a 0%,#0d1b2a 100%);
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        padding:60px;
+        position:relative;
+        overflow:hidden;
+    }
 
-	<style>
 
-		body {
-			margin: 0;
-			font-family: Arial,sans-serif;
-			height: 100vh;
-			background: url('/imager/banner.png') no-repeat center center;
-			background-size: cover;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
 
-		.login-box {
-			width: 420px;
-			background: #fff0f5;
-			padding: 40px;
-			border-radius: 20px;
-			box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-			text-align: center;
-		}
+    .lp-brand { display:flex; align-items:center; gap:12px; margin-bottom:60px; }
+    .lp-brand .icon {
+        width:48px;height:48px;border-radius:14px;
+        background:linear-gradient(135deg,#3b82f6,#6366f1);
+        display:flex;align-items:center;justify-content:center;font-size:22px;
+        
+    }
+    .lp-brand .name { font-size:20px;font-weight:800;color:#f1f5f9;letter-spacing:-.3px; }
 
-			.login-box h2 {
-				margin: 0;
-				font-size: 28px;
-				font-weight: bold;
-			}
+    .lp-tagline { font-size:38px;font-weight:800;color:#f1f5f9;line-height:1.2;max-width:420px;margin-bottom:20px; }
+    .lp-tagline span { color:#3b82f6; }
+    .lp-sub { font-size:15px;color:#64748b;max-width:380px;line-height:1.7;margin-bottom:48px; }
 
-			.login-box p {
-				margin-bottom: 25px;
-				color: #555;
-			}
+    .lp-features { display:flex; flex-direction:column; gap:14px; }
+    .lp-feat {
+        display:flex;align-items:center;gap:14px;
+        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+        border-radius:12px;padding:13px 18px;transition:.2s;
+    }
+    .lp-feat:hover { background:rgba(59,130,246,.08); border-color:rgba(59,130,246,.3); }
+    .lp-feat .fi { width:36px;height:36px;border-radius:10px;background:#1e293b;
+        display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0; }
+    .lp-feat .ft { font-size:13px;font-weight:600;color:#e2e8f0; }
+    .lp-feat .fs { font-size:11px;color:#475569;margin-top:2px; }
 
-		/* INPUT */
+    /* ===== RIGHT PANEL ===== */
+    .lp-right {
+        width:480px;
+        background:#0f172a;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:48px 44px;
+        flex-shrink:0;
+        position:relative;
+    }
 
-		.input-group {
-			position: relative;
-			width: 100%;
-			margin-bottom: 18px;
-		}
 
-			.input-group i {
-				position: absolute;
-				left: 12px;
-				top: 50%;
-				transform: translateY(-50%);
-				color: gray;
-			}
+    .login-form { width:100%; }
+    .lf-head { margin-bottom:32px; }
+    .lf-head h2 { font-size:26px;font-weight:800;color:#f1f5f9;margin-bottom:6px; }
+    .lf-head p  { font-size:13px;color:#64748b; }
 
-			.input-group input {
-				width: 100%;
-				box-sizing: border-box;
-				padding: 12px 12px 12px 40px;
-				border-radius: 10px;
-				border: 1px solid #ccc;
-				font-size: 15px;
-			}
+    /* ERROR BANNER */
+    .lf-error {
+        background:rgba(239,68,68,.1);
+        border:1px solid rgba(239,68,68,.3);
+        border-radius:10px;
+        padding:12px 16px;
+        margin-bottom:20px;
+        color:#f87171;
+        font-size:13px;
+        font-weight:600;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        animation:shake .4s ease;
+    }
 
-		/* FORGOT PASSWORD */
+    @@keyframes shake {
+        0%,100% { transform:translateX(0); }
+        25%      { transform:translateX(-6px); }
+        75%      { transform:translateX(6px); }
+    }
 
-		.forgot-password {
-			text-align: right;
-			margin-top: -8px;
-			margin-bottom: 10px;
-		}
+    /* FORM GROUP */
+    .lf-group { margin-bottom:18px; }
+    .lf-group label { display:block;font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em; }
+    .lf-input-wrap { position:relative; }
+    .lf-input-wrap i.icon-l { 
+        position:absolute;left:14px;top:50%;transform:translateY(-50%);
+        color:#475569;font-size:14px;pointer-events:none;
+    }
+    .lf-input-wrap input {
+        width:100%;
+        background:#1e293b;
+        border:1px solid #334155;
+        border-radius:10px;
+        padding:12px 14px 12px 42px;
+        color:#f1f5f9;
+        font-size:14px;
+        font-family:'Inter',sans-serif;
+        outline:none;
+        transition:border-color .2s;
+    }
+    .lf-input-wrap input:focus {
+        border-color:#3b82f6;
+        
+    }
+    .lf-input-wrap input::placeholder { color:#475569; }
+    .lf-input-wrap input.error { border-color:#ef4444; }
+    .lf-input-wrap .toggle-pw {
+        position:absolute;right:14px;top:50%;transform:translateY(-50%);
+        color:#475569;cursor:pointer;font-size:14px;
+        background:none;border:none;padding:0;
+        display:flex;align-items:center;line-height:0;
+    }
+    .lf-input-wrap .toggle-pw:hover { color:#94a3b8; }
+    .lf-field-err { font-size:11px;color:#f87171;margin-top:5px;display:none; }
+    .lf-field-err.show { display:block; }
 
-			.forgot-password a {
-				font-size: 14px;
-				text-decoration: none;
-				color: #ff3d2e;
-			}
+    /* FORGOT */
+    .lf-forgot { text-align:right;margin-bottom:22px; }
+    .lf-forgot a { font-size:12px;color:#3b82f6;text-decoration:none;font-weight:600; }
+    .lf-forgot a:hover { text-decoration:underline; }
 
-				.forgot-password a:hover {
-					text-decoration: underline;
-				}
+    /* SUBMIT */
+    .lf-submit {
+        width:100%;
+        padding:13px;
+        background:linear-gradient(135deg,#3b82f6,#2563eb);
+        border:none;border-radius:10px;
+        color:white;font-size:15px;font-weight:700;
+        font-family:'Inter',sans-serif;
+        cursor:pointer;
+        transition:opacity .2s, transform .1s;
+        display:flex;align-items:center;justify-content:center;gap:8px;
+        letter-spacing:-.2px;
+    }
+    .lf-submit:hover { opacity:.9; }
+    .lf-submit:active { transform:scale(.98); }
+    .lf-submit.loading { opacity:.7; pointer-events:none; }
 
-		/* BUTTON */
+    /* DIVIDER */
+    .lf-divider { display:flex;align-items:center;gap:12px;margin:22px 0; }
+    .lf-divider hr { flex:1;border:none;border-top:1px solid #1e293b; }
+    .lf-divider span { font-size:12px;color:#475569; }
 
-		.btn-login {
-			width: 100%;
-			padding: 12px;
-			border: none;
-			border-radius: 8px;
-			font-size: 16px;
-			color: white;
-			cursor: pointer;
-			margin-top: 10px;
-			background: linear-gradient(90deg,#ff7a7a,#ff3d2e);
-		}
+    /* REGISTER */
+    .lf-register { text-align:center;font-size:13px;color:#64748b; }
+    .lf-register a { color:#3b82f6;font-weight:700;text-decoration:none; }
+    .lf-register a:hover { text-decoration:underline; }
 
-			.btn-login:hover {
-				opacity: 0.9;
-			}
-
-		/* REGISTER */
-
-		.register-link {
-			margin-top: 15px;
-		}
-
-			.register-link a {
-				color: #007bff;
-				text-decoration: none;
-				font-weight: bold;
-			}
-
-	</style>
-
+    /* LOADER */
+    .spin { animation:spin .8s linear infinite; }
+    @@keyframes spin { to { transform:rotate(360deg); } }
+    </style>
 </head>
-
 <body>
 
-	<div class="login-box">
+<!-- LEFT -->
+<div class="lp-left">
 
-		<h2>ĐĂNG NHẬP</h2>
-		<p>Đăng nhập vào hệ thống</p>
 
-		<form asp-controller="Account" asp-action="Login" method="post">
+    <div class="lp-brand">
+        <div class="icon">🚚</div>
+        <div class="name">Delivery Zone</div>
+    </div>
 
-			<div class="input-group">
-				<i class="fa fa-user"></i>
-				<input type="text" name="username" placeholder="Username" required />
-			</div>
+    <div class="lp-tagline">
+        Hệ thống <span>tối ưu hóa</span><br>vùng giao hàng
+    </div>
+    <div class="lp-sub">
+        Quản lý, phân chia và theo dõi vùng hoạt động của bưu tá trong thương mại điện tử một cách thông minh.
+    </div>
 
-			<div class="input-group">
-				<i class="fa fa-lock"></i>
-				<input type="password" name="password" placeholder="Password" required />
-			</div>
+    <div class="lp-features">
+        <div class="lp-feat">
+            <div class="fi">🗺️</div>
+            <div>
+                <div class="ft">Quản lý vùng bản đồ</div>
+                <div class="fs">Vẽ và phân chia khu vực trực tiếp trên Leaflet map</div>
+            </div>
+        </div>
+        <div class="lp-feat">
+            <div class="fi">📊</div>
+            <div>
+                <div class="ft">Thống kê & Báo cáo</div>
+                <div class="fs">Theo dõi hiệu suất giao hàng theo tháng, khu vực</div>
+            </div>
+        </div>
+        <div class="lp-feat">
+            <div class="fi">🚴</div>
+            <div>
+                <div class="ft">Quản lý tài xế</div>
+                <div class="fs">Phân công, theo dõi và đánh giá hoàn thành chỉ tiêu</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-			<!-- QUÊN MẬT KHẨU -->
+<div class="lp-right">
+    <div class="login-form">
+        <div class="lf-head">
+            <h2>Chào mừng trở lại 👋</h2>
+            <p>Đăng nhập để tiếp tục quản lý hệ thống</p>
+        </div>
 
-			<div class="forgot-password">
-				<a asp-controller="Account" asp-action="ForgotPassword">
-					Quên mật khẩu?
-				</a>
-			</div>
+        @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+        {
+            <div class="lf-error">
+                <i class="fas fa-circle-exclamation"></i>
+                <span>@ViewBag.Error</span>
+            </div>
+        }
+        @if (TempData["RegisterSuccess"] != null)
+        {
+            <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;color:#4ade80;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;">
+                <i class="fas fa-circle-check"></i>
+                <span>@TempData["RegisterSuccess"]</span>
+            </div>
+        }
 
-			<button type="submit" class="btn-login">
-				ĐĂNG NHẬP
-			</button>
+        <form id="loginForm" asp-controller="Account" asp-action="Login" method="post" onsubmit="return validateForm()">
 
-		</form>
+            <!-- USERNAME -->
+            <div class="lf-group">
+                <label>Tên đăng nhập</label>
+                <div class="lf-input-wrap">
+                    <i class="fas fa-user icon-l"></i>
+                    <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập..."
+                           autocomplete="username" value="@(ViewBag.Username ?? "")">
 
-		<div class="register-link">
-			Chưa có tài khoản?
-			<a asp-controller="Account" asp-action="Register">
-				Đăng ký
-			</a>
-		</div>
+                </div>
+                <div class="lf-field-err" id="err-username">
+                    <i class="fas fa-triangle-exclamation"></i> Vui lòng nhập tên đăng nhập
+                </div>
+            </div>
 
-	</div>
+            <!-- PASSWORD -->
+            <div class="lf-group">
+                <label>Mật khẩu</label>
+                <div class="lf-input-wrap">
+                    <i class="fas fa-lock icon-l"></i>
+                    <input type="password" id="password" name="password" placeholder="Nhập mật khẩu..."
+                           autocomplete="current-password">
+                    <button type="button" class="toggle-pw" onclick="togglePassword()" tabindex="-1">
+                        <i class="fas fa-eye" id="pwIcon"></i>
+                    </button>
+                </div>
+                <div class="lf-field-err" id="err-password">
+                    <i class="fas fa-triangle-exclamation"></i> Vui lòng nhập mật khẩu
+                </div>
+            </div>
 
+            <!-- FORGOT -->
+            <div class="lf-forgot">
+                <a asp-controller="Account" asp-action="ForgotPassword">
+                    <i class="fas fa-key"></i> Quên mật khẩu?
+                </a>
+            </div>
+
+            <!-- SUBMIT -->
+            <button type="submit" class="lf-submit" id="btnLogin">
+                <i class="fas fa-right-to-bracket"></i>
+                Đăng nhập
+            </button>
+        </form>
+
+        <div class="lf-divider"><hr><span>hoặc</span><hr></div>
+
+        <div class="lf-register">
+            Chưa có tài khoản?
+            <a asp-controller="Account" asp-action="Register">Đăng ký ngay →</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function validateForm() {
+    let ok = true;
+    const u  = document.getElementById('username');
+    const p  = document.getElementById('password');
+    const eu = document.getElementById('err-username');
+    const ep = document.getElementById('err-password');
+
+    // Reset
+    [u,p].forEach(i => i.classList.remove('error'));
+    [eu,ep].forEach(e => e.classList.remove('show'));
+
+    // Validate username
+    if (!u.value.trim()) {
+        u.classList.add('error');
+        eu.classList.add('show');
+        ok = false;
+    }
+    // Validate password
+    if (!p.value.trim()) {
+        p.classList.add('error');
+        ep.classList.add('show');
+        ok = false;
+    }
+    // Password length
+    if (p.value.trim() && p.value.length < 4) {
+        p.classList.add('error');
+        ep.textContent = '⚠ Mật khẩu phải có ít nhất 4 ký tự';
+        ep.classList.add('show');
+        ok = false;
+    }
+
+    if (ok) {
+        // Loading state
+        const btn = document.getElementById('btnLogin');
+        btn.classList.add('loading');
+        btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Đang đăng nhập...';
+    }
+    return ok;
+}
+
+function togglePassword() {
+    const pw  = document.getElementById('password');
+    const ico = document.getElementById('pwIcon');
+    if (pw.type === 'password') {
+        pw.type = 'text';
+        ico.className = 'fas fa-eye-slash';
+    } else {
+        pw.type = 'password';
+        ico.className = 'fas fa-eye';
+    }
+}
+
+// Clear error on typing
+['username','password'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+        this.classList.remove('error');
+        document.getElementById('err-' + id).classList.remove('show');
+    });
+});
+
+// ── Bfcache fix: khi người dùng bấm Back sau khi đã đăng nhập,
+//    trình duyệt hiện trang từ memory (bfcache) mà không request server.
+//    Khi detect được bfcache restore → force reload → session check trên
+//    server sẽ chạy và redirect về dashboard.
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        // Page was restored from bfcache
+        window.location.reload();
+    }
+});
+// Reveal body if not redirected
+window.onload = function() {
+    document.body.style.visibility = 'visible';
+    document.body.style.opacity = '1';
+};
+</script>
 </body>
 </html>

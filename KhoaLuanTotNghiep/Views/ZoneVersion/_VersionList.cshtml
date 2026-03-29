@@ -1,99 +1,234 @@
-﻿@model List<KhoaLuanTotNghiep.Models.ZoneVersion>
+@model List<KhoaLuanTotNghiep.Models.ZoneVersion>
 
-<h2>Danh sách Version</h2>
-<button onclick="openCreateVersion(@ViewBag.AreaId)" class="btn-add">
-	+ Thêm Version
-</button>
-<table class="table-area">
-
-	<thead>
-		<tr>
-			<th>ID</th>
-			<th>Version</th>
-			<th>Ngày tạo</th>
-			<th>Ngày sửa</th>
-			<th>Số polygon</th>
-			<th>Diện tích</th>
-			<th>Active</th>
-			<th>Action</th>
-		</tr>
-	</thead>
-
-	<tbody>
-
-		@foreach (var v in Model)
-		{
-			<tr>
-
-				<td>@v.Id</td>
-
-				<td>@v.VersionName</td>
-
-				<td>@(v.CreatedDate?.ToString("dd/MM/yyyy") ?? "")</td>
-
-				<td>@(v.UpdatedDate?.ToString("dd/MM/yyyy") ?? "")</td>
-
-				<td>@(v.SoPolygon ?? 0)</td>
-
-				<td>
-					@((v.DienTichBaoPhu ?? 0) != 0
-									? (v.DienTichBaoPhu ?? 0).ToString("N2") + " m²"
-									: "0")
-				</td>
-
-				<td>
-					@if (v.IsActive == true)
-					{
-						<span style="color:lime">Active</span>
-					}
-					else
-					{
-						<span style="color:gray">Inactive</span>
-					}
-				</td>
-
-				<td>
-					<button onclick="openMap(@v.Id)">
-						Mở bản đồ
-					</button>
-					<button onclick="setActive(@v.Id)">
-						Active
-					</button>
-					<button onclick="deleteVersion(@v.Id)">
-						Xoá
-					</button>
-
-				</td>
-
-			</tr>
-		}
-
-	</tbody>
-
-</table>
 <style>
-	.table-area {
-		width: 100%;
-		border-collapse: collapse;
-		margin-top: 15px;
-	}
+.vl-wrap { font-family:'Segoe UI',sans-serif; padding:4px 0; }
 
-		.table-area th {
-			background: #1e293b;
-			color: white;
-			padding: 10px;
-			text-align: left;
-		}
+/* HEADER */
+.vl-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+.vl-title { display:flex; align-items:center; gap:10px; }
+.vl-title h2 { margin:0; font-size:20px; font-weight:700; color:#f1f5f9; }
+.vl-back-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    background:#1e293b; border:1px solid #334155; color:#94a3b8;
+    padding:7px 14px; border-radius:8px; font-size:12px; cursor:pointer;
+    text-decoration:none; transition:all .15s;
+}
+.vl-back-btn:hover { background:#334155; color:#e2e8f0; }
 
-		.table-area td {
-			background: white;
-			color: black;
-			padding: 10px;
-			border: 1px solid #ddd;
-		}
+/* STAT CARDS */
+.vl-stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+.vl-stat {
+    background:#1e293b; border:1px solid #334155; border-radius:12px;
+    padding:14px 20px; min-width:120px; position:relative; overflow:hidden;
+}
+.vl-stat::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--accent,#3b82f6);
+}
+.vl-stat .val { font-size:22px; font-weight:800; color:var(--accent,#3b82f6); }
+.vl-stat .lbl { font-size:11px; color:#64748b; margin-top:3px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
 
-		.table-area tr:hover {
-			background: #f1f5f9;
-		}
+/* ADD BUTTON */
+.vl-add-btn {
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg,#3b82f6,#2563eb); color:white;
+    border:none; padding:10px 20px; border-radius:10px; font-size:13px;
+    font-weight:700; cursor:pointer; transition:opacity .15s;
+}
+.vl-add-btn:hover { opacity:.88; }
+
+/* TABLE */
+.vl-table-wrap { background:#1e293b; border-radius:14px; border:1px solid #334155; overflow:hidden; }
+.vl-table { width:100%; border-collapse:collapse; font-size:13px; }
+.vl-table thead tr { background:#0f172a; }
+.vl-table th {
+    padding:12px 16px; text-align:left; color:#64748b;
+    font-weight:700; font-size:11px; text-transform:uppercase;
+    letter-spacing:.05em; border-bottom:1px solid #1e293b;
+}
+.vl-table tbody tr { border-bottom:1px solid #0f172a55; transition:background .15s; cursor:pointer; }
+.vl-table tbody tr:hover { background:#0f172a88; }
+.vl-table td { padding:14px 16px; color:#e2e8f0; vertical-align:middle; }
+
+/* VERSION NAME CELL */
+.vl-ver-cell { display:flex; align-items:center; gap:10px; }
+.vl-ver-icon {
+    width:34px; height:34px; border-radius:9px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:15px;
+    background:linear-gradient(135deg,#1d4ed8,#6366f1);
+}
+.vl-ver-name { font-weight:700; color:#f1f5f9; }
+.vl-ver-id   { font-size:11px; color:#475569; margin-top:1px; }
+
+/* BADGES */
+.vl-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 11px; border-radius:20px; font-size:11px; font-weight:700;
+}
+.vl-badge-active   { background:#16a34a22; color:#4ade80; border:1px solid #16a34a44; }
+.vl-badge-inactive { background:#47474722; color:#94a3b8; border:1px solid #47474744; }
+
+/* CHIPS */
+.vl-chip {
+    display:inline-flex; align-items:center; gap:4px;
+    background:#0f172a; border:1px solid #334155; border-radius:8px;
+    padding:4px 10px; font-size:12px; color:#94a3b8; font-weight:600;
+}
+.vl-chip i { font-size:10px; }
+
+/* AREA DISPLAY */
+.vl-area {
+    font-size:13px; color:#e2e8f0; font-weight:600;
+    display:flex; align-items:baseline; gap:4px;
+}
+.vl-area .unit { font-size:10px; color:#475569; font-weight:400; }
+
+/* ACTION BUTTONS */
+.vl-actions { display:flex; gap:6px; flex-wrap:nowrap; }
+.vl-btn {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:6px 12px; border-radius:8px; border:none;
+    font-size:11px; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap;
+}
+.vl-btn-map    { background:#1c3d5a; color:#38bdf8; }
+.vl-btn-map:hover    { background:#0284c7; color:white; }
+.vl-btn-active { background:#1e3d2f; color:#4ade80; }
+.vl-btn-active:hover { background:#16a34a; color:white; }
+.vl-btn-del    { background:#3d1c1c; color:#f87171; }
+.vl-btn-del:hover    { background:#dc2626; color:white; }
+
+.vl-date { font-size:12px; color:#64748b; }
+.vl-num  { font-weight:700; color:#475569; }
 </style>
 
+<div class="vl-wrap">
+
+    <!-- HEADER -->
+    <div class="vl-header">
+        <div class="vl-title">
+            <span onclick="loadArea()" class="vl-back-btn" title="Quay lại danh sách khu vực">
+                <i class="fas fa-arrow-left"></i>
+            </span>
+            <div>
+                <h2><i class="fas fa-layer-group" style="color:#3b82f6;margin-right:8px"></i>Danh sách Version</h2>
+                <div style="font-size:12px;color:#64748b;margin-top:2px">
+                    Khu vực: <span style="color:#60a5fa;font-weight:600">@ViewBag.AreaName</span>
+                </div>
+            </div>
+        </div>
+        <button class="vl-add-btn" onclick="openCreateVersion(@ViewBag.AreaId)">
+            <i class="fas fa-plus-circle"></i> Thêm Version mới
+        </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="vl-stats">
+        <div class="vl-stat" style="--accent:#3b82f6">
+            <div class="val">@Model.Count</div>
+            <div class="lbl">Tổng Version</div>
+        </div>
+        <div class="vl-stat" style="--accent:#4ade80">
+            <div class="val">@Model.Count(v => v.IsActive == true)</div>
+            <div class="lbl">Đang Active</div>
+        </div>
+        <div class="vl-stat" style="--accent:#f59e0b">
+            <div class="val">@Model.Sum(v => v.SoPolygon ?? 0)</div>
+            <div class="lbl">Tổng Polygon</div>
+        </div>
+        <div class="vl-stat" style="--accent:#a78bfa">
+            <div class="val">@((Model.Sum(v => v.DienTichBaoPhu ?? 0) / 1_000_000).ToString("N1"))</div>
+            <div class="lbl">Tổng diện tích (km²)</div>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="vl-table-wrap">
+        <table class="vl-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên Version</th>
+                    <th>Ngày tạo</th>
+                    <th>Cập nhật</th>
+                    <th><i class="fas fa-vector-square"></i> Polygon</th>
+                    <th><i class="fas fa-ruler-combined"></i> Diện tích</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int idx = 0; }
+                @foreach (var v in Model)
+                {
+                    idx++;
+                    double dienTichKm = (v.DienTichBaoPhu ?? 0) / 1_000_000.0;
+                    string dienTichStr = (v.DienTichBaoPhu ?? 0) > 0
+                        ? (dienTichKm >= 0.01 ? dienTichKm.ToString("N3") + " km²" : (v.DienTichBaoPhu ?? 0).ToString("N0") + " m²")
+                        : "—";
+
+                    <tr>
+                        <td class="vl-num">@idx</td>
+                        <td>
+                            <div class="vl-ver-cell">
+                                <div class="vl-ver-icon">🗺️</div>
+                                <div>
+                                    <div class="vl-ver-name">@v.VersionName</div>
+                                    <div class="vl-ver-id">ID: @v.Id</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="vl-date">@(v.CreatedDate?.ToString("dd/MM/yyyy") ?? "—")</span></td>
+                        <td><span class="vl-date">@(v.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "—")</span></td>
+                        <td>
+                            <div class="vl-chip">
+                                <i class="fas fa-draw-polygon"></i>
+                                @(v.SoPolygon ?? 0)
+                            </div>
+                        </td>
+                        <td>
+                            <div class="vl-area">
+                                <span>@dienTichStr</span>
+                            </div>
+                        </td>
+                        <td>
+                            @if (v.IsActive == true)
+                            {
+                                <span class="vl-badge vl-badge-active">
+                                    <i class="fas fa-circle" style="font-size:7px"></i> Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="vl-badge vl-badge-inactive">
+                                    <i class="fas fa-circle" style="font-size:7px"></i> Inactive
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            <div class="vl-actions">
+                                <button class="vl-btn vl-btn-map" onclick="openMap(@v.Id)" title="Mở bản đồ version này">
+                                    <i class="fas fa-map"></i> Bản đồ
+                                </button>
+                                <button class="vl-btn vl-btn-active" onclick="setActive(@v.Id)" title="Đặt làm version Active">
+                                    <i class="fas fa-check"></i> Active
+                                </button>
+                                <button class="vl-btn vl-btn-del" onclick="deleteVersion(@v.Id)" title="Xóa version này">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (!Model.Any())
+        {
+            <div style="text-align:center;padding:60px;color:#475569">
+                <i class="fas fa-layer-group" style="font-size:44px;display:block;margin-bottom:14px;color:#334155"></i>
+                <div style="font-size:16px;font-weight:700;color:#64748b">Chưa có Version nào</div>
+                <div style="font-size:13px;color:#475569;margin-top:6px">Nhấn "Thêm Version mới" để bắt đầu</div>
+            </div>
+        }
+    </div>
+</div>

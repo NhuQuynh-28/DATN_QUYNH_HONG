@@ -1,128 +1,335 @@
-﻿@model KhoaLuanTotNghiep.Models.User
+@model KhoaLuanTotNghiep.Models.User
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <meta charset="utf-8" />
-    <title>Đăng ký</title>
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Đăng ký — Delivery Zone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: url('/imager/banner.png') no-repeat center center;
-            background-size: cover;
-            font-family: Arial;
-        }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
-        .register-box {
-            width: 420px;
-            margin: 80px auto;
-            background: #fff0f5;
-            padding: 35px;
-            border-radius: 18px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
+    body {
+        font-family:'Inter',sans-serif;
+        min-height:100vh;
+        background:#0b1120;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:30px 20px;
+    }
 
-        h2 {
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+    .rg-wrap {
+        width:100%;
+        max-width:680px;
+        background:#0f172a;
+        border:1px solid #1e293b;
+        border-radius:16px;
+        padding:36px 40px;
+    }
 
-        .input-group {
-            position: relative;
-            width: 100%;
-            margin: 15px 0;
-        }
+    /* HEADER */
+    .rg-header { text-align:center; margin-bottom:28px; }
+    .rg-brand {
+        display:inline-flex; align-items:center; gap:10px;
+        text-decoration:none; margin-bottom:20px;
+    }
+    .rg-brand .ico {
+        width:38px;height:38px;border-radius:11px;
+        background:linear-gradient(135deg,#3b82f6,#6366f1);
+        display:flex;align-items:center;justify-content:center;font-size:18px;
+    }
+    .rg-brand .nm { font-size:16px;font-weight:800;color:#f1f5f9; }
+    .rg-header h2 { font-size:22px;font-weight:800;color:#f1f5f9;margin-bottom:6px; }
+    .rg-header p  { font-size:13px;color:#64748b; }
 
-            .input-group i {
-                position: absolute;
-                left: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: gray;
-            }
+    /* ERROR */
+    .rg-error {
+        background:rgba(239,68,68,.1);
+        border:1px solid rgba(239,68,68,.3);
+        border-radius:9px;
+        padding:11px 14px;
+        margin-bottom:18px;
+        color:#f87171;
+        font-size:13px;
+        font-weight:600;
+        display:flex; align-items:center; gap:8px;
+    }
 
-            .input-group input,
-            .input-group select {
-                width: 100%;
-                height: 45px;
-                padding-left: 40px;
-                padding-right: 10px;
-                border-radius: 10px;
-                border: 1px solid #ccc;
-                box-sizing: border-box; /* QUAN TRỌNG */
-                font-size: 15px;
-            }
+    /* SECTION LABEL */
+    .rg-section {
+        font-size:10px;font-weight:800;color:#3b82f6;
+        text-transform:uppercase;letter-spacing:.08em;
+        margin:20px 0 12px;
+        display:flex;align-items:center;gap:8px;
+    }
+    .rg-section::after { content:'';flex:1;height:1px;background:#1e293b; }
 
-        .btn {
-            width: 100%;
-            height: 45px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(to right,#ff7b7b,#ff3d2e);
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    /* GRID */
+    .rg-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .rg-grid.full { grid-template-columns:1fr; }
 
-            .btn:hover {
-                opacity: 0.9;
-            }
+    /* FIELD */
+    .rg-field { }
+    .rg-field label {
+        display:block;font-size:11px;color:#94a3b8;font-weight:700;
+        margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;
+    }
+    .rg-field label span { color:#ef4444; }
+    .rg-input-wrap { position:relative; }
+    .rg-input-wrap i {
+        position:absolute;left:13px;top:50%;transform:translateY(-50%);
+        color:#475569;font-size:13px;pointer-events:none;
+    }
+    .rg-input-wrap input,
+    .rg-input-wrap select {
+        width:100%;
+        background:#1e293b;
+        border:1px solid #334155;
+        border-radius:9px;
+        padding:10px 13px 10px 38px;
+        color:#f1f5f9;
+        font-size:13px;
+        font-family:'Inter',sans-serif;
+        outline:none;
+        transition:border-color .2s;
+        appearance:none;
+    }
+    .rg-input-wrap input:focus,
+    .rg-input-wrap select:focus { border-color:#3b82f6; }
+    .rg-input-wrap input::placeholder { color:#475569; }
+    .rg-input-wrap input.err { border-color:#ef4444; }
+    .rg-field-hint { font-size:11px;color:#475569;margin-top:4px; }
+    .rg-field-err  { font-size:11px;color:#f87171;margin-top:4px;display:none; }
+    .rg-field-err.show { display:block; }
+
+    /* TOGGLE PW */
+    .pw-toggle {
+        position:absolute;right:12px;top:50%;transform:translateY(-50%);
+        color:#475569;cursor:pointer;background:none;border:none;font-size:13px;
+    }
+    .pw-toggle:hover { color:#94a3b8; }
+
+    /* SUBMIT */
+    .rg-submit {
+        width:100%;
+        margin-top:22px;
+        padding:12px;
+        background:linear-gradient(135deg,#3b82f6,#2563eb);
+        border:none;border-radius:9px;
+        color:white;font-size:14px;font-weight:700;
+        font-family:'Inter',sans-serif;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:center;gap:8px;
+        transition:opacity .2s;
+    }
+    .rg-submit:hover { opacity:.9; }
+    .rg-submit.loading { opacity:.65;pointer-events:none; }
+
+    .rg-login { text-align:center;margin-top:16px;font-size:13px;color:#64748b; }
+    .rg-login a { color:#3b82f6;font-weight:700;text-decoration:none; }
+    .rg-login a:hover { text-decoration:underline; }
+
+    /* NOTICE */
+    .rg-notice {
+        background:rgba(59,130,246,.08);
+        border:1px solid rgba(59,130,246,.2);
+        border-radius:9px;
+        padding:11px 14px;
+        margin-top:16px;
+        font-size:12px;color:#60a5fa;
+        display:flex;align-items:flex-start;gap:8px;line-height:1.6;
+    }
+
+    @@keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin .8s linear infinite; }
     </style>
 </head>
 <body>
+<div class="rg-wrap">
 
-    <div class="register-box">
-
-        <h2>ĐĂNG KÝ</h2>
-        <p>Tạo tài khoản mới</p>
-
-        <form asp-controller="Account" asp-action="Register" method="post">
-
-            <div class="input-group">
-                <i class="fa fa-user"></i>
-                <input asp-for="Username" placeholder="Username" required />
-            </div>
-
-            <div class="input-group">
-                <i class="fa fa-lock"></i>
-                <input asp-for="Password" type="password" placeholder="Password" required />
-            </div>
-
-            <div class="input-group">
-                <i class="fa fa-lock"></i>
-                <input asp-for="ConfirmPassword" type="password" placeholder="Confirm Password" />
-            </div>
-
-            <div class="input-group">
-                <i class="fa fa-user-shield"></i>
-                <select asp-for="Role">
-                    <option value="">Chọn Role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Dispatcher">Dispatcher</option>
-                    <option value="Driver">Driver</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn">ĐĂNG KÝ</button>
-
-            <p>
-                Đã có tài khoản?
-                <a asp-controller="Account" asp-action="Login">
-                    Đăng nhập
-                </a>
-            </p>
-
-        </form>
-
+    <!-- HEADER -->
+    <div class="rg-header">
+        <a href="/" class="rg-brand">
+            <div class="ico">🚚</div>
+            <div class="nm">Delivery Zone</div>
+        </a>
+        <h2>Tạo tài khoản mới</h2>
+        <p>Điền đầy đủ thông tin để đăng ký tài khoản</p>
     </div>
 
+    @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+    {
+        <div class="rg-error">
+            <i class="fas fa-circle-exclamation"></i>
+            <span>@ViewBag.Error</span>
+        </div>
+    }
+
+    <form asp-controller="Account" asp-action="Register" method="post" id="regForm" onsubmit="return validateReg()">
+
+        <!-- THÔNG TIN ĐĂNG NHẬP -->
+        <div class="rg-section"><i class="fas fa-lock"></i> Thông tin đăng nhập</div>
+        <div class="rg-grid">
+            <div class="rg-field">
+                <label>Tên đăng nhập <span>*</span></label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input asp-for="Username" placeholder="Tên đăng nhập..." id="r-username">
+                </div>
+                <div class="rg-field-err" id="e-username">Vui lòng nhập tên đăng nhập</div>
+            </div>
+            <div class="rg-field">
+                <label>Email <span>*</span></label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-envelope"></i>
+                    <input asp-for="Email" type="email" placeholder="example@email.com" id="r-email">
+                </div>
+                <div class="rg-field-err" id="e-email">Email không hợp lệ</div>
+            </div>
+            <div class="rg-field">
+                <label>Mật khẩu <span>*</span></label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input asp-for="Password" type="password" placeholder="Ít nhất 6 ký tự..." id="r-pw">
+                    <button type="button" class="pw-toggle" onclick="togglePw('r-pw','ico-pw')">
+                        <i class="fas fa-eye" id="ico-pw"></i>
+                    </button>
+                </div>
+                <div class="rg-field-err" id="e-pw">Mật khẩu ít nhất 6 ký tự</div>
+            </div>
+            <div class="rg-field">
+                <label>Xác nhận mật khẩu <span>*</span></label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input asp-for="ConfirmPassword" type="password" placeholder="Nhập lại mật khẩu..." id="r-cpw">
+                    <button type="button" class="pw-toggle" onclick="togglePw('r-cpw','ico-cpw')">
+                        <i class="fas fa-eye" id="ico-cpw"></i>
+                    </button>
+                </div>
+                <div class="rg-field-err" id="e-cpw">Mật khẩu không khớp</div>
+            </div>
+        </div>
+
+        <!-- THÔNG TIN CÁ NHÂN -->
+        <div class="rg-section"><i class="fas fa-id-card"></i> Thông tin cá nhân</div>
+        <div class="rg-grid">
+            <div class="rg-field">
+                <label>Số điện thoại <span>*</span></label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-phone"></i>
+                    <input asp-for="Phone" placeholder="0912345678" id="r-phone">
+                </div>
+                <div class="rg-field-err" id="e-phone">SĐT không hợp lệ (10 số)</div>
+            </div>
+            <div class="rg-field">
+                <label>CCCD / CMND <span>*</span></label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-id-badge"></i>
+                    <input asp-for="Cccd" placeholder="012345678901" id="r-cccd" maxlength="12">
+                </div>
+                <div class="rg-field-hint">Căn cước công dân 12 số</div>
+                <div class="rg-field-err" id="e-cccd">CCCD phải có 9 hoặc 12 số</div>
+            </div>
+        </div>
+        <div class="rg-grid full" style="margin-top:12px">
+            <div class="rg-field">
+                <label>Địa chỉ</label>
+                <div class="rg-input-wrap">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input asp-for="Address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/TP">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="rg-submit" id="btnReg">
+            <i class="fas fa-user-plus"></i> Đăng ký tài khoản
+        </button>
+    </form>
+
+    <div class="rg-login">
+        Đã có tài khoản?
+        <a asp-controller="Account" asp-action="Login">Đăng nhập ngay →</a>
+    </div>
+
+    <div class="rg-notice">
+        <i class="fas fa-circle-info" style="margin-top:2px;flex-shrink:0"></i>
+        <span>Sau khi đăng ký, tài khoản của bạn sẽ được <strong>Admin phê duyệt</strong> trước khi có thể đăng nhập vào hệ thống.</span>
+    </div>
+</div>
+
+<script>
+function togglePw(inputId, iconId) {
+    const inp = document.getElementById(inputId);
+    const ico = document.getElementById(iconId);
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        ico.className = 'fas fa-eye-slash';
+    } else {
+        inp.type = 'password';
+        ico.className = 'fas fa-eye';
+    }
+}
+
+function validateReg() {
+    let ok = true;
+
+    const fields = [
+        { id:'r-username', eid:'e-username', check: v => v.trim().length >= 3 },
+        { id:'r-email',    eid:'e-email',    check: v => /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(v) },
+        { id:'r-pw',       eid:'e-pw',       check: v => v.length >= 6 },
+        { id:'r-phone',    eid:'e-phone',    check: v => /^0\d{9}$/.test(v) },
+        { id:'r-cccd',     eid:'e-cccd',     check: v => /^\d{9}$|^\d{12}$/.test(v) },
+    ];
+
+    fields.forEach(f => {
+        const el  = document.getElementById(f.id);
+        const err = document.getElementById(f.eid);
+        const val = el ? el.value : '';
+        if (!f.check(val)) {
+            if (el) el.classList.add('err');
+            if (err) err.classList.add('show');
+            ok = false;
+        } else {
+            if (el) el.classList.remove('err');
+            if (err) err.classList.remove('show');
+        }
+    });
+
+    // xác nhận mật khẩu
+    const pw  = document.getElementById('r-pw').value;
+    const cpw = document.getElementById('r-cpw');
+    const ecpw= document.getElementById('e-cpw');
+    if (pw !== cpw.value) {
+        cpw.classList.add('err');
+        ecpw.classList.add('show');
+        ok = false;
+    } else {
+        cpw.classList.remove('err');
+        ecpw.classList.remove('show');
+    }
+
+    if (ok) {
+        const btn = document.getElementById('btnReg');
+        btn.classList.add('loading');
+        btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Đang xử lý...';
+    }
+    return ok;
+}
+
+// clear err on input
+document.querySelectorAll('.rg-input-wrap input').forEach(inp => {
+    inp.addEventListener('input', () => {
+        inp.classList.remove('err');
+        const errId = 'e-' + inp.id.replace('r-','');
+        const err = document.getElementById(errId);
+        if (err) err.classList.remove('show');
+    });
+});
+</script>
 </body>
 </html>

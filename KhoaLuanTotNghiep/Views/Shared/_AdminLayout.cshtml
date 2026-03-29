@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 @{
     var role = Context.Session.GetString("Role");
     var username = Context.Session.GetString("Username");
@@ -23,6 +23,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
 
         body {
@@ -74,86 +75,110 @@
                 background: #2563eb;
             }
 
-        /* SUB MENU */
+        /* SUB MENU - area city tabs */
+        .submenu { display:none; padding-left:0; margin-bottom:10px; }
+        .submenu a { display:block; padding:8px 12px; color:#cbd5e1; text-decoration:none; border-radius:6px; font-size:13px; }
+        .submenu a:hover { background:#1e40af; color:white; }
 
-        .submenu {
-            display: none;
-            padding-left: 15px;
-            margin-bottom: 10px;
+        /* area city tabs */
+        .area-cities { padding-left:10px; margin-top:4px; }
+        .area-city-tab {
+            display:flex; align-items:center; gap:8px;
+            padding:8px 12px; border-radius:8px; cursor:pointer;
+            color:#94a3b8; font-size:13px; transition:all .2s;
+            margin-bottom:3px;
         }
+        .area-city-tab:hover { background:#1e40af22; color:#60a5fa; }
+        .area-city-tab.active { background:#1e40af; color:white; font-weight:600; }
+        .area-city-dot { width:8px; height:8px; border-radius:50%; background:#3b82f6; flex-shrink:0; }
+        .area-city-dot.hcm { background:#f59e0b; }
+        .area-city-dot.dn  { background:#22c55e; }
+        .area-city-dot.hp  { background:#a78bfa; }
+        .area-city-dot.other { background:#64748b; }
+        .area-add-btn {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 12px; border-radius:8px; cursor:pointer;
+            color:#38bdf8; font-size:12px; border:1px dashed #334155;
+            margin:6px 10px 4px; transition:all .2s;
+        }
+        .area-add-btn:hover { background:#0f172a; border-color:#3b82f6; }
 
-            .submenu a {
-                display: block;
-                padding: 8px;
-                color: white;
-                text-decoration: none;
-                border-radius: 6px;
-            }
+        /* map toolbar */
+        .map-toolbar {
+            display:none; background:#1e293b; border-radius:12px;
+            padding:10px 14px; margin-bottom:12px;
+            flex-wrap:wrap; gap:8px; align-items:center;
+            border:1px solid #334155;
+        }
+        .map-toolbar.visible { display:flex; }
+        .mt-label { color:#64748b; font-size:11px; font-weight:700;
+            text-transform:uppercase; letter-spacing:.05em; margin-right:4px; }
+        .mt-sep { width:1px; height:28px; background:#334155; margin:0 4px; }
+        .mt-btn {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:6px 12px; border-radius:8px; border:none;
+            font-size:12px; font-weight:600; cursor:pointer;
+            transition:all .15s; white-space:nowrap;
+        }
+        .mt-btn-draw   { background:#1c3d5a; color:#38bdf8; }
+        .mt-btn-draw:hover   { background:#0284c7; color:white; }
+        .mt-btn-save   { background:#1e3d2f; color:#4ade80; }
+        .mt-btn-save:hover   { background:#16a34a; color:white; }
+        .mt-btn-done   { background:#1c3855; color:#93c5fd; }
+        .mt-btn-done:hover   { background:#1d4ed8; color:white; }
+        .mt-btn-del    { background:#3d1c1c; color:#f87171; }
+        .mt-btn-del:hover    { background:#dc2626; color:white; }
+        .mt-btn-clear  { background:#2d1f3d; color:#c4b5fd; }
+        .mt-btn-clear:hover  { background:#7c3aed; color:white; }
+        .mt-btn-update { background:#2d2a1a; color:#fbbf24; }
+        .mt-btn-update:hover { background:#d97706; color:white; }
+        .mt-btn-dist   { background:#1a2d2a; color:#34d399; }
+        .mt-btn-dist:hover   { background:#059669; color:white; }
+        .mt-btn-adj    { background:#1a1a2d; color:#818cf8; }
+        .mt-btn-adj:hover    { background:#4f46e5; color:white; }
+        .mt-zone-name {
+            background:#0f172a; border:1px solid #334155; border-radius:7px;
+            padding:6px 10px; color:#f1f5f9; font-size:12px; outline:none;
+            width:130px;
+        }
+        .mt-zone-name:focus { border-color:#3b82f6; }
 
-                .submenu a:hover {
-                    background: #1e40af;
-                }
+        /* modal overlay */
+        .am-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9000;
+            display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+        .am-overlay.open { display:flex; }
+        .am-modal { background:#1e293b; border:1px solid #334155; border-radius:16px;
+            padding:28px; min-width:360px; max-width:440px; width:100%;
+            box-shadow:0 24px 64px rgba(0,0,0,.5); }
+        .am-modal h3 { margin:0 0 20px; font-size:17px; color:#f1f5f9;
+            display:flex; align-items:center; gap:8px; }
+        .am-form-group { margin-bottom:14px; }
+        .am-form-group label { display:block; font-size:12px; color:#94a3b8;
+            font-weight:600; margin-bottom:5px; }
+        .am-form-input { width:100%; background:#0f172a; border:1px solid #334155;
+            border-radius:8px; padding:9px 12px; color:#f1f5f9; font-size:13px;
+            outline:none; box-sizing:border-box; }
+        .am-form-input:focus { border-color:#3b82f6; }
+        .am-footer { display:flex; justify-content:flex-end; gap:10px;
+            margin-top:20px; padding-top:16px; border-top:1px solid #334155; }
+        .am-btn-cancel { background:#334155; border:none; border-radius:8px;
+            padding:9px 18px; color:#94a3b8; font-size:13px; cursor:pointer; }
+        .am-btn-save { background:linear-gradient(135deg,#3b82f6,#2563eb); border:none;
+            border-radius:8px; padding:9px 22px; color:white; font-size:13px;
+            font-weight:700; cursor:pointer; }
 
         /* CONTENT */
-
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* TOPBAR */
-
-        .topbar {
-            height: 60px;
-            background: #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 0 20px;
-        }
-
-        .user-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logout-btn {
-            background: #ef4444;
-            border: none;
-            padding: 6px 12px;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        /* PAGE */
-
-        .page-body {
-            flex: 1;
-            padding: 20px;
-            overflow: auto;
-            background: #0f172a;
-        }
-
-        .leaflet-div-icon {
-            width: 8px !important;
-            height: 8px !important;
-        }
-
-        .leaflet-editing-icon {
-            width: 8px !important;
-            height: 8px !important;
-            margin-left: -4px !important;
-            margin-top: -4px !important;
-        }
-        #map {
-            width: 100%;
-            height: 650px;
-            border-radius: 10px;
-        }
-
+        .content { flex:1; display:flex; flex-direction:column; }
+        .topbar { height:60px; background:#1e293b; display:flex; align-items:center;
+            justify-content:flex-end; padding:0 20px; }
+        .user-box { display:flex; align-items:center; gap:10px; }
+        .logout-btn { background:#ef4444; border:none; padding:6px 12px;
+            color:white; border-radius:6px; cursor:pointer; }
+        .page-body { flex:1; padding:20px; overflow:auto; background:#0f172a; }
+        .leaflet-div-icon { width:8px !important; height:8px !important; }
+        .leaflet-editing-icon { width:8px !important; height:8px !important;
+            margin-left:-4px !important; margin-top:-4px !important; }
+        #map { width:100%; height:calc(100vh - 220px); min-height:480px; border-radius:10px; }
     </style>
 
 </head>
@@ -175,56 +200,27 @@
             @if (!string.IsNullOrEmpty(role) && role.ToLower() == "admin")
             {
 
-                <div class="menu-item" onclick="toggleMenu()">
+                <div class="menu-item" onclick="toggleMenu()" id="areaMenuBtn">
                     <span>📍 Quản lý khu vực</span>
                     <span id="arrow">▼</span>
                 </div>
 
                 <div id="areaMenu" class="submenu">
-
-                    <a href="#" onclick="loadArea()">Danh sách khu vực</a>
-
-                    <a href="#" onclick="enableDraw()">
-                        <i class="fas fa-draw-polygon"></i>
-                        Vẽ vùng giao hàng
+                    <!-- Tab danh sách tổng -->
+                    <a href="#" onclick="loadArea();setActiveCity(this)" class="submenu-link" style="font-weight:600;color:#60a5fa;padding:8px 12px;margin-bottom:4px">
+                        <i class="fas fa-list" style="width:14px"></i> Tất cả khu vực
                     </a>
 
-                    <a href="#" onclick="clearAll()">
-                        <i class="fas fa-trash"></i>
-                        Xóa tất cả vùng
-                    </a>
-                    <input type="text" id="zoneName" placeholder="Nhập tên vùng"
-                           style="padding:6px;border-radius:6px;border:none">
-                    <a href="#" onclick="saveZone()">
-                        <i class="fas fa-floppy-disk"></i>
-                        Save vùng
-                    </a>
+                    <!-- Dynamic city tabs -->
+                    <div class="area-cities" id="areaCityList">
+                        <div style="color:#475569;font-size:11px;padding:4px 12px">Đang tải...</div>
+                    </div>
 
-                    <a href="#" onclick="finishArea()">
-                        <i class="fas fa-check"></i>
-                        Done khu vực
-                    </a>
-
-                    <a href="#" onclick="deleteSelected()">
-                        <i class="fas fa-xmark"></i>
-                        Xóa vùng đang chọn
-                    </a>
-
-                    <a href="#" onclick="updateZone()">
-                        <i class="fas fa-pen"></i>
-                        Update vùng
-                    </a>
-
-                    <a href="#" onclick="calculateDistances()">
-                        <i class="fas fa-ruler"></i>
-                        Tính khoảng cách
-                    </a>
-
-                    <a href="#" onclick="checkAdjacency()">
-                        <i class="fas fa-link"></i>
-                        Kiểm tra vùng kề
-                    </a>
-
+                    <!-- Nút thêm khu vực -->
+                    <div class="area-add-btn" onclick="openAddAreaModal()">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Thêm khu vực</span>
+                    </div>
                 </div>
 
                 <div class="menu-item" onclick="loadUsers()">
@@ -237,19 +233,17 @@
 
                 <div id="driverMenu" class="submenu">
 
-                    <a href="#" onclick="loadPage('/Driver/ByMonth') ; return false;">
-                        📅 Xem theo tháng
-                    </a>
-
-                    <a href="#" onclick="loadPage('/Driver/List') ; return false;">
+                    <a href="#" onclick="loadPage('/Driver/List');return false;">
                         📋 Danh sách tài xế
                     </a>
 
-                    <a href="#" onclick="loadPage('/Driver/Detail') ; return false">
-                        📊 Thông tin phân công
+                    <a href="#" onclick="loadDriverTab('month');return false;">
+                        📅 Phân công theo tháng
                     </a>
 
-                
+                    <a href="#" onclick="loadDriverTab('detail');return false;">
+                        📊 Thông tin phân công
+                    </a>
 
                 </div>
                 <div class="menu-item" onclick="toggleReportMenu()">
@@ -287,23 +281,76 @@
             <div class="topbar">
 
                 <div class="user-box">
+                    <a href="/Account/Profile" class="logout-btn" style="background:#2563eb; text-decoration:none;">
+                        <i class="fas fa-user-circle"></i> Hồ sơ
+                    </a>
                     <i class="fas fa-user"></i>
                     <span>@username</span>
-
-                    <a href="/Account/Logout" class="logout-btn">
+                    <a href="/Account/Logout" class="logout-btn" style="text-decoration:none;">
                         Đăng xuất
                     </a>
-
                 </div>
 
             </div>
 
             <div class="page-body">
 
+                <!-- MAP TOOLBAR (hiển thị khi vào chế độ xem map) -->
+                <div class="map-toolbar" id="mapToolbar">
+                    <span class="mt-label">🗺️ Công cụ bản đồ</span>
+                    <div class="mt-sep"></div>
+                    <button class="mt-btn mt-btn-draw" onclick="enableDraw()" title="Bắt đầu vẽ vùng">
+                        <i class="fas fa-draw-polygon"></i> Vẽ vùng
+                    </button>
+                    <button class="mt-btn mt-btn-done" onclick="finishArea()" title="Hoàn thành vùng đang vẽ">
+                        <i class="fas fa-check-circle"></i> Done vùng
+                    </button>
+                    <input class="mt-zone-name" type="text" id="zoneName" placeholder="Tên vùng...">
+                    <button class="mt-btn mt-btn-save" onclick="saveZone()" title="Lưu vùng vào DB">
+                        <i class="fas fa-floppy-disk"></i> Lưu vùng
+                    </button>
+                    <button class="mt-btn mt-btn-update" onclick="updateZone()" title="Cập nhật vùng đang chọn">
+                        <i class="fas fa-pen"></i> Cập nhật
+                    </button>
+                    <div class="mt-sep"></div>
+                    <button class="mt-btn mt-btn-del" onclick="deleteSelected()" title="Xóa vùng đang chọn">
+                        <i class="fas fa-times"></i> Xóa đang chọn
+                    </button>
+                    <button class="mt-btn mt-btn-clear" onclick="clearAll()" title="Xóa tất cả vùng trên bản đồ">
+                        <i class="fas fa-trash"></i> Xóa tất cả
+                    </button>
+                    <div class="mt-sep"></div>
+                    <button class="mt-btn mt-btn-dist" onclick="calculateDistances()" title="Tính khoảng cách">
+                        <i class="fas fa-ruler"></i> Khoảng cách
+                    </button>
+                    <button class="mt-btn mt-btn-adj" onclick="checkAdjacency()" title="Kiểm tra vùng kề nhau">
+                        <i class="fas fa-link"></i> Vùng kề
+                    </button>
+                </div>
+
                 <div id="content-area">
                     @RenderBody()
                 </div>
 
+            </div>
+
+            <!-- Modal thêm khu vực -->
+            <div class="am-overlay" id="addAreaOverlay" onclick="if(event.target===this)closeAddAreaModal()">
+                <div class="am-modal">
+                    <h3><i class="fas fa-map-location-dot" style="color:#3b82f6"></i> Thêm khu vực mới</h3>
+                    <div class="am-form-group">
+                        <label>Tên khu vực <span style="color:#ef4444">*</span></label>
+                        <input class="am-form-input" id="newAreaName" placeholder="VD: Hải Dương, Cần Thơ..." autofocus>
+                    </div>
+                    <div class="am-form-group">
+                        <label>Mô tả <span style="color:#64748b;font-weight:400">(tùy chọn)</span></label>
+                        <input class="am-form-input" id="newAreaDesc" placeholder="Ghi chú về khu vực...">
+                    </div>
+                    <div class="am-footer">
+                        <button class="am-btn-cancel" onclick="closeAddAreaModal()">Hủy</button>
+                        <button class="am-btn-save" onclick="submitAddArea()"><i class="fas fa-plus"></i> Thêm</button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -313,106 +360,158 @@
 
 <script>
 
-/* ================= MENU ================= */
+/* ================= AREA MANAGEMENT ================= */
 
-        /* ================= MENU ================= */
+        let _activeAreaId = null;
 
         function toggleMenu(){
-
-        var menu=document.getElementById("areaMenu");
-        var arrow=document.getElementById("arrow");
-
-        if(menu.style.display==="block"){
-        menu.style.display="none";
-        arrow.innerHTML="▼";
+            var menu = document.getElementById("areaMenu");
+            var arrow = document.getElementById("arrow");
+            if(menu.style.display==="block"){
+                menu.style.display="none";
+                arrow.innerHTML="▼";
+            } else {
+                menu.style.display="block";
+                arrow.innerHTML="▲";
+                loadAreaSidebar();
+            }
         }
-        else{
-        menu.style.display="block";
-        arrow.innerHTML="▲";
-        }
 
-        }
-                function openCreateArea(){ 
-                    fetch("/Area/Create") 
-                    .then(res=>res.text())
-                    .then(data=>{
-                        document.getElementById("content-area").innerHTML=data;
-                    })
-                } 
-                function deleteArea(id){ 
-                    if(confirm("Xóa khu vực?")){
-                        fetch("/Area/Delete/"+id) 
-                        .then(()=>{
-                            loadArea()
-                        }) 
-                    }
+        function loadAreaSidebar(){
+            fetch("/Area/GetAll")
+            .then(r=>r.json())
+            .then(areas=>{
+                let cityColors = {
+                    'hà nội':'#3b82f6','ha noi':'#3b82f6',
+                    'hồ chí minh':'#f59e0b','ho chi minh':'#f59e0b','hcm':'#f59e0b',
+                    'đà nẵng':'#22c55e','da nang':'#22c55e',
+                    'hải phòng':'#a78bfa','hai phong':'#a78bfa'
+                };
+                let icons = {
+                    'hà nội':'🏛️','ha noi':'🏛️',
+                    'hồ chí minh':'🌆','ho chi minh':'🌆','hcm':'🌆',
+                    'đà nẵng':'🌊','da nang':'🌊',
+                    'hải phòng':'⚓','hai phong':'⚓'
+                };
+                let container = document.getElementById('areaCityList');
+                if(!areas.length){
+                    container.innerHTML = '<div style="color:#475569;font-size:11px;padding:6px 12px">Chưa có khu vực nào</div>';
+                    return;
                 }
-                function loadVersion(areaId){ 
-                    fetch("/ZoneVersion/Index?areaId=" + areaId)
-                    .then(res => res.text())
-                    .then(data => { 
-                        document.getElementById("content-area").innerHTML = data;
-                    });
+                container.innerHTML = areas.map(a=>{
+                    let key = a.areaName.toLowerCase();
+                    let color = cityColors[key] || '#64748b';
+                    let icon = icons[key] || '📍';
+                    return `<div class="area-city-tab" id="citytab-${a.id}"
+                        onclick="openAreaMap(${a.id},'${a.areaName}',this)">
+                        <span style="font-size:15px">${icon}</span>
+                        <span style="flex:1;color:#e2e8f0">${a.areaName}</span>
+                        <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0"></span>
+                    </div>`;
+                }).join('');
+            })
+            .catch(()=>{
+                document.getElementById('areaCityList').innerHTML =
+                    '<div style="color:#ef4444;font-size:11px;padding:6px 12px">Lỗi tải khu vực</div>';
+            });
+        }
+
+        function setActiveCity(el){ document.querySelectorAll('.area-city-tab').forEach(t=>t.classList.remove('active')); }
+
+        function openAreaMap(areaId, areaName, tabEl){
+            _activeAreaId = areaId;
+            document.querySelectorAll('.area-city-tab').forEach(t=>t.classList.remove('active'));
+            if(tabEl) tabEl.classList.add('active');
+            // Load danh sách version của khu vực này
+            loadVersion(areaId, areaName);
+        }
+
+        /* ================= ADD AREA MODAL ================= */
+        function openAddAreaModal(){
+            document.getElementById('newAreaName').value='';
+            document.getElementById('newAreaDesc').value='';
+            document.getElementById('addAreaOverlay').classList.add('open');
+            setTimeout(()=>document.getElementById('newAreaName').focus(),100);
+        }
+        function closeAddAreaModal(){
+            document.getElementById('addAreaOverlay').classList.remove('open');
+        }
+        function submitAddArea(){
+            let name = document.getElementById('newAreaName').value.trim();
+            if(!name){ showToast('Vui lòng nhập tên khu vực!','error'); return; }
+            fetch('/Area/Create',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({Name: name, Status:'Active'})
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){
+                    closeAddAreaModal();
+                    showToast(`Đã thêm khu vực "${d.name}"!`,'success');
+                    loadAreaSidebar();
+                    loadArea();
+                } else {
+                    showToast(d.message||'Lỗi thêm khu vực','error');
                 }
+            })
+            .catch(()=>showToast('Lỗi kết nối server','error'));
+        }
+        document.addEventListener('keydown', e=>{
+            if(e.key==='Enter' && document.getElementById('addAreaOverlay').classList.contains('open'))
+                submitAddArea();
+            if(e.key==='Escape') closeAddAreaModal();
+        });
+
+        function deleteArea(id){
+            if(!confirm('Xóa khu vực này?')) return;
+            fetch('/Area/Delete',{
+                method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'id='+id
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){ showToast('Đã xóa khu vực!','info'); loadAreaSidebar(); loadArea(); }
+                else showToast(d.message,'error');
+            });
+        }
 
         /* ================= GLOBAL ================= */
-
-        var map;
-        var drawnItems;
-        var versionId;
-
-        var draw=false;
-        var points=[];
-        var polygon=null;
-
-        var markers=[];
-        var selectedPolygon=null;
-        var selectedId=null;
-
+        var map; var drawnItems; var versionId;
+        var draw=false; var points=[]; var polygon=null;
+        var markers=[]; var selectedPolygon=null; var selectedId=null;
         var polygons=[];
 
-        /* ================= LOAD AREA ================= */
-
+        /* ================= LOAD AREA (content) ================= */
         function loadArea(){
-
-        fetch("/Area/Index")
-        .then(res=>res.text())
-        .then(data=>{
-        document.getElementById("content-area").innerHTML=data;
-        });
-
+            cleanupState();
+            fetch("/Area/Index")
+            .then(res=>res.text())
+            .then(data=>{ document.getElementById("content-area").innerHTML=data; });
         }
 
+        function showMapToolbar(){ document.getElementById('mapToolbar').classList.add('visible'); }
+        function hideMapToolbar(){ document.getElementById('mapToolbar').classList.remove('visible'); }
+
         /* ================= LOAD VERSION ================= */
-
-        function loadVersion(areaId , name){
+        function loadVersion(areaId, name){
             areaName = name;
-         fetch("/ZoneVersion/Index?areaId="+areaId)
-        .then(res=>res.text())
-        .then(data=>{
-        document.getElementById("content-area").innerHTML=data;
-        });
-
+            currentAreaId = areaId;  // track để dùng cho setActive / deleteVersion
+            hideMapToolbar();
+            fetch("/ZoneVersion/Index?areaId="+areaId)
+            .then(res=>res.text())
+            .then(data=>{ document.getElementById("content-area").innerHTML=data; });
         }
 
         /* ================= OPEN MAP ================= */
 
         function openMap(id){
-
-        fetch("/Zone/Map?versionId="+id)
-        .then(res=>res.text())
-        .then(data=>{
-
-        document.getElementById("content-area").innerHTML=data;
-
-        setTimeout(function(){
-
-        initMap(id);
-
-        },300);
-
-        });
-
+            showMapToolbar();
+            fetch("/Zone/Map?versionId="+id)
+            .then(res=>res.text())
+            .then(data=>{
+                document.getElementById("content-area").innerHTML=data;
+                setTimeout(function(){ initMap(id); }, 300);
+            });
         }
 
         /* ================= INIT MAP ================= */
@@ -469,41 +568,33 @@
         /* ================= DRAW ================= */
 
         function enableDraw(){
-
-        draw=true;
-
-        points=[];
-
-        if(polygon){
-        map.removeLayer(polygon);
-        polygon=null;
-        }
-
-        markers.forEach(m=>map.removeLayer(m));
-        markers=[];
-
+            if(!map){ showToast('Vui lòng mở bản đồ trước!','error'); return; }
+            draw=true;
+            points=[];
+            if(polygon){ map.removeLayer(polygon); polygon=null; }
+            markers.forEach(m=>map.removeLayer(m));
+            markers=[];
+            // Reset màu input tên vùng
+            let ni = document.getElementById('zoneName');
+            if(ni){ ni.value=''; ni.style.borderColor='#334155'; }
+            showToast('Chế độ vẽ vùng: Bấm vào bản đồ để vẽ điểm, bấm Done khi xong','info');
         }
 
         /* ================= DONE ================= */
 
 
         function finishArea(){
-
-        if(!polygon){
-        alert("Chưa vẽ vùng");
-        return;
-        }
-
-        draw=false;
-
-        selectedPolygon=polygon;
-
-        drawnItems.addLayer(polygon);
-
-        // ⭐ HIỆN FORM CHỌN KHU VỰC
-
-        loadAreaSelect();
-
+            if(!polygon){
+                showToast('Chưa vẽ vùng! Hãy bấm vào bản đồ để vẽ điểm.','error');
+                return;
+            }
+            draw=false;
+            selectedPolygon=polygon;
+            drawnItems.addLayer(polygon);
+            showToast('Vùng sẵn sàng! Nhập tên vùng ở thanh công cụ rồi bấm Lưu vùng ↑','info');
+            // Focus input tên vùng trong toolbar
+            let nameInput = document.getElementById('zoneName');
+            if(nameInput){ nameInput.focus(); nameInput.style.borderColor='#f59e0b'; }
         }
         function loadAreaSelect(){
 
@@ -580,48 +671,42 @@ function calculateArea(latlngs) {
 
 /* ================= SAVE ================= */
 function saveZone(){
+    if(!map){ showToast('Vui lòng mở bản đồ trước!','error'); return; }
 
-    let name = document.getElementById("zoneName").value;
+    let nameInput = document.getElementById('zoneName');
+    let name = nameInput ? nameInput.value.trim() : '';
 
     if(!name){
-        alert("Nhập tên vùng");
+        showToast('Vui lòng nhập tên vùng!','error');
+        if(nameInput){ nameInput.focus(); nameInput.style.borderColor='#ef4444'; }
         return;
     }
 
     if(!polygon){
-        alert("Chưa vẽ vùng");
+        showToast('Chưa vẽ vùng! Bấm "Vẽ vùng" rồi vẽ điểm trên bản đồ.','error');
         return;
     }
 
     let latlngs = polygon.getLatLngs();
-
     if(!latlngs || latlngs.length === 0){
-        alert("Chưa có dữ liệu vùng");
+        showToast('Chưa có dữ liệu vùng!','error');
         return;
     }
 
-    // ⭐ tính diện tích
     let area = calculateArea(latlngs);
-    console.log("AREA:", area); // debug
-
     let center = polygon.getBounds().getCenter();
 
-    // ❌ BỎ areaSelect → vì không tồn tại trong map
-    // let areaName = "";
-
     if(!versionId){
-        alert("Chưa chọn version");
+        showToast('Chưa chọn Version! Vui lòng vào khu vực → chọn Version → mở bản đồ.','error');
         return;
     }
 
-    fetch("/Zone/SaveZone",{
-        method:"POST",
-        headers:{
-            'Content-Type':'application/json'
-        },
+    fetch('/Zone/SaveZone',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
             zoneName: name,
-            areaName: currentAreaName,
+            areaName: areaName || '',
             points: JSON.stringify(latlngs),
             centerLat: center.lat,
             centerLng: center.lng,
@@ -631,30 +716,21 @@ function saveZone(){
     })
     .then(r=>r.json())
     .then(d=>{
-
         if(d.success){
-
-            alert("Đã lưu vùng");
-
+            showToast(`Đã lưu vùng "${name}" thành công! ✅`,'success');
+            // Reset
             polygon = null;
-
+            if(nameInput){ nameInput.value=''; nameInput.style.borderColor='#334155'; }
+            // Reload zones trên bản đồ hiện tại (KHÔNG điều hướng ra khỏi map)
             loadZones(versionId);
-
-            // ⭐ reload lại version để cập nhật diện tích
-            if(typeof loadVersion === "function"){
-                loadVersion(currentAreaId);
-            }
+        } else {
+            showToast('Lưu vùng thất bại! Vui lòng thử lại.','error');
         }
-        else{
-            alert("Lưu thất bại");
-        }
-
     })
     .catch(err=>{
         console.error(err);
-        alert("Lỗi khi lưu");
+        showToast('Lỗi kết nối khi lưu vùng!','error');
     });
-
 }
         /* ================= LOAD ZONE ================= */
                      function loadZones(versionId){
@@ -954,150 +1030,467 @@ function saveZone(){
         };
 
         }
+        /* ================= USER MANAGEMENT ================= */
+
+        function fmtDate(d){
+            if(!d) return '—';
+            let dt = new Date(d);
+            return dt.toLocaleDateString('vi-VN') + ' ' + dt.toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
+        }
+
         function loadUsers(){
-
-        fetch("/User/GetUsers")
-        .then(r=>r.json())
-        .then(data=>{
-
-        let html = `<h2>Quản lý User</h2>`;
-
-        html += `<table border="1">
-        <tr>
-        <th>ID</th>
-        <th>User</th>
-        <th>Role</th>
-        <th>Approve</th>
-        <th>Active</th>
-        <th>Area</th>
-        <th>Action</th>
-        </tr>`;
-
-        data.forEach(u=>{
-
-        html += `
-        <tr>
-        <td>${u.id}</td>
-        <td>${u.username}</td>
-
-        <td>
-        <select onchange="changeRole(${u.id}, this.value)">
-        <option ${u.role=='Admin'?'selected':''}>Admin</option>
-        <option ${u.role=='Dispatcher'?'selected':''}>Dispatcher</option>
-        <option ${u.role=='Driver'?'selected':''}>Driver</option>
-        </select>
-        </td>
-
-        <td>
-        ${u.isApproved
-        ? '✔'
-        : `<button onclick="approveUser(${u.id})">Approve</button>`}
-        </td>
-
-        <td>
-        <button onclick="toggleActive(${u.id})">
-        ${u.isActive ? 'Active' : 'Deactive'}
-        </button>
-        </td>
-
-        <td>
-        ${u.areaName || "Chưa có"}
-        <br>
-        <button onclick="assignArea(${u.id})">Gán</button>
-        </td>
-
-        <td>
-        <button onclick="viewUser(${u.id})">Xem</button>
-        </td>
-
-        </tr>
-        `;
-
-        });
-
-        html += `</table>`;
-
-        document.getElementById("content-area").innerHTML = html;
-
-        });
-        }
-                function approveUser(id){
-            fetch("/User/Approve",{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/x-www-form-urlencoded'
-                },
-                body:"id="+id
-            })
+            cleanupState();
+            fetch("/User/GetUsers")
             .then(r=>r.json())
-            .then(d=>{
+            .then(data=>{
+                let pendingCount = data.filter(u=>!u.isApproved).length;
+                let activeCount  = data.filter(u=>u.isApproved && u.isActive).length;
+
+                let html = `
+                <style>
+                .um-wrap { font-family:'Segoe UI',sans-serif; padding:4px 0; }
+                .um-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+                .um-title { font-size:22px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:10px; }
+                .um-title i { color:#3b82f6; }
+                .um-stats { display:flex; gap:12px; }
+                .um-stat { background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 18px; text-align:center; }
+                .um-stat .val { font-size:20px; font-weight:700; color:#3b82f6; }
+                .um-stat .lbl { font-size:11px; color:#94a3b8; margin-top:2px; }
+                .um-stat.green .val { color:#22c55e; }
+                .um-stat.yellow .val { color:#f59e0b; }
+                .um-toolbar { display:flex; gap:10px; margin-bottom:16px; }
+                .um-search { flex:1; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:9px 14px; color:#f1f5f9; font-size:14px; outline:none; }
+                .um-search::placeholder { color:#64748b; }
+                .um-filter { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:9px 14px; color:#f1f5f9; font-size:13px; cursor:pointer; outline:none; }
+                .um-table-wrap { background:#1e293b; border-radius:14px; border:1px solid #334155; overflow:hidden; }
+                .um-table { width:100%; border-collapse:collapse; font-size:13px; }
+                .um-table thead tr { background:#0f172a; }
+                .um-table th { padding:13px 14px; text-align:left; color:#64748b; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid #334155; white-space:nowrap; }
+                .um-table tbody tr { border-bottom:1px solid #1e293b; transition:background .15s; }
+                .um-table tbody tr:hover { background:#0f172a55; }
+                .um-table td { padding:12px 14px; color:#e2e8f0; vertical-align:middle; }
+                .um-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#6366f1); display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:white; margin-right:8px; flex-shrink:0; }
+                .um-user-cell { display:flex; align-items:center; }
+                .um-user-info .name { font-weight:600; color:#f1f5f9; }
+                .um-user-info .email { font-size:11px; color:#64748b; margin-top:1px; }
+                .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+                .badge-admin { background:#7c3aed22; color:#a78bfa; border:1px solid #7c3aed44; }
+                .badge-dispatcher { background:#0891b222; color:#38bdf8; border:1px solid #0891b244; }
+                .badge-driver { background:#16a34a22; color:#4ade80; border:1px solid #16a34a44; }
+                .badge-active { background:#16a34a22; color:#4ade80; border:1px solid #16a34a55; }
+                .badge-inactive { background:#dc262622; color:#f87171; border:1px solid #dc262644; }
+                .badge-approved { background:#16a34a22; color:#4ade80; border:1px solid #16a34a55; }
+                .badge-pending { background:#d9770622; color:#fb923c; border:1px solid #d9770644; }
+                .um-date { font-size:11px; color:#64748b; }
+                .um-actions { display:flex; gap:6px; flex-wrap:nowrap; }
+                .um-btn { display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:7px; border:none; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; white-space:nowrap; }
+                .um-btn-view { background:#1e3a5f; color:#60a5fa; }
+                .um-btn-view:hover { background:#1d4ed8; color:white; }
+                .um-btn-edit { background:#1e3d2f; color:#4ade80; }
+                .um-btn-edit:hover { background:#16a34a; color:white; }
+                .um-btn-approve { background:#1c3d5a; color:#38bdf8; }
+                .um-btn-approve:hover { background:#0284c7; color:white; }
+                .um-btn-reject { background:#3d1c1c; color:#f87171; }
+                .um-btn-reject:hover { background:#dc2626; color:white; }
+                .um-btn-toggle-on { background:#1e3d2f; color:#4ade80; }
+                .um-btn-toggle-on:hover { background:#15803d; color:white; }
+                .um-btn-toggle-off { background:#3d2020; color:#f87171; }
+                .um-btn-toggle-off:hover { background:#b91c1c; color:white; }
+                .um-btn-area { background:#2e1b5e; color:#c4b5fd; }
+                .um-btn-area:hover { background:#7c3aed; color:white; }
+                .um-btn-delete { background:#3d1c1c; color:#f87171; }
+                .um-btn-delete:hover { background:#dc2626; color:white; }
+                .um-empty { text-align:center; padding:40px; color:#64748b; }
+                .um-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); animation:umFadeIn .2s; }
+                @@keyframes umFadeIn { from{opacity:0} to{opacity:1} }
+                .um-modal { background:#1e293b; border:1px solid #334155; border-radius:16px; padding:28px; min-width:420px; max-width:560px; width:100%; box-shadow:0 24px 64px rgba(0,0,0,.5); animation:umSlideUp .25s; position:relative; }
+                @@keyframes umSlideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+                .um-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+                .um-modal-title { font-size:17px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:8px; }
+                .um-modal-close { background:none; border:none; color:#64748b; font-size:20px; cursor:pointer; padding:4px; border-radius:6px; transition:color .15s; }
+                .um-modal-close:hover { color:#f1f5f9; background:#334155; }
+                .um-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+                .um-info-item label { display:block; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+                .um-info-item span { color:#e2e8f0; font-size:14px; }
+                .um-form-group { margin-bottom:14px; }
+                .um-form-group label { display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:5px; }
+                .um-form-input { width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:9px 12px; color:#f1f5f9; font-size:13px; outline:none; box-sizing:border-box; }
+                .um-form-input:focus { border-color:#3b82f6; }
+                .um-form-select { width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:9px 12px; color:#f1f5f9; font-size:13px; outline:none; box-sizing:border-box; cursor:pointer; }
+                .um-form-select:focus { border-color:#3b82f6; }
+                .um-form-textarea { width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:9px 12px; color:#f1f5f9; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; min-height:90px; }
+                .um-form-textarea:focus { border-color:#3b82f6; }
+                .um-modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid #334155; }
+                .um-btn-cancel { background:#334155; border:none; border-radius:8px; padding:9px 18px; color:#94a3b8; font-size:13px; font-weight:600; cursor:pointer; }
+                .um-btn-cancel:hover { background:#475569; color:white; }
+                .um-btn-primary { background:linear-gradient(135deg,#3b82f6,#2563eb); border:none; border-radius:8px; padding:9px 22px; color:white; font-size:13px; font-weight:700; cursor:pointer; }
+                .um-btn-primary:hover { opacity:.88; }
+                .um-btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); border:none; border-radius:8px; padding:9px 22px; color:white; font-size:13px; font-weight:700; cursor:pointer; }
+                .um-btn-danger:hover { opacity:.88; }
+                .um-btn-success { background:linear-gradient(135deg,#22c55e,#16a34a); border:none; border-radius:8px; padding:9px 22px; color:white; font-size:13px; font-weight:700; cursor:pointer; }
+                .um-btn-success:hover { opacity:.88; }
+                .um-toast { position:fixed; bottom:28px; right:28px; z-index:99999; display:flex; align-items:center; gap:10px; background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px 20px; color:#f1f5f9; font-size:13px; font-weight:600; box-shadow:0 8px 32px rgba(0,0,0,.4); animation:toastIn .3s; min-width:260px; }
+                @@keyframes toastIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
+                .um-toast.success { border-left:4px solid #22c55e; }
+                .um-toast.error { border-left:4px solid #ef4444; }
+                .um-toast.info { border-left:4px solid #3b82f6; }
+                .um-reason-chip { display:inline-block; background:#334155; border-radius:6px; padding:4px 10px; margin:3px; font-size:12px; color:#94a3b8; cursor:pointer; transition:all .15s; }
+                .um-reason-chip:hover { background:#3b82f6; color:white; }
+                .role-select { background:#0f172a; border:1px solid #334155; border-radius:6px; padding:4px 8px; color:#f1f5f9; font-size:12px; cursor:pointer; outline:none; }
+                </style>
+                <div class="um-wrap">
+                  <div class="um-header">
+                    <div class="um-title"><i class="fas fa-users"></i> Quản lý User</div>
+                    <div class="um-stats">
+                      <div class="um-stat"><div class="val">${data.length}</div><div class="lbl">Tổng User</div></div>
+                      <div class="um-stat green"><div class="val">${activeCount}</div><div class="lbl">Đang hoạt động</div></div>
+                      <div class="um-stat yellow"><div class="val">${pendingCount}</div><div class="lbl">Chờ duyệt</div></div>
+                    </div>
+                  </div>
+                  <div class="um-toolbar">
+                    <input class="um-search" id="umSearch" placeholder="🔍  Tìm theo username, email..." oninput="umFilter()">
+                    <select class="um-filter" id="umFilterRole" onchange="umFilter()">
+                      <option value="">Tất cả Role</option>
+                      <option value="Admin">Admin</option>
+                      <option value="Dispatcher">Dispatcher</option>
+                      <option value="Driver">Driver</option>
+                    </select>
+                    <select class="um-filter" id="umFilterStatus" onchange="umFilter()">
+                      <option value="">Tất cả trạng thái</option>
+                      <option value="approved">Đã duyệt</option>
+                      <option value="pending">Chờ duyệt</option>
+                    </select>
+                  </div>
+                  <div class="um-table-wrap">
+                    <table class="um-table" id="umTable">
+                      <thead><tr>
+                        <th>#</th>
+                        <th>Người dùng</th>
+                        <th>Role</th>
+                        <th>Trạng thái</th>
+                        <th>Khu vực</th>
+                        <th>Ngày tạo TK</th>
+                        <th>Ngày cập nhật</th>
+                        <th>Thao tác</th>
+                      </tr></thead>
+                      <tbody id="umTbody">`;
+
+                data.forEach((u,i)=>{
+                    let initials = u.username ? u.username.substring(0,2).toUpperCase() : '??';
+                    let approveStatus = u.isApproved
+                        ? `<span class="badge badge-approved"><i class="fas fa-check-circle" style="font-size:9px"></i> Đã duyệt</span>`
+                        : `<span class="badge badge-pending"><i class="fas fa-clock" style="font-size:9px"></i> Chờ duyệt</span>`;
+                    let activeStatus = u.isActive
+                        ? `<span class="badge badge-active" style="margin-top:4px;display:inline-flex"><i class="fas fa-circle" style="font-size:7px"></i> Active</span>`
+                        : `<span class="badge badge-inactive" style="margin-top:4px;display:inline-flex"><i class="fas fa-circle" style="font-size:7px"></i> Inactive</span>`;
+                    let approveActions = u.isApproved
+                        ? `<button class="um-btn um-btn-toggle-${u.isActive?'on':'off'}" onclick="toggleActive(${u.id})" title="${u.isActive?'Khóa':'Kích hoạt'} tài khoản">
+                             <i class="fas fa-power-off"></i> ${u.isActive?'Active':'Inactive'}
+                           </button>`
+                        : `<button class="um-btn um-btn-approve" onclick="approveUser(${u.id})" title="Duyệt tài khoản">
+                             <i class="fas fa-check"></i> Duyệt
+                           </button>
+                           <button class="um-btn um-btn-reject" onclick="openReject(${u.id},'${u.username}')" title="Từ chối">
+                             <i class="fas fa-times"></i> Từ chối
+                           </button>`;
+
+                    html += `<tr data-username="${u.username}" data-email="${u.email||''}" data-role="${u.role}" data-approved="${u.isApproved}">
+                      <td style="color:#64748b;font-weight:600">${i+1}</td>
+                      <td>
+                        <div class="um-user-cell">
+                          <div class="um-avatar">${initials}</div>
+                          <div class="um-user-info">
+                            <div class="name">${u.username}</div>
+                            <div class="email">${u.email||'—'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <select class="role-select" onchange="changeRole(${u.id},this.value)">
+                          <option ${u.role==='Admin'?'selected':''}>Admin</option>
+                          <option ${u.role==='Dispatcher'?'selected':''}>Dispatcher</option>
+                          <option ${u.role==='Driver'?'selected':''}>Driver</option>
+                        </select>
+                      </td>
+                      <td><div style="display:flex;flex-direction:column;gap:4px">${approveStatus}${activeStatus}</div></td>
+                      <td><span style="color:${u.areaName?'#e2e8f0':'#475569'}">${u.areaName||'Chưa gán'}</span></td>
+                      <td><span class="um-date">${fmtDate(u.createdAt)}</span></td>
+                      <td><span class="um-date">${fmtDate(u.updatedAt)}</span></td>
+                      <td>
+                        <div class="um-actions">
+                          <button class="um-btn um-btn-view" onclick="viewUser(${u.id})" title="Xem chi tiết"><i class="fas fa-eye"></i></button>
+                          <button class="um-btn um-btn-edit" onclick="editUser(${u.id})" title="Chỉnh sửa"><i class="fas fa-pen"></i></button>
+                          ${approveActions}
+                          <button class="um-btn um-btn-area" onclick="openAssignArea(${u.id},'${u.username}')" title="Gán khu vực"><i class="fas fa-map-marker-alt"></i></button>
+                          <button class="um-btn um-btn-delete" onclick="deleteUser(${u.id},'${u.username}')" title="Xóa"><i class="fas fa-trash"></i></button>
+                        </div>
+                      </td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table>
+                  </div>
+                  ${data.length===0?'<div class="um-empty"><i class="fas fa-inbox" style="font-size:40px;margin-bottom:10px;display:block"></i>Chưa có User nào</div>':''}
+                </div>`;
+
+                document.getElementById("content-area").innerHTML = html;
+            });
+        }
+
+        function umFilter(){
+            let q = (document.getElementById('umSearch')||{}).value?.toLowerCase()||'';
+            let role = (document.getElementById('umFilterRole')||{}).value||'';
+            let status = (document.getElementById('umFilterStatus')||{}).value||'';
+            document.querySelectorAll('#umTbody tr').forEach(r=>{
+                let matchQ = !q || (r.dataset.username||'').toLowerCase().includes(q) || (r.dataset.email||'').toLowerCase().includes(q);
+                let matchRole = !role || r.dataset.role === role;
+                let approved = r.dataset.approved === 'true';
+                let matchStatus = !status || (status==='approved'&&approved) || (status==='pending'&&!approved);
+                r.style.display = (matchQ&&matchRole&&matchStatus) ? '' : 'none';
+            });
+        }
+
+        function showToast(msg, type='success'){
+            let t = document.getElementById('umToast');
+            if(!t){ t=document.createElement('div'); t.id='umToast'; document.body.appendChild(t); }
+            let icons = {success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle'};
+            let colors = {success:'#22c55e', error:'#ef4444', info:'#3b82f6'};
+            t.className = `um-toast ${type}`;
+            t.innerHTML = `<i class="fas ${icons[type]||icons.info}" style="color:${colors[type]||colors.info}"></i> ${msg}`;
+            t.style.display = 'flex';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(()=>{ t.style.display='none'; }, 3200);
+        }
+
+        function openModal(html){
+            let ov = document.getElementById('umOverlay');
+            if(!ov){
+                ov = document.createElement('div');
+                ov.id = 'umOverlay';
+                ov.className = 'um-modal-overlay';
+                ov.onclick = function(e){ if(e.target===ov) closeModal(); };
+                document.body.appendChild(ov);
+            }
+            ov.innerHTML = html;
+            ov.style.display = 'flex';
+        }
+        function closeModal(){
+            let ov = document.getElementById('umOverlay');
+            if(ov) ov.style.display = 'none';
+        }
+
+        function viewUser(id){
+            fetch("/User/Detail?id="+id).then(r=>r.json()).then(u=>{
+                let roleBadge = {Admin:`<span class="badge badge-admin"><i class="fas fa-crown" style="font-size:9px"></i> Admin</span>`,
+                    Dispatcher:`<span class="badge badge-dispatcher"><i class="fas fa-headset" style="font-size:9px"></i> Dispatcher</span>`}[u.role]
+                    || `<span class="badge badge-driver"><i class="fas fa-truck" style="font-size:9px"></i> Driver</span>`;
+                openModal(`<div class="um-modal">
+                  <div class="um-modal-header">
+                    <div class="um-modal-title"><i class="fas fa-id-card" style="color:#3b82f6"></i> Thông tin User</div>
+                    <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;padding:16px;background:#0f172a;border-radius:12px">
+                    <div class="um-avatar" style="width:52px;height:52px;font-size:20px">${(u.username||'?').substring(0,2).toUpperCase()}</div>
+                    <div><div style="font-size:18px;font-weight:700;color:#f1f5f9">${u.username}</div><div style="margin-top:4px">${roleBadge}</div></div>
+                  </div>
+                  <div class="um-info-grid">
+                    <div class="um-info-item"><label><i class="fas fa-envelope"></i> Email</label><span>${u.email||'—'}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-phone"></i> Số điện thoại</label><span>${u.phone||'—'}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-id-badge"></i> CCCD</label><span>${u.cccd||'—'}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-map-marker-alt"></i> Khu vực</label><span>${u.areaName||'Chưa gán'}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-home"></i> Địa chỉ</label><span>${u.address||'—'}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-check-circle"></i> Trạng thái</label><span>${u.isApproved?(u.isActive?'✅ Active':'⚠️ Khóa'):'⏳ Chờ duyệt'}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-calendar-plus"></i> Ngày tạo TK</label><span style="font-size:12px">${fmtDate(u.createdAt)}</span></div>
+                    <div class="um-info-item"><label><i class="fas fa-calendar-check"></i> Ngày cập nhật</label><span style="font-size:12px">${fmtDate(u.updatedAt)}</span></div>
+                  </div>
+                  <div class="um-modal-footer">
+                    <button class="um-btn-cancel" onclick="closeModal()">Đóng</button>
+                    <button class="um-btn-primary" onclick="closeModal();editUser(${u.id})"><i class="fas fa-pen"></i> Chỉnh sửa</button>
+                  </div>
+                </div>`);
+            });
+        }
+
+        function editUser(id){
+            fetch("/User/Detail?id="+id).then(r=>r.json()).then(u=>{
+                fetch("/Area/GetAll").then(r2=>r2.json()).then(areas=>{
+                    let areaOpts = areas.map(a=>`<option value="${a.id}" ${u.areaId==a.id?'selected':''}>${a.areaName||a.name}</option>`).join('');
+                    _showEditModal(u, areaOpts);
+                }).catch(()=>_showEditModal(u, ''));
+            });
+        }
+        function _showEditModal(u, areaOpts){
+            openModal(`<div class="um-modal">
+              <div class="um-modal-header">
+                <div class="um-modal-title"><i class="fas fa-user-edit" style="color:#4ade80"></i> Chỉnh sửa User</div>
+                <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+              </div>
+              <div class="um-form-group"><label>Username</label><input class="um-form-input" value="${u.username}" disabled style="opacity:.6"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="um-form-group"><label>Email</label><input class="um-form-input" id="eEmail" value="${u.email||''}"></div>
+                <div class="um-form-group"><label>Số điện thoại</label><input class="um-form-input" id="ePhone" value="${u.phone||''}"></div>
+                <div class="um-form-group"><label>CCCD</label><input class="um-form-input" id="eCccd" value="${u.cccd||''}"></div>
+                <div class="um-form-group"><label>Role</label>
+                  <select class="um-form-select" id="eRole">
+                    <option ${u.role==='Admin'?'selected':''}>Admin</option>
+                    <option ${u.role==='Dispatcher'?'selected':''}>Dispatcher</option>
+                    <option ${u.role==='Driver'?'selected':''}>Driver</option>
+                  </select>
+                </div>
+              </div>
+              <div class="um-form-group"><label>Địa chỉ</label><input class="um-form-input" id="eAddress" value="${u.address||''}"></div>
+              ${areaOpts ? `<div class="um-form-group"><label>Khu vực</label><select class="um-form-select" id="eArea"><option value="">-- Chưa gán --</option>${areaOpts}</select></div>` : ''}
+              <div class="um-modal-footer">
+                <button class="um-btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="um-btn-primary" onclick="saveEdit(${u.id})"><i class="fas fa-save"></i> Lưu thay đổi</button>
+              </div>
+            </div>`);
+        }
+
+        function saveEdit(id){
+            let body = `id=${id}`
+                + `&email=${encodeURIComponent(document.getElementById('eEmail')?.value||'')}`
+                + `&phone=${encodeURIComponent(document.getElementById('ePhone')?.value||'')}`
+                + `&cccd=${encodeURIComponent(document.getElementById('eCccd')?.value||'')}`
+                + `&address=${encodeURIComponent(document.getElementById('eAddress')?.value||'')}`
+                + `&role=${document.getElementById('eRole')?.value||'Driver'}`
+                + `&areaId=${document.getElementById('eArea')?.value||''}`;
+            fetch("/User/Update",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body })
+            .then(r=>r.json()).then(d=>{
+                if(d.success){ closeModal(); showToast('Đã cập nhật thông tin user!','success'); loadUsers(); }
+                else showToast(d.message||'Lỗi cập nhật','error');
+            });
+        }
+
+        function approveUser(id){
+            fetch("/User/Approve",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:"id="+id })
+            .then(r=>r.json()).then(d=>{
+                if(d.success){ showToast('Đã duyệt tài khoản thành công! Trạng thái: Active','success'); loadUsers(); }
+                else showToast(d.message||'Lỗi khi duyệt','error');
+            });
+        }
+
+        function openReject(id, username){
+            let reasons = ['Thông tin không hợp lệ','CCCD không khớp với hồ sơ','Tài khoản trùng lặp trong hệ thống','Không đủ điều kiện đăng ký','Ảnh hồ sơ không rõ ràng','Số điện thoại không xác minh được'];
+            let chips = reasons.map(r=>`<span class="um-reason-chip" onclick="document.getElementById('rejectReason').value='${r}'">${r}</span>`).join('');
+            openModal(`<div class="um-modal">
+              <div class="um-modal-header">
+                <div class="um-modal-title"><i class="fas fa-ban" style="color:#ef4444"></i> Từ chối duyệt</div>
+                <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+              </div>
+              <p style="color:#94a3b8;margin:0 0 14px">Từ chối tài khoản: <strong style="color:#f1f5f9">${username}</strong></p>
+              <div class="um-form-group">
+                <label>Lý do từ chối <span style="color:#64748b;font-weight:400">(chọn nhanh hoặc tự nhập)</span></label>
+                <div style="margin-bottom:10px">${chips}</div>
+                <textarea class="um-form-textarea" id="rejectReason" placeholder="Nhập lý do từ chối..."></textarea>
+              </div>
+              <div class="um-modal-footer">
+                <button class="um-btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="um-btn-danger" onclick="submitReject(${id},'${username}')"><i class="fas fa-times-circle"></i> Xác nhận từ chối</button>
+              </div>
+            </div>`);
+        }
+
+        function submitReject(id, username){
+            let reason = document.getElementById('rejectReason').value.trim();
+            if(!reason){ showToast('Vui lòng nhập lý do từ chối!','error'); return; }
+            fetch("/User/Reject",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`id=${id}&reason=${encodeURIComponent(reason)}` })
+            .then(r=>r.json()).then(d=>{
                 if(d.success){
-                    loadUsers();
+                    closeModal();
+                    openModal(`<div class="um-modal">
+                      <div class="um-modal-header">
+                        <div class="um-modal-title"><i class="fas fa-envelope" style="color:#f59e0b"></i> Đã ghi nhận lý do từ chối</div>
+                        <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div style="background:#0f172a;border-radius:10px;padding:16px;margin-bottom:16px">
+                        <div style="color:#94a3b8;font-size:12px;margin-bottom:4px">Tài khoản</div>
+                        <div style="font-weight:700;color:#f1f5f9">${d.username}</div>
+                        <div style="color:#94a3b8;font-size:12px;margin-top:12px;margin-bottom:4px">Lý do từ chối</div>
+                        <div style="color:#fca5a5;font-style:italic">"${d.reason}"</div>
+                      </div>
+                      <p style="color:#64748b;font-size:12px;margin:0">* Lý do chỉ hiển thị để tham khảo, không lưu vào cơ sở dữ liệu.</p>
+                      <div class="um-modal-footer"><button class="um-btn-primary" onclick="closeModal()">Đóng</button></div>
+                    </div>`);
                 }
             });
         }
-                function toggleActive(id){
-            fetch("/User/ToggleActive",{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/x-www-form-urlencoded'
-                },
-                body:"id="+id
-            })
-            .then(r=>r.json())
-            .then(d=>{
-                if(d.success){
-                    loadUsers();
-                }
+
+        function toggleActive(id){
+            fetch("/User/ToggleActive",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:"id="+id })
+            .then(r=>r.json()).then(d=>{
+                if(d.success){ showToast(d.isActive?'Đã kích hoạt tài khoản!':'Đã khóa tài khoản!', d.isActive?'success':'info'); loadUsers(); }
             });
         }
-                function changeRole(id, role){
-            fetch("/User/ChangeRole",{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/x-www-form-urlencoded'
-                },
-                body:`id=${id}&role=${role}`
-            })
-            .then(r=>r.json())
-            .then(d=>{
-                if(d.success){
-                    console.log("Đã đổi role");
-                }
+
+        function changeRole(id, role){
+            fetch("/User/ChangeRole",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`id=${id}&role=${role}` })
+            .then(r=>r.json()).then(d=>{ if(d.success) showToast(`Đã đổi role thành ${role}`,'info'); });
+        }
+
+        function openAssignArea(id, username){
+            fetch("/Area/GetAll").then(r=>r.json()).then(areas=>{
+                let opts = areas.map(a=>`<option value="${a.id}">${a.areaName||a.name}</option>`).join('');
+                openModal(`<div class="um-modal" style="min-width:340px;max-width:400px">
+                  <div class="um-modal-header">
+                    <div class="um-modal-title"><i class="fas fa-map-marked-alt" style="color:#c4b5fd"></i> Gán khu vực</div>
+                    <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                  </div>
+                  <p style="color:#94a3b8;margin:0 0 16px">User: <strong style="color:#f1f5f9">${username}</strong></p>
+                  <div class="um-form-group"><label>Chọn khu vực</label>
+                    <select class="um-form-select" id="assignAreaSel"><option value="">-- Chọn khu vực --</option>${opts}</select>
+                  </div>
+                  <div class="um-modal-footer">
+                    <button class="um-btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button class="um-btn-primary" onclick="submitAssignArea(${id})"><i class="fas fa-check"></i> Gán</button>
+                  </div>
+                </div>`);
+            }).catch(()=>{
+                openModal(`<div class="um-modal" style="min-width:340px;max-width:400px">
+                  <div class="um-modal-header">
+                    <div class="um-modal-title"><i class="fas fa-map-marked-alt" style="color:#c4b5fd"></i> Gán khu vực</div>
+                    <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                  </div>
+                  <div class="um-form-group"><label>Nhập Area ID</label><input class="um-form-input" id="assignAreaIdInput" placeholder="Nhập ID khu vực..."></div>
+                  <div class="um-modal-footer">
+                    <button class="um-btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button class="um-btn-primary" onclick="submitAssignAreaManual(${id})"><i class="fas fa-check"></i> Gán</button>
+                  </div>
+                </div>`);
             });
         }
-                function viewUser(id){
-            fetch("/User/Detail?id="+id)
-            .then(r=>r.json())
-            .then(u=>{
-                alert(`
-        User: ${u.username}
-        Role: ${u.role}
-        Active: ${u.isActive}
-        Approved: ${u.isApproved}
-        Area: ${u.areaName || "Chưa có"}
-                `);
-            });
+        function submitAssignArea(id){
+            let areaId = document.getElementById('assignAreaSel')?.value;
+            if(!areaId){ showToast('Vui lòng chọn khu vực!','error'); return; }
+            fetch("/User/AssignArea",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`id=${id}&areaId=${areaId}` })
+            .then(r=>r.json()).then(d=>{ if(d.success){ closeModal(); showToast('Đã gán khu vực!','success'); loadUsers(); } });
         }
-                function assignArea(id){
+        function submitAssignAreaManual(id){
+            let areaId = document.getElementById('assignAreaIdInput')?.value;
+            if(!areaId){ showToast('Vui lòng nhập Area ID!','error'); return; }
+            fetch("/User/AssignArea",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`id=${id}&areaId=${areaId}` })
+            .then(r=>r.json()).then(d=>{ if(d.success){ closeModal(); showToast('Đã gán khu vực!','success'); loadUsers(); } });
+        }
+        function assignArea(id){ openAssignArea(id,''); }
 
-            let areaId = prompt("Nhập AreaId:");
-
-            if(!areaId) return;
-
-            fetch("/User/AssignArea",{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/x-www-form-urlencoded'
-                },
-                body:`id=${id}&areaId=${areaId}`
-            })
-            .then(r=>r.json())
-            .then(d=>{
-                if(d.success){
-                    loadUsers();
-                }
-            });
+        function deleteUser(id, username){
+            openModal(`<div class="um-modal" style="min-width:340px;max-width:400px">
+              <div class="um-modal-header">
+                <div class="um-modal-title"><i class="fas fa-trash" style="color:#ef4444"></i> Xóa User</div>
+                <button class="um-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+              </div>
+              <p style="color:#94a3b8;margin:0 0 6px">Bạn có chắc muốn xóa tài khoản:</p>
+              <p style="color:#f87171;font-weight:700;font-size:16px;margin:0 0 18px">${username}</p>
+              <p style="color:#64748b;font-size:12px;margin:0">Hành động này không thể hoàn tác.</p>
+              <div class="um-modal-footer">
+                <button class="um-btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="um-btn-danger" onclick="confirmDelete(${id})"><i class="fas fa-trash"></i> Xóa</button>
+              </div>
+            </div>`);
+        }
+        function confirmDelete(id){
+            fetch("/User/Delete",{ method:"POST", headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:"id="+id })
+            .then(r=>r.json()).then(d=>{ if(d.success){ closeModal(); showToast('Đã xóa user!','info'); loadUsers(); } });
         }
                         function toggleDriverMenu(){
 
@@ -1112,7 +1505,37 @@ function saveZone(){
                 arrow.innerHTML = "▲";
             }
         }
-                function loadPage(url){
+                /* ===== CLEANUP STATE KHEN CHUYỂN TRANG ===== */
+        function cleanupState(){
+            // Ẩn map toolbar
+            hideMapToolbar();
+
+            // Destroy map instance nếu có
+            if(map){
+                try { map.remove(); } catch(e){}
+                map = null;
+            }
+            drawnItems = null;
+            versionId = null;
+            draw = false;
+            points = [];
+            polygon = null;
+            markers = [];
+            selectedPolygon = null;
+            selectedId = null;
+            polygons = [];
+
+            // Xóa các script đã inject trước đó
+            document.querySelectorAll('script[data-injected]').forEach(s => s.remove());
+
+            // Đóng modal nếu đang mở
+            closeModal();
+            let driverOverlay = document.getElementById('driverOverlay');
+            if(driverOverlay) driverOverlay.classList.remove('open');
+        }
+
+        function loadPage(url){
+            cleanupState();
             fetch(url)
             .then(res => res.text())
             .then(data => {
@@ -1124,6 +1547,7 @@ function saveZone(){
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
                     newScript.text = oldScript.text;
+                    newScript.setAttribute('data-injected', 'true');
                     document.body.appendChild(newScript);
                 });
 
@@ -1185,57 +1609,36 @@ function saveZone(){
                 modal.style.display = "none";
             }
         });
-                function deleteVersion(id) {
-
+        function deleteVersion(id) {
             if (!confirm("Bạn có chắc muốn xoá version này?")) return;
-
             fetch("/ZoneVersion/Delete?id=" + id)
-                .then(res => res.text())
-                .then(html => {
-
-                    // 👉 reload lại danh sách version
-                    document.getElementById("content-area").innerHTML = html;
-
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Lỗi khi xoá");
-                });
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("content-area").innerHTML = html;
+                showToast('Đã xóa version!','info');
+            })
+            .catch(err => { console.error(err); showToast('Lỗi khi xóa!','error'); });
         }
-                function setActive(id) {
-
+        function setActive(id) {
             fetch("/ZoneVersion/SetActive?id=" + id)
-                .then(res => {
-                    if (!res.ok) throw new Error("Lỗi set active");
-
-                    // 👉 reload lại list version
-                    // lấy lại areaId từ button hiện tại
-                    let areaId = getCurrentAreaId();
-
-                    return fetch("/ZoneVersion/Index?areaId=" + areaId);
-                })
-                .then(res => res.text())
-                .then(html => {
-                    document.getElementById("content-area").innerHTML = html;
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Lỗi khi active");
-                });
+            .then(res => {
+                if (!res.ok) throw new Error("Lỗi set active");
+                let aid = getCurrentAreaId();
+                if (!aid) { showToast('Không xác định được khu vực!','error'); return Promise.reject('no area'); }
+                return fetch("/ZoneVersion/Index?areaId=" + aid);
+            })
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("content-area").innerHTML = html;
+                showToast('Đã đặt Active thành công!','success');
+            })
+            .catch(err => {
+                if (err !== 'no area') { console.error(err); showToast('Lỗi khi set Active!','error'); }
+            });
         }
-                function getCurrentAreaId() {
-
-            // cách đơn giản: lấy từ button "+ Thêm Version"
-            let btn = document.querySelector(".btn-add");
-
-            if (!btn) return 0;
-
-            let onclick = btn.getAttribute("onclick");
-
-            // lấy số trong openCreateVersion(1)
-            let match = onclick.match(/\d+/);
-
-            return match ? match[0] : 0;
+        function getCurrentAreaId() {
+            // Dùng biến global currentAreaId (được set khi openAreaMap / loadVersion)
+            return currentAreaId || _activeAreaId || 0;
         }
                         function toggleReportMenu(){
 
@@ -1276,7 +1679,69 @@ function saveZone(){
 
             console.log("AREA CHỌN:", currentAreaName);
         }
+        function loadDriverTab(tab){
+            cleanupState();
+            // Load trang Driver/List rồi switch tab
+            fetch('/Driver/List')
+            .then(res => res.text())
+            .then(html => {
+                const content = document.getElementById('content-area');
+                content.innerHTML = html;
+                // Chạy script trong view
+                const scripts = content.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    newScript.text = oldScript.text;
+                    newScript.setAttribute('data-injected', 'true');
+                    document.body.appendChild(newScript);
+                });
+                // Đợi DOM render xong rồi switch tab
+                setTimeout(() => {
+                    if(typeof switchTab === 'function') switchTab(tab);
+                }, 100);
+            });
+        }
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Kiểm tra thông báo đăng nhập thành công từ TempData
+            var loginMsg = '@TempData["LoginSuccess"]';
+            if (loginMsg) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: loginMsg
+                });
+            }
+
+            // 2. Nếu là Admin và đang ở trang chủ (chưa có nội dung), tự động load màn hình Khu vực
+            var currentRole = '@Context.Session.GetString("Role")';
+            var currentPath = window.location.pathname;
+            
+            if (currentRole === 'Admin' && (currentPath === '/Admin' || currentPath === '/Admin/Index' || currentPath === '/')) {
+                // Mở menu khu vực ở sidebar
+                var menu = document.getElementById("areaMenu");
+                var arrow = document.getElementById("arrow");
+                if (menu) {
+                    menu.style.display = "block";
+                    arrow.innerHTML = "▲";
+                    loadAreaSidebar();
+                }
+                // Load nội dung quản lý khu vực vào content-area
+                loadArea();
+            }
+        });
+    </script>
 </body>
 </html>

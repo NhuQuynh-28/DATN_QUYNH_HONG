@@ -1,25 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj": {}
+    "D:\\DATN QUYNH HONG\\DATN_QUYNH_HONG\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj": {}
   },
   "projects": {
-    "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj": {
+    "D:\\DATN QUYNH HONG\\DATN_QUYNH_HONG\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj",
+        "projectUniqueName": "D:\\DATN QUYNH HONG\\DATN_QUYNH_HONG\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj",
         "projectName": "KhoaLuanTotNghiep",
-        "projectPath": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep\\obj\\",
+        "projectPath": "D:\\DATN QUYNH HONG\\DATN_QUYNH_HONG\\KhoaLuanTotNghiep\\KhoaLuanTotNghiep.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\DATN QUYNH HONG\\DATN_QUYNH_HONG\\KhoaLuanTotNghiep\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Users\\ADMIN\\Desktop\\Components\\Offline Packages",
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 25.1.config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -27,7 +25,7 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\Users\\ADMIN\\Desktop\\Components\\System\\Components\\Packages": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -46,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -86,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

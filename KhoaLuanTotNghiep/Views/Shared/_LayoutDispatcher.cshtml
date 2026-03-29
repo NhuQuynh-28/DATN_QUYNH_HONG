@@ -1,130 +1,218 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 @{
     var username = Context.Session.GetString("Username");
+    var role = Context.Session.GetString("Role");
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>Dispatcher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dispatcher — Delivery Zone</title>
 
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            margin: 0;
-            font-family: Segoe UI;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             background: #0f172a;
-            color: white;
+            color: #e2e8f0;
             height: 100vh;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
-        .layout {
-            display: flex;
-            height: 100vh;
-        }
+        .layout { display: flex; height: 100vh; }
 
+        /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 220px;
+            width: 260px;
             background: #1e293b;
             padding: 20px;
-            z-index: 1000;
-            position: relative;
-        }
-
-        .menu-item {
-            padding: 10px;
-            margin: 10px 0;
-            background: #334155;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-            .menu-item:hover {
-                background: #2563eb;
-            }
-
-        .content {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            position: relative;
-            z-index: 1;
+            flex-shrink: 0;
+            border-right: 1px solid #334155;
         }
+        .logo {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 30px; padding-bottom: 18px;
+            border-bottom: 1px solid #334155;
+        }
+        .logo-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .logo-text { font-size: 17px; font-weight: 800; color: #f1f5f9; letter-spacing: -.3px; }
+        .logo-sub { font-size: 10px; color: #64748b; margin-top: 1px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+        .menu-section { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; padding-left: 4px; }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 14px; margin-bottom: 4px;
+            border-radius: 10px; cursor: pointer;
+            color: #94a3b8; font-size: 13px; font-weight: 600;
+            transition: all .2s; text-decoration: none;
+        }
+        .menu-item:hover { background: #334155; color: #e2e8f0; }
+        .menu-item.active { background: linear-gradient(135deg, #f59e0b22, #d9770622); color: #fbbf24; border: 1px solid #f59e0b33; }
+        .menu-item i { width: 18px; text-align: center; font-size: 14px; }
+
+        .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid #334155; }
+        .sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; padding: 8px 4px; }
+        .sidebar-footer .user-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; color: white;
+        }
+        .sidebar-footer .user-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+        .sidebar-footer .user-role { font-size: 11px; color: #64748b; }
+
+        /* ===== CONTENT ===== */
+        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
         .topbar {
-            height: 60px;
-            background: #1e293b;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 0 20px;
+            height: 56px; background: #1e293b;
+            display: flex; align-items: center; justify-content: flex-end;
+            padding: 0 24px; gap: 12px;
+            border-bottom: 1px solid #334155;
         }
-
+        .topbar-user { display: flex; align-items: center; gap: 10px; }
+        .topbar-user span { font-size: 13px; color: #94a3b8; font-weight: 600; }
         .logout-btn {
-            background: red;
-            padding: 6px 12px;
-            border-radius: 6px;
-            color: white;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #dc2626; border: none; padding: 7px 14px;
+            border-radius: 8px; color: white; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: opacity .15s; text-decoration: none;
         }
+        .logout-btn:hover { opacity: .85; }
 
         .page-body {
-            flex: 1;
-            padding: 20px;
-            overflow: auto;
+            flex: 1; padding: 24px; overflow-y: auto; background: #0f172a;
         }
 
-        #map {
-            width: 100%;
-            height: 500px;
-            border-radius: 10px;
-            z-index: 1;
-        }
+        /* Leaflet overrides */
+        #map { border-radius: 12px; z-index: 1; }
+        .leaflet-pane { z-index: 1 !important; }
+        .zone-label { pointer-events: none; }
 
-        .leaflet-pane {
-            z-index: 1 !important;
+        /* ===== TOAST ===== */
+        .dp-toast {
+            position: fixed; bottom: 28px; right: 28px; z-index: 99999;
+            display: flex; align-items: center; gap: 10px;
+            background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+            padding: 14px 20px; color: #f1f5f9; font-size: 13px; font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0,0,0,.4); min-width: 260px;
+            transform: translateX(120%); transition: transform .3s ease;
         }
-
-        canvas {
-            margin-top: 20px;
-        }
-
-        .zone-label {
-            pointer-events: none;
-        }
+        .dp-toast.show { transform: translateX(0); }
+        .dp-toast.success { border-left: 4px solid #22c55e; }
+        .dp-toast.error { border-left: 4px solid #ef4444; }
+        .dp-toast.info { border-left: 4px solid #3b82f6; }
     </style>
 </head>
 
 <body>
+<div class="layout">
 
-    <div class="layout">
-
-        <div class="sidebar">
-            <div>🚚 Dispatcher</div>
-            <div class="menu-item" onclick="loadMap()">📍 Bản đồ</div>
-            <div class="menu-item" onclick="openPredict()">📊 Nhập dự kiến</div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">📋</div>
+            <div>
+                <div class="logo-text">Delivery Zone</div>
+                <div class="logo-sub">Dispatcher Panel</div>
+            </div>
         </div>
 
-        <div class="content">
+        <div class="menu-section">Quản lý</div>
 
-            <div class="topbar">
-                <span>@username</span>
-                <a href="/Account/Logout" class="logout-btn">Đăng xuất</a>
+        @if (role == "Admin" || role == "Dispatcher")
+        {
+            <div class="menu-item active" id="menuDashboard" onclick="switchMenu('dashboard')">
+                <i class="fas fa-chart-pie"></i> Tổng quan
             </div>
-
-            <div class="page-body">
-                @RenderBody()
+            <div class="menu-item" id="menuForecast" onclick="switchMenu('forecast')">
+                <i class="fas fa-edit"></i> Nhập dự kiến
             </div>
+            <div class="menu-item" id="menuMap" onclick="switchMenu('map')">
+                <i class="fas fa-map-marked-alt"></i> Bản đồ vùng
+            </div>
+            <div class="menu-item" id="menuAssign" onclick="switchMenu('assign')">
+                <i class="fas fa-user-check"></i> Phân công tự động 
+            </div>
+        }
+        else
+        {
+            <div class="menu-item active" id="menuMap" onclick="switchMenu('map')">
+                <i class="fas fa-map-marked-alt"></i> Khu vực của tôi
+            </div>
+        }
 
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">@(username?.Length > 0 ? username[0].ToString().ToUpper() : "?")</div>
+                <div>
+                    <div class="user-name">@username</div>
+                    <div class="user-role">@role</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    @RenderSection("Scripts", required: false)
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="topbar">
+            <div class="header-user">
+                <a href="/Account/Profile" class="logout-btn" style="margin-right:12px; background:#2563eb;">
+                    <i class="fas fa-user-circle"></i> Hồ sơ
+                </a>
+                <span style="font-size:13px; font-weight:600; color:#94a3b8">Xin chào, <b>@username</b></span>
+                <a href="/Account/Logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Thoát</a>
+            </div>
+        </div>
+
+        <div class="page-body" id="pageBody">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="dp-toast" id="dpToast"></div>
+
+<script>
+function dpToast(msg, type='success'){
+    let t = document.getElementById('dpToast');
+    let icons = {success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle'};
+    let colors = {success:'#22c55e', error:'#ef4444', info:'#3b82f6'};
+    t.className = `dp-toast ${type}`;
+    t.innerHTML = `<i class="fas ${icons[type]||icons.info}" style="color:${colors[type]||colors.info}"></i> ${msg}`;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=> t.classList.remove('show'), 3200);
+}
+
+function switchMenu(menu){
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    let btn = document.getElementById('menu' + menu.charAt(0).toUpperCase() + menu.slice(1));
+    if(btn) btn.classList.add('active');
+    // Trigger page function if exists
+    if(typeof onMenuSwitch === 'function') onMenuSwitch(menu);
+}
+</script>
+
+@RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,232 @@
+@using Microsoft.AspNetCore.Http
+@using KhoaLuanTotNghiep.Models
+@{
+    Layout = null;
+    var driver = ViewBag.Driver as Driver;
+    var assignment = ViewBag.Assignment as Assignment;
+    var zones = ViewBag.Zones as List<Zone>;
+    var username = Context.Session.GetString("Username");
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Driver Dashboard — Theo dõi phân công</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Inter', sans-serif; background:#0f172a; color:#f1f5f9; height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+
+        /* HEADER */
+        header { 
+            height:60px; background:#1e293b; border-bottom:1px solid #334155;
+            display:flex; align-items:center; justify-content:space-between; padding:0 24px;
+            flex-shrink:0;
+        }
+        .header-logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; color:#f59e0b; }
+        .header-user { display:flex; align-items:center; gap:12px; }
+        .logout-btn { background:#334155; color:#94a3b8; padding:8px 12px; border-radius:8px; text-decoration:none; font-size:13px; font-weight:700; transition: .2s; }
+        .logout-btn:hover { background:#dc2626; color:white; }
+
+        /* MAIN CONTENT */
+        main { flex:1; overflow-y:auto; padding:24px; max-width:1400px; margin:0 auto; width:100%; }
+
+        .welcome { margin-bottom:24px; }
+        .welcome h1 { font-size:24px; font-weight:800; margin-bottom:4px; }
+        .welcome p { color:#64748b; font-size:14px; }
+
+        /* STATS */
+        .stats-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:24px; }
+        .stat-card {
+            background:#1e293b; border:1px solid #334155; border-radius:16px; padding:20px 24px;
+            display:flex; flex-direction:column; gap:8px; position:relative; overflow:hidden;
+        }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--c, #f59e0b); }
+        .stat-val { font-size:32px; font-weight:900; color:var(--c, #f59e0b); }
+        .stat-lbl { font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; letter-spacing:.05em; }
+        .stat-icon { position:absolute; right:20px; top:20px; font-size:24px; color:#334155; opacity:.4; }
+
+        /* VIEW PORT */
+        .view-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; }
+        .map-wrap { background:#1e293b; border:1px solid #334155; border-radius:18px; overflow:hidden; position:relative; min-height:450px; }
+        #map { height:100%; width:100%; z-index:1; }
+
+        .list-wrap { background:#1e293b; border:1px solid #334155; border-radius:18px; padding:20px; display:flex; flex-direction:column; }
+        .list-title { font-size:15px; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .zone-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+        .zone-card {
+            background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px;
+            transition:.15s; cursor:pointer;
+        }
+        .zone-card:hover { border-color:#f59e0b22; background:#1e293b; }
+        .zc-name { font-size:13px; font-weight:700; color:#f1f5f9; margin-bottom:4px; }
+        .zc-info { font-size:11px; color:#64748b; display:flex; justify-content:space-between; }
+
+        .empty-state { text-align:center; padding:100px 40px; color:#64748b; }
+        .empty-state i { font-size:48px; margin-bottom:16px; opacity:.3; }
+
+        .badge-time { background:rgba(245,158,11,.1); color:#f59e0b; border:1px solid rgba(245,158,11,.2); padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+
+        @@media (max-width: 900px) {
+            .view-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            body { overflow:auto; height:auto; }
+            main { padding:16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-logo">📋 Delivery Zone</div>
+        <div class="header-user">
+            <a href="/Account/Profile" class="logout-btn" style="background:#2563eb; color:white; margin-right:8px;">
+                <i class="fas fa-user-circle"></i> Hồ sơ
+            </a>
+            <span style="font-size:13px; font-weight:600; color:#94a3b8">Xin chào, <b>@username</b></span>
+            <a href="/Account/Logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Thoát</a>
+        </div>
+    </header>
+
+    <main>
+        @if (ViewBag.NoDriverRecord == true)
+        {
+            <div class="empty-state">
+                <i class="fas fa-id-card-alt"></i>
+                <h2>Chưa tìm thấy hồ sơ tài xế</h2>
+                <p>Số điện thoại tài khoản của bạn chưa khớp với bản ghi bưu tá nào trong hệ thống. Vui lòng liên hệ Admin.</p>
+            </div>
+        }
+        else if (ViewBag.NoAssignment == true)
+        {
+            <div class="welcome">
+                <h1>Chào mừng, @driver?.DriverName!</h1>
+                <p>Bạn chưa có phân công trong tháng hiện tại.</p>
+            </div>
+            <div class="empty-state">
+                <i class="fas fa-map-marker-alt"></i>
+                <h2>Chưa được phân công</h2>
+                <p>Hiện bạn chưa có vùng phụ trách nào được lưu trong hệ thống.</p>
+            </div>
+        }
+        else
+        {
+            <div class="welcome">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end">
+                    <div>
+                        <h1>Tuyến đường của bạn</h1>
+                        <p>Khu vực: <b>@assignment.Area?.Name</b></p>
+                    </div>
+                    <div class="badge-time">
+                        Tháng @assignment.Month / @assignment.Year
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" style="--c:#3b82f6">
+                    <i class="fas fa-box stat-icon"></i>
+                    <div class="stat-lbl">Đơn hàng dự báo</div>
+                    <div class="stat-val">@assignment.PlannedOrders</div>
+                </div>
+                <div class="stat-card" style="--c:#22c55e">
+                    <i class="fas fa-users stat-icon"></i>
+                    <div class="stat-lbl">Khách hàng ước tính</div>
+                    <div class="stat-val">@assignment.PlannedCustomers</div>
+                </div>
+                <div class="stat-card" style="--c:#8b5cf6">
+                    <i class="fas fa-route stat-icon"></i>
+                    <div class="stat-lbl">Khoảng cách trung bình</div>
+                    <div class="stat-val">@assignment.TotalDistance.ToString("N3")</div>
+                </div>
+            </div>
+
+            <div class="view-grid">
+                <div class="map-wrap">
+                    <div id="map"></div>
+                </div>
+
+                <div class="list-wrap">
+                    <div class="list-title"><i class="fas fa-layer-group" style="color:#f59e0b"></i> Danh sách vùng (@(zones?.Count ?? 0))</div>
+                    <div class="zone-list">
+                        @if (zones != null)
+                        {
+                            @foreach (var z in zones)
+                            {
+                                <div class="zone-card" onclick="focusZone(@z.Id)">
+                                    <div class="zc-name">@z.ZoneName</div>
+                                    <div class="zc-info">
+                                        <span><i class="fas fa-box"></i> @z.Order đơn</span>
+                                        <span><i class="fas fa-users"></i> @z.Customers KH</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+
+    @if (zones != null) {
+        <script>
+            let map = L.map('map').setView([21.0285, 105.8542], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(map);
+
+            let zonesData = @Html.Raw(Json.Serialize(zones));
+            let polygons = {};
+            let bounds = [];
+
+            zonesData.forEach(z => {
+                try {
+                    let pts = JSON.parse(z.points);
+                    let poly = L.polygon(pts, { 
+                        color: '#3b82f6', 
+                        weight: 2, 
+                        fillOpacity: 0.2 
+                    }).addTo(map);
+
+                    polygons[z.id] = poly;
+                    let center = poly.getBounds().getCenter();
+                    bounds.push(center);
+
+                    L.marker(center, {
+                        interactive:false,
+                        icon: L.divIcon({
+                            className: 'zone-label',
+                            html: `<div style="background:#2563eb; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.3)">${z.zoneName}</div>`
+                        })
+                    }).addTo(map);
+
+                    poly.bindPopup(`<b>${z.zoneName}</b><br>${z.order} đơn / ${z.customers} KH`);
+                } catch(e) { console.error(e); }
+            });
+
+            if(bounds.length) map.fitBounds(bounds, { padding:[40,40] });
+
+            function focusZone(id) {
+                if(polygons[id]) {
+                    map.fitBounds(polygons[id].getBounds(), { padding:[100,100] });
+                    polygons[id].openPopup();
+                }
+            }
+        </script>
+    }
+        <script>
+            // Khi người dùng nhấn Back sau khi đã đăng nhập, chuyển họ về Dashboard luôn
+            if (history.length > 1) {
+                history.pushState(null, null, location.href);
+                window.onpopstate = function () {
+                    // Thay thế entry hiện tại bằng Dashboard để không quay lại Login
+                    window.location.replace('/DriverDashboard/Index');
+                };
+            }
+        </script>
+</body>
+</html>
