@@ -184,6 +184,13 @@ namespace KhoaLuanTotNghiep.Controllers
             var username = HttpContext.Session.GetString("Username");
             var user = _context.Users.FirstOrDefault(u => u.Username == username);
             if (user == null) return RedirectToAction("Login");
+
+            if (user.Role == "Driver")
+            {
+                var driver = _context.Drivers.FirstOrDefault(d => d.Phone == user.Phone);
+                ViewBag.Driver = driver;
+            }
+
             return View(user);
         }
 
@@ -217,8 +224,38 @@ namespace KhoaLuanTotNghiep.Controllers
             }
 
             _context.SaveChanges();
+            
+            // Sync with Driver profile if the user is a Driver
+            if (user.Role == "Driver")
+            {
+                SyncDriverProfile(user);
+            }
+
             TempData["Success"] = "Cập nhật hồ sơ thành công!";
             return RedirectToAction("Profile");
+        }
+
+        private void SyncDriverProfile(User user)
+        {
+            // Sync logic: Find by phone then update name, or create if not found
+            var driver = _context.Drivers.FirstOrDefault(d => d.Phone == user.Phone);
+            if (driver != null)
+            {
+                driver.DriverName = user.Username; // Or user.FullName if you have it
+                _context.SaveChanges();
+            }
+            else
+            {
+                // Optionally create if phone was changed to something NEW that doesn't exist
+                _context.Drivers.Add(new Driver 
+                { 
+                    DriverName = user.Username,
+                    Phone = user.Phone ?? "0000000000",
+                    Status = "DangLam",
+                    CreatedAt = DateTime.Now
+                });
+                _context.SaveChanges();
+            }
         }
 
         // Quên mk

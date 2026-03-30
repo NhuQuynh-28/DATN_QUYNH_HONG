@@ -1,78 +1,174 @@
-﻿<h2>📊 Dashboard</h2>
-
-<div class="dashboard">
-
-    <div class="card">Khu vực: <span id="totalArea"></span></div>
-    <div class="card">Version: <span id="totalVersion"></span></div>
-    <div class="card">Polygon: <span id="totalZone"></span></div>
-    <div class="card">Shipper: <span id="totalShipper"></span></div>
-
-    <div class="card">Khách hàng: <span id="totalCustomers"></span></div>
-    <div class="card">Đơn hàng: <span id="totalOrders"></span></div>
-
+<div class="report-header" style="margin-bottom: 24px;">
+    <h2 style="display:flex; align-items:center; gap:10px; color:#f1f5f9; font-size:24px;">
+        <i class="fas fa-chart-line" style="color:#3b82f6"></i>
+        Tổng quan hệ thống
+    </h2>
+    <p style="color:#64748b; font-size:14px; margin-top:4px;">Báo cáo tổng kết dữ liệu vận hành toàn hệ thống</p>
 </div>
 
-<hr />
+<div class="stats-grid">
+    <div class="stat-card" style="border-left: 4px solid #3b82f6;">
+        <div class="stat-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;"><i class="fas fa-layer-group"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Tổng số Vùng</div>
+            <div class="stat-value" id="totalZone">-</div>
+        </div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;"><i class="fas fa-truck"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Bưu tá hoạt động</div>
+            <div class="stat-value" id="activeDrivers">-</div>
+        </div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #10b981;">
+        <div class="stat-icon" style="background:rgba(16,185,129,0.1); color:#10b981;"><i class="fas fa-box-open"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Tổng Đơn hàng</div>
+            <div class="stat-value" id="totalOrders">-</div>
+        </div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #8b5cf6;">
+        <div class="stat-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;"><i class="fas fa-user-friends"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Tổng Khách hàng</div>
+            <div class="stat-value" id="totalCustomers">-</div>
+        </div>
+    </div>
+</div>
 
-<canvas id="barChart"></canvas>
-<canvas id="pieChart"></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    loadDashboardData();
-
-    function loadDashboardData(){
-        fetch("/Report/DashboardData")
-        .then(r=>r.json())
-        .then(d=>{
-
-            document.getElementById("totalArea").innerText = d.totalArea;
-            document.getElementById("totalVersion").innerText = d.totalVersion;
-            document.getElementById("totalZone").innerText = d.totalZone;
-            document.getElementById("totalShipper").innerText = d.totalShipper;
-            document.getElementById("totalCustomers").innerText = d.totalCustomers;
-            document.getElementById("totalOrders").innerText = d.totalOrders;
-
-            drawCharts(d);
-        });
-    }
-
-    function drawCharts(data){
-
-        new Chart(document.getElementById("barChart"), {
-            type: 'bar',
-            data: {
-                labels: ['Đơn hàng'],
-                datasets: [{
-                    label: 'Total Orders',
-                    data: [data.totalOrders]
-                }]
-            }
-        });
-
-        new Chart(document.getElementById("pieChart"), {
-            type: 'pie',
-            data: {
-                labels: ['Zone', 'Shipper'],
-                datasets: [{
-                    data: [data.totalZone, data.totalShipper]
-                }]
-            }
-        });
-    }
-</script>
+<div class="charts-row">
+    <div class="chart-container">
+        <h4 class="chart-title">Phân bổ nguồn lực</h4>
+        <div style="height: 300px; position:relative;">
+            <canvas id="resourceChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-container">
+        <h4 class="chart-title">Hiệu suất vận hành</h4>
+        <div style="height: 300px; position:relative;">
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+</div>
 
 <style>
-    .dashboard {
+    .stats-grid {
         display: grid;
-        grid-template-columns: repeat(3,1fr);
-        gap: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
     }
-
-    .card {
+    .stat-card {
         background: #1e293b;
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-icon {
+        width: 48px; height: 48px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+    }
+    .stat-label { font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 4px; }
+    .stat-value { font-size: 24px; font-weight: 800; color: #f1f5f9; }
+
+    .charts-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    .chart-container {
+        background: #1e293b;
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid #334155;
+    }
+    .chart-title { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 20px; }
+
+    @@media (max-width: 900px) {
+        .charts-row { grid-template-columns: 1fr; }
     }
 </style>
+
+<script>
+    (function() {
+        function loadDashboardData() {
+            fetch("/Report/DashboardData")
+                .then(r => r.json())
+                .then(d => {
+                    const totalZone = document.getElementById("totalZone");
+                    const activeDrivers = document.getElementById("activeDrivers");
+                    const totalOrders = document.getElementById("totalOrders");
+                    const totalCustomers = document.getElementById("totalCustomers");
+
+                    if(totalZone) totalZone.innerText = d.totalZone;
+                    if(activeDrivers) activeDrivers.innerText = d.activeDrivers + "/" + d.totalShipper;
+                    if(totalOrders) totalOrders.innerText = d.totalOrders.toLocaleString();
+                    if(totalCustomers) totalCustomers.innerText = d.totalCustomers.toLocaleString();
+                    
+                    renderDashboardCharts(d);
+                });
+        }
+
+        function renderDashboardCharts(data) {
+            const resourceCtx = document.getElementById("resourceChart");
+            const performanceCtx = document.getElementById("performanceChart");
+            
+            if(!resourceCtx || !performanceCtx) return;
+
+            new Chart(resourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Khu vực', 'Bản ghi Vùng', 'Bưu tá', 'Người dùng'],
+                    datasets: [{
+                        data: [data.totalArea, data.totalZone, data.totalShipper, data.totalUsers],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 0,
+                        hoverOffset: 12
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', padding: 20, font: { size: 12 } }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Đơn hàng', 'Khách hàng'],
+                    datasets: [{
+                        label: 'Số lượng thực tế',
+                        data: [data.totalOrders, data.totalCustomers],
+                        backgroundColor: ['#3b82f6', '#8b5cf6'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+        
+        loadDashboardData();
+    })();
+</script>

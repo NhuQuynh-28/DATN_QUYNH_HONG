@@ -48,7 +48,9 @@
             font-weight: 600;
             transition: 0.2s;
         }
-
+    </style>
+</head>
+<body>
     <div class="profile-container" style="flex-direction:column; align-items:center;">
     <div class="back-nav">
         <a href="@backUrl" class="back-link">
@@ -60,6 +62,39 @@
             <h3>Thiết lập tài khoản</h3>
             <p>Quản lý thông tin cá nhân và ảnh đại diện</p>
         </div>
+
+        @if (role == "Driver")
+        {
+            var driver = ViewBag.Driver as KhoaLuanTotNghiep.Models.Driver;
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                <h4 style="color: #60a5fa; margin-bottom: 8px;"><i class="fas fa-id-card"></i> Thông tin bưu tá</h4>
+                @if (driver != null)
+                {
+                    <div style="display: flex; gap: 20px; font-size: 14px;">
+                        <div>
+                            <span style="color: #94a3b8;">Họ tên:</span>
+                            <span style="color: #f1f5f9; font-weight: 600;">@driver.DriverName</span>
+                        </div>
+                        <div>
+                            <span style="color: #94a3b8;">Trạng thái:</span>
+                            <span class="badge" style="background: @(driver.Status == "DangLam" ? "#16a34a" : "#dc2626"); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                                @(driver.Status == "DangLam" ? "Đang làm việc" : driver.Status == "NghiLam" ? "Nghỉ làm" : "Rời bỏ")
+                            </span>
+                        </div>
+                        <div>
+                            <span style="color: #94a3b8;">Ngày gia nhập:</span>
+                            <span style="color: #f1f5f9;">@driver.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p style="color: #f87171; font-size: 13px; margin: 0;">
+                        <i class="fas fa-exclamation-triangle"></i> Bạn chưa có bản ghi bưu tá tương ứng. Vui lòng cập nhật số điện thoại chính xác.
+                    </p>
+                }
+            </div>
+        }
 
         @if (TempData["Success"] != null)
         {

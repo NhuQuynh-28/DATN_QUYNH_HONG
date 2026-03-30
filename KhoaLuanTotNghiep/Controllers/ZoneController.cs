@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using KhoaLuanTotNghiep.Data;
 using KhoaLuanTotNghiep.Models;
 using System.Linq;
@@ -17,9 +17,18 @@ namespace KhoaLuanTotNghiep.Controllers
             _context = context;
         }
 
-        // mở bản đồ theo version
         public IActionResult Map(int versionId)
         {
+            var version = _context.ZoneVersions
+                .Include(v => v.Area)
+                .FirstOrDefault(v => v.Id == versionId);
+
+            if (version != null)
+            {
+                ViewBag.VersionName = version.VersionName;
+                ViewBag.AreaName = version.Area?.Name;
+            }
+
             ViewBag.VersionId = versionId;
             return PartialView("~/Views/Zone/_ZoneMap.cshtml");
         }

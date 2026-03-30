@@ -24,6 +24,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
 
         body {
@@ -170,10 +171,39 @@
         /* CONTENT */
         .content { flex:1; display:flex; flex-direction:column; }
         .topbar { height:60px; background:#1e293b; display:flex; align-items:center;
-            justify-content:flex-end; padding:0 20px; }
-        .user-box { display:flex; align-items:center; gap:10px; }
-        .logout-btn { background:#ef4444; border:none; padding:6px 12px;
-            color:white; border-radius:6px; cursor:pointer; }
+            justify-content:flex-end; padding:0 24px; border-bottom: 1px solid #334155; }
+        .user-box { display:flex; align-items:center; gap:0; }
+        
+        .header-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; text-decoration: none;
+            transition: all 0.2s ease; border: none; cursor: pointer;
+        }
+        .btn-profile {
+            background: rgba(37, 99, 235, 0.1); color: #3b82f6;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            margin-right: 12px;
+        }
+        .btn-profile:hover {
+            background: #2563eb; color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1); color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .btn-logout:hover {
+            background: #dc2626; color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .user-welcome {
+            font-size: 13px; color: #94a3b8; font-weight: 500;
+            margin-right: 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .user-welcome i { font-size: 14px; color: #64748b; }
+        .user-welcome b { color: #f1f5f9; font-weight: 700; }
+
         .page-body { flex:1; padding:20px; overflow:auto; background:#0f172a; }
         .leaflet-div-icon { width:8px !important; height:8px !important; }
         .leaflet-editing-icon { width:8px !important; height:8px !important;
@@ -247,28 +277,23 @@
 
                 </div>
                 <div class="menu-item" onclick="toggleReportMenu()">
-                    📊 Thống kê báo cáo
+                    <span>📊 Thống kê báo cáo</span>
                     <span id="arrowReport">▼</span>
                 </div>
 
-                <div id="reportMenu" style="display:none; padding-left:15px;">
-
-                    <div class="menu-sub" onclick="loadDashboard()">
-                        📈 Tổng quan
-                    </div>
-
-                    <div class="menu-sub" onclick="loadReportZone()">
-                        📍 Thống kê vùng
-                    </div>
-
-                    <div class="menu-sub" onclick="loadReportShipper()">
-                        🚴 Theo bưu tá
-                    </div>
-
-                    <div class="menu-sub" onclick="loadReportOrder()">
-                        📦 Đơn hàng
-                    </div>
-
+                <div id="reportMenu" class="submenu">
+                    <a href="#" onclick="loadDashboard(); return false;">
+                        <i class="fas fa-chart-line"></i> Tổng quan
+                    </a>
+                    <a href="#" onclick="loadReportZone(); return false;">
+                        <i class="fas fa-map-pin"></i> Thống kê vùng
+                    </a>
+                    <a href="#" onclick="loadReportShipper(); return false;">
+                        <i class="fas fa-user-friends"></i> Theo bưu tá
+                    </a>
+                    <a href="#" onclick="loadReportOrder(); return false;">
+                        <i class="fas fa-boxes"></i> Đơn hàng
+                    </a>
                 </div>  
             }
 
@@ -281,13 +306,15 @@
             <div class="topbar">
 
                 <div class="user-box">
-                    <a href="/Account/Profile" class="logout-btn" style="background:#2563eb; text-decoration:none;">
+                    <a href="/Account/Profile" class="header-btn btn-profile">
                         <i class="fas fa-user-circle"></i> Hồ sơ
                     </a>
-                    <i class="fas fa-user"></i>
-                    <span>@username</span>
-                    <a href="/Account/Logout" class="logout-btn" style="text-decoration:none;">
-                        Đăng xuất
+                    <div class="user-welcome">
+                        <i class="fas fa-user"></i>
+                        <span>Xin chào, <b>@username</b></span>
+                    </div>
+                    <a href="/Account/Logout" class="header-btn btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Thoát
                     </a>
                 </div>
 
@@ -1658,18 +1685,38 @@ function saveZone(){
             .then(res => res.text())
             .then(html => {
                 document.getElementById("content-area").innerHTML = html;
+                const scripts = document.getElementById("content-area").querySelectorAll('script');
+                scripts.forEach(s => eval(s.innerHTML));
             });
         }
                 function loadReportZone(){
-            alert("Thống kê vùng");
+            fetch("/Report/ZoneReport")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("content-area").innerHTML = html;
+                const scripts = document.getElementById("content-area").querySelectorAll('script');
+                scripts.forEach(s => eval(s.innerHTML));
+            });
         }
 
         function loadReportShipper(){
-            alert("Theo bưu tá");
+            fetch("/Report/DriverReport")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("content-area").innerHTML = html;
+                const scripts = document.getElementById("content-area").querySelectorAll('script');
+                scripts.forEach(s => eval(s.innerHTML));
+            });
         }
 
         function loadReportOrder(){
-            alert("Đơn hàng");
+            fetch("/Report/OrderReport")
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("content-area").innerHTML = html;
+                const scripts = document.getElementById("content-area").querySelectorAll('script');
+                scripts.forEach(s => eval(s.innerHTML));
+            });
         }
                 function changeArea(){
             let select = document.getElementById("areaSelect");
