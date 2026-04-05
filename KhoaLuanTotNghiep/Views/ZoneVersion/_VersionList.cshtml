@@ -99,8 +99,34 @@
 .vl-btn-update { background:#3d2f1c; color:#f59e0b; }
 .vl-btn-update:hover { background:#d97706; color:white; }
 
+.vl-btn-dist   { background:#1e293b; color:#fbbf24; border:1px solid #fbbf2444; }
+.vl-btn-dist:hover   { background:#fbbf24; color:#0f172a; }
+.vl-btn-adj    { background:#1e293b; color:#a78bfa; border:1px solid #a78bfa44; }
+.vl-btn-adj:hover    { background:#a78bfa; color:#0f172a; }
+
 .vl-date { font-size:12px; color:#64748b; }
 .vl-num  { font-weight:700; color:#475569; }
+
+/* MODAL OVERLAY & CONTENT */
+.am-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
+    z-index: 9999; backdrop-filter: blur(8px);
+}
+.am-overlay.open { display: flex; }
+.am-modal {
+    background: #111827; border: 1px solid #334155; border-radius: 20px;
+    padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    max-width: 1000px; width: 95%; max-height: 90vh; overflow-y: auto;
+    position: relative; animation: amPop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@@keyframes amPop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.am-footer { margin-top: 24px; padding-top: 18px; border-top: 1px solid #334155; display: flex; justify-content: flex-end; }
+.am-btn-cancel {
+    background: #334155; color: #f1f5f9; border: none; padding: 10px 24px;
+    border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all .2s;
+}
+.am-btn-cancel:hover { background: #475569; }
 </style>
 
 <div class="vl-wrap">
@@ -134,14 +160,16 @@
             <div class="lbl">Đang Active</div>
         </div>
         <div class="vl-stat" style="--accent:#f59e0b">
-            <div class="val">@Model.Sum(v => v.Zones?.Count ?? 0)</div>
+            <div class="val">@Model.Sum(v => v.SoPolygon ?? 0)</div>
             <div class="lbl">Tổng Polygon</div>
         </div>
         <div class="vl-stat" style="--accent:#a78bfa">
             @{
-                double totalArea = Model.Sum(v => v.Zones?.Sum(z => z.Area) ?? 0);
+                double totalArea = Model.Sum(v => v.DienTichBaoPhu ?? 0);
                 double totalAreaKm = totalArea / 1_000_000.0;
-                string totalAreaDisp = totalAreaKm >= 0.1 ? totalAreaKm.ToString("N1") + " km²" : totalArea.ToString("N0") + " m²";
+                string totalAreaDisp = totalArea > 0 
+                    ? (totalAreaKm >= 0.1 ? totalAreaKm.ToString("N2") + " km²" : totalArea.ToString("N0") + " m²")
+                    : "0 m²";
             }
             <div class="val">@totalAreaDisp</div>
             <div class="lbl">Tổng diện tích</div>
@@ -185,17 +213,17 @@
                         <td>
                             <div class="vl-chip">
                                 <i class="fas fa-draw-polygon"></i>
-                                @(v.Zones?.Count ?? 0)
+                                @(v.SoPolygon ?? 0)
                             </div>
                         </td>
                         <td>
                             <div class="vl-area">
                                 @{
-                                    double dArea = v.Zones?.Sum(z => z.Area) ?? 0;
+                                    double dArea = v.DienTichBaoPhu ?? 0;
                                     double dAreaKm = dArea / 1_000_000.0;
                                     string dAreaStr = dArea > 0
-                                        ? (dAreaKm >= 0.01 ? dAreaKm.ToString("N3") + " km²" : dArea.ToString("N0") + " m²")
-                                        : "—";
+                                        ? (dAreaKm >= 0.001 ? dAreaKm.ToString("N3") + " km²" : dArea.ToString("N0") + " m²")
+                                        : "0 m²";
                                 }
                                 <span>@dAreaStr</span>
                             </div>
@@ -219,8 +247,11 @@
                                 <button class="vl-btn vl-btn-map" onclick="openMap(@v.Id)" title="Mở bản đồ version này">
                                     <i class="fas fa-map"></i> Bản đồ
                                 </button>
-                                <button class="vl-btn vl-btn-update" onclick="showVersionMatrix(@v.Id, '@v.VersionName')" title="Xem ma trận khoảng cách & kề">
-                                    <i class="fas fa-sync-alt"></i> Cập nhất
+                                <button class="vl-btn vl-btn-dist" onclick="showVersionMatrix(@v.Id, '@v.VersionName', 'dist')" title="Tính toán ma trận khoảng cách">
+                                    <i class="fas fa-arrows-alt-h"></i> Khoảng cách
+                                </button>
+                                <button class="vl-btn vl-btn-adj" onclick="showVersionMatrix(@v.Id, '@v.VersionName', 'adj')" title="Xác định các vùng kề">
+                                    <i class="fas fa-link"></i> Vùng kề
                                 </button>
                                 <button class="vl-btn vl-btn-active" onclick="setActive(@v.Id)" title="Đặt làm version Active">
                                     <i class="fas fa-check"></i> Active
@@ -239,15 +270,17 @@
                     <td>
                         <div class="vl-chip" style="background:#1e293b; border-color:#f59e0b22; color:#f59e0b">
                             <i class="fas fa-draw-polygon"></i>
-                            @Model.Sum(v => v.Zones?.Count ?? 0)
+                            @Model.Sum(v => v.SoPolygon ?? 0)
                         </div>
                     </td>
                     <td>
                         <div class="vl-area" style="color:#f59e0b">
                             @{
-                                double sArea = Model.Sum(v => v.Zones?.Sum(z => z.Area) ?? 0);
+                                double sArea = Model.Sum(v => v.DienTichBaoPhu ?? 0);
                                 double sAreaKm = sArea / 1_000_000.0;
-                                string sAreaStr = sAreaKm >= 0.01 ? sAreaKm.ToString("N3") + " km²" : sArea.ToString("N0") + " m²";
+                                string sAreaStr = sArea > 0 
+                                    ? (sAreaKm >= 0.01 ? sAreaKm.ToString("N3") + " km²" : sArea.ToString("N0") + " m²")
+                                    : "0 m²";
                             }
                             <span>@sAreaStr</span>
                         </div>
@@ -307,12 +340,12 @@
         document.getElementById('matrixModal').classList.remove('open');
     }
 
-    function showVersionMatrix(vId, vName) {
+    function showVersionMatrix(vId, vName, focusType = 'all') {
         document.getElementById('mtVerName').innerText = vName;
         const distBox = document.getElementById('mtDistanceBox');
         const adjBox = document.getElementById('mtAdjacentBox');
         
-        distBox.innerHTML = '<div style="padding:30px; text-align:center; color:#64748b;"><i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px; display:block"></i> Đang tải dữ liệu và tính toán ma trận...</div>';
+        distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b;"><i class="fas fa-circle-notch fa-spin" style="font-size:32px; margin-bottom:14px; display:block; color:#fbbf24"></i> Đang tải dữ liệu và phân tích không gian...</div>';
         adjBox.innerHTML = '';
         
         document.getElementById('matrixModal').classList.add('open');
@@ -321,31 +354,57 @@
             .then(r => r.json())
             .then(zones => {
                 if (!zones || zones.length === 0) {
-                    distBox.innerHTML = '<div style="padding:30px; text-align:center; color:#64748b"><i class="fas fa-exclamation-triangle" style="margin-right:8px"></i> Không có vùng nào trong phiên bản này.</div>';
+                    distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b"><i class="fas fa-ghost" style="font-size:32px; display:block; margin-bottom:14px"></i> Không tìm thấy dữ liệu vùng cho Version này.</div>';
                     return;
                 }
                 
+                // Helper: Tính bounds cho vùng (Fallback nếu không có Leaflet)
+                function getPolygonBounds(points) {
+                    try {
+                        let pts = (typeof points === 'string') ? JSON.parse(points) : points;
+                        if (!Array.isArray(pts)) return null;
+                        
+                        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+                        pts.forEach(p => {
+                            let lat = (p[0] !== undefined) ? p[0] : p.lat;
+                            let lng = (p[1] !== undefined) ? p[1] : p.lng;
+                            if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+                            if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                        });
+                        return { minLat, maxLat, minLng, maxLng };
+                    } catch(e) { return null; }
+                }
+
+                function checkIntersects(b1, b2) {
+                    if (!b1 || !b2) return false;
+                    return !(b2.minLat > b1.maxLat || b2.maxLat < b1.minLat || b2.minLng > b1.maxLng || b2.maxLng < b1.minLng);
+                }
+
                 // 1. Render Distance Matrix
                 let distHtml = '<table class="vl-table" style="min-width:100%"><thead><tr><th>Vùng</th>';
-                zones.forEach(z => { distHtml += `<th style="text-align:center">${z.zoneName}</th>`; });
+                zones.forEach(z => { distHtml += `<th style="text-align:center; font-size:10px">${z.zoneName}</th>`; });
                 distHtml += '</tr></thead><tbody>';
                 
                 zones.forEach((z1, i) => {
-                    distHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#94a3b8">${z1.zoneName}</td>`;
+                    distHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#fbbf24; font-size:11px">${z1.zoneName}</td>`;
                     zones.forEach((z2, j) => {
                         if (i === j) {
                             distHtml += '<td style="color:#475569; text-align:center">0</td>';
                         } else {
                             let d = 0;
-                            // Sử dụng Leaflet distanceTo nếu có, hoặc Havorsine/Euclidean
-                            if (typeof L !== 'undefined' && L.latLng) {
-                                d = L.latLng(z1.centerLat, z1.centerLng).distanceTo(L.latLng(z2.centerLat, z2.centerLng));
-                            } else {
-                                let dx = (z1.centerLat - z2.centerLat) * 111320;
-                                let dy = (z1.centerLng - z2.centerLng) * 111320 * Math.cos(z1.centerLat * Math.PI / 180);
-                                d = Math.sqrt(dx*dx + dy*dy);
-                            }
-                            distHtml += `<td style="text-align:center; font-family:monospace">${Math.round(d)}m</td>`;
+                            // Tính khoảng cách Havorsine nhanh
+                            const R = 6371e3; // meters
+                            const p1 = z1.centerLat * Math.PI/180;
+                            const p2 = z2.centerLat * Math.PI/180;
+                            const dp = (z2.centerLat - z1.centerLat) * Math.PI/180;
+                            const dl = (z2.centerLng - z1.centerLng) * Math.PI/180;
+                            const a = Math.sin(dp/2) * Math.sin(dp/2) +
+                                      Math.cos(p1) * Math.cos(p2) *
+                                      Math.sin(dl/2) * Math.sin(dl/2);
+                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                            d = R * c;
+                            
+                            distHtml += `<td style="text-align:center; font-family:monospace; color:#e2e8f0; font-size:11px">${Math.round(d)}m</td>`;
                         }
                     });
                     distHtml += '</tr>';
@@ -355,35 +414,38 @@
                 
                 // 2. Render Adjacency Matrix
                 let adjHtml = '<table class="vl-table" style="min-width:100%"><thead><tr><th>Vùng</th>';
-                zones.forEach(z => { adjHtml += `<th style="text-align:center">${z.zoneName}</th>`; });
+                zones.forEach(z => { adjHtml += `<th style="text-align:center; font-size:10px">${z.zoneName}</th>`; });
                 adjHtml += '</tr></thead><tbody>';
                 
+                // Tiền tính toán bounds cho tất cả zones
+                const zoneBounds = zones.map(z => getPolygonBounds(z.points));
+
                 zones.forEach((z1, i) => {
-                    adjHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#94a3b8">${z1.zoneName}</td>`;
-                    let pts1 = JSON.parse(z1.points);
+                    adjHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#a78bfa; font-size:11px">${z1.zoneName}</td>`;
+                    let b1 = zoneBounds[i];
                     
                     zones.forEach((z2, j) => {
                         if (i === j) {
                             adjHtml += '<td style="color:#475569; text-align:center">-</td>';
                         } else {
-                            let isAdj = 0;
-                            if (typeof L !== 'undefined' && L.latLngBounds) {
-                                let pts2 = JSON.parse(z2.points);
-                                let b1 = L.latLngBounds(pts1);
-                                let b2 = L.latLngBounds(pts2);
-                                isAdj = b1.intersects(b2) ? 1 : 0;
-                            }
-                            adjHtml += `<td style="text-align:center"><span class="vl-badge ${isAdj ? 'vl-badge-active' : ''}" style="padding:2px 8px; font-size:10px; ${!isAdj?'opacity:0.3;border:none':''}">${isAdj ? 'KỀ' : '0'}</span></td>`;
+                            let b2 = zoneBounds[j];
+                            let isAdj = checkIntersects(b1, b2);
+                            adjHtml += `<td style="text-align:center"><span class="vl-badge ${isAdj ? 'vl-badge-active' : ''}" style="padding:2px 8px; font-size:10px; min-width:40px; justify-content:center; ${!isAdj?'opacity:0.25;border:none;background:transparent':''}">${isAdj ? 'KỀ' : '—'}</span></td>`;
                         }
                     });
                     adjHtml += '</tr>';
                 });
                 adjHtml += '</tbody></table>';
                 adjBox.innerHTML = adjHtml;
+
+                // Tự động cuộn đến phần quan tâm nếu cần
+                if(focusType === 'adj') {
+                    adjBox.parentElement.scrollIntoView({ behavior: 'smooth' });
+                }
             })
             .catch(err => {
                 console.error(err);
-                distBox.innerHTML = '<div style="padding:30px; text-align:center; color:#ef4444">Lỗi tải dữ liệu vùng.</div>';
+                distBox.innerHTML = '<div style="padding:30px; text-align:center; color:#f87171">Lỗi hệ thống khi tải hoặc tính toán ma trận.</div>';
             });
     }
 </script>
