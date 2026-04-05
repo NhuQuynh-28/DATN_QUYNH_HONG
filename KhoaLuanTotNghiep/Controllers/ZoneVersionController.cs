@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using KhoaLuanTotNghiep.Data;
 using System.Linq;
 using KhoaLuanTotNghiep.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace KhoaLuanTotNghiep.Controllers
 {
