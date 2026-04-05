@@ -42,7 +42,10 @@ namespace KhoaLuanTotNghiep.Controllers
                 {
                     z.Id,
                     z.ZoneName,
-                    z.Points // JSON string
+                    z.Points,
+                    z.CenterLat,
+                    z.CenterLng,
+                    z.Area
                 })
                 .ToList();
 

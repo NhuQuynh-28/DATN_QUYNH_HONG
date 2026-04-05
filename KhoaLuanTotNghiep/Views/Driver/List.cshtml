@@ -297,6 +297,7 @@
                         <th>Tài xế</th>
                         <th>Khu vực</th>
                         <th>Điều phối bởi</th>
+                        <th>Số vùng</th>
                         <th>Dự kiến</th>
                         <th>Thực tế</th>
                         <th>Hoàn thành</th>
@@ -356,6 +357,7 @@
                         <th>Khu vực</th>
                         <th>Điều phối</th>
                         <th>Tháng/Năm</th>
+                        <th>Số vùng</th>
                         <th>Dự kiến</th>
                         <th>Thực tế</th>
                         <th>Tiến độ</th>
@@ -397,6 +399,17 @@
             <button class="dm-btn-cancel" onclick="closeDriverModal()">Hủy</button>
             <button class="dm-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Lưu</button>
         </div>
+    </div>
+
+    <!-- MAP PREVIEW AT BOTTOM -->
+    <div class="dp-map-wrap" style="margin-top:20px;">
+        <div class="dp-map-header">
+            <div class="dp-map-title">
+                <i class="fas fa-map-marked-alt" style="color:#f59e0b"></i> Xem chi tiết vùng phân công
+                <span id="dmMapTitle" style="font-size:12px;color:#64748b;font-weight:400;margin-left:12px">Chọn một dòng phân công để xem bản đồ</span>
+            </div>
+        </div>
+        <div id="dmMap" style="height:450px; background:#0f172a"></div>
     </div>
 </div>
 
@@ -455,7 +468,8 @@ function loadMonthData() {
         tbody.innerHTML = data.map((a, i) => {
             let pct = a.plannedOrders > 0 ? Math.min(100, Math.round(a.actualOrders / a.plannedOrders * 100)) : 0;
             let color = a.isOk ? '#4ade80' : '#f87171';
-            return `<tr>
+            let zoneIds = a.zoneIds || '';
+            return `<tr onclick="previewAssignmentOnMap('${zoneIds}', '${a.driverName}')" style="cursor:pointer">
                 <td style="color:#475569;font-weight:700">${i+1}</td>
                 <td>
                     <div style="font-weight:700;color:#f1f5f9">${a.driverName}</div>
@@ -463,6 +477,7 @@ function loadMonthData() {
                 </td>
                 <td style="color:#94a3b8">${a.areaName}</td>
                 <td style="color:#64748b;font-size:12px">${a.dispatcher}</td>
+                <td style="color:#3b82f6;font-weight:700">${a.zoneCount}</td>
                 <td style="font-weight:700;color:#60a5fa">${a.plannedOrders}</td>
                 <td style="font-weight:700;color:${color}">${a.actualOrders}</td>
                 <td>
@@ -592,7 +607,8 @@ function loadDetailData() {
             let pct   = a.plannedOrders > 0 ? Math.min(100, Math.round(a.actualOrders / a.plannedOrders * 100)) : 0;
             let color = a.isOk ? '#4ade80' : '#f87171';
             let icon  = a.isOk ? '✅' : '❌';
-            return `<tr>
+            let zoneIds = a.zoneIds || '';
+            return `<tr onclick="previewAssignmentOnMap('${zoneIds}', '${a.driverName}')" style="cursor:pointer">
                 <td style="color:#475569;font-weight:700">${i+1}</td>
                 <td>
                     <div style="font-weight:700;color:#f1f5f9">${icon} ${a.driverName}</div>
@@ -601,6 +617,7 @@ function loadDetailData() {
                 <td><span class="dm-chip"><i class="fas fa-map-marker-alt"></i> ${a.areaName}</span></td>
                 <td style="color:#64748b;font-size:12px">${a.dispatcher || '—'}</td>
                 <td style="color:#64748b;font-size:12px">T${a.month}/${a.year}</td>
+                <td style="color:#3b82f6;font-weight:700">${a.zoneCount}</td>
                 <td style="font-weight:700;color:#60a5fa">${a.plannedOrders}</td>
                 <td style="font-weight:700;color:${color}">${a.actualOrders}</td>
                 <td>
@@ -620,4 +637,77 @@ function clearDetailFilter() {
     document.getElementById('df-status').value = '';
     loadDetailData();
 }
+
+/* ===== MAP LOGIC ===== */
+let dmMap = null;
+let dmPolygons = [];
+let dmMarkers = [];
+
+function initDmMap() {
+    if (dmMap) return;
+    dmMap = L.map('dmMap').setView([21.0285, 105.8542], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(dmMap);
+}
+
+function previewAssignmentOnMap(zoneIds, driverName) {
+    if (!zoneIds) {
+        dpToast('Tài xế này không có vùng phân công cụ thể!', 'info');
+        return;
+    }
+    
+    initDmMap();
+    if(dmMap) {
+        dmMap.invalidateSize();
+    }
+
+    // Clear old layers
+    dmPolygons.forEach(p => dmMap.removeLayer(p));
+    dmMarkers.forEach(m => dmMap.removeLayer(m));
+    dmPolygons = [];
+    dmMarkers = [];
+
+    document.getElementById('dmMapTitle').innerHTML = `Đang xem các vùng của: <b style="color:#f1f5f9">${driverName}</b>`;
+
+    let idArray = zoneIds.split(',').map(x => x.trim()).filter(x => x);
+    let bounds = [];
+    
+    // Fetch zone geometries
+    fetch(`/Dispatcher/GetForecastStatus?month=0&year=0`).then(r=>r.json()).then(data => {
+        let allZones = data.zones || [];
+        idArray.forEach(zid => {
+            let zInfo = allZones.find(x => x.zoneId == zid);
+            if(zInfo && zInfo.points) {
+                try {
+                    let pts = JSON.parse(zInfo.points);
+                    let poly = L.polygon(pts, {color: '#3b82f6', weight: 3, fillOpacity: 0.4}).addTo(dmMap);
+                    dmPolygons.push(poly);
+                    let center = poly.getBounds().getCenter();
+                    bounds.push(center);
+
+                    let marker = L.marker(center, {
+                        interactive: false,
+                        icon: L.divIcon({
+                            className: 'zone-label',
+                            html: `<div style="background:#2563eb;color:white;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3)">${zInfo.zoneName}</div>`
+                        })
+                    }).addTo(dmMap);
+                    dmMarkers.push(marker);
+                    
+                    poly.bindTooltip(`${driverName} - ${zInfo.zoneName}`, {sticky:true});
+                } catch(e){}
+            }
+        });
+
+        if(bounds.length) {
+            dmMap.fitBounds(bounds, {padding:[50,50]});
+        }
+        
+        // Scroll to map
+        document.getElementById('dmMap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+}
+</script>
 </script>

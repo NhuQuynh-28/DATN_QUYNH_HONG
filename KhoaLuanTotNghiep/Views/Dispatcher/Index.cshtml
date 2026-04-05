@@ -382,6 +382,33 @@
         </button>
     </div>
 
+    <!-- Map & Legend Row -->
+    <div id="aaMapArea" style="display:none; margin-bottom:18px;">
+        <div style="display:grid; grid-template-columns: 1fr 300px; gap:16px;">
+            <div class="dp-map-wrap" style="margin-bottom:0;">
+                <div class="dp-map-header">
+                    <div class="dp-map-title"><i class="fas fa-map-marked-alt"></i> Phân vùng theo tài xế</div>
+                    <div id="aaMapLegend" style="display:flex; flex-wrap:wrap; gap:10px; max-height:40px; overflow-y:auto;"></div>
+                </div>
+                <div id="aaMap" style="height:480px;"></div>
+            </div>
+            
+            <div class="dp-table-wrap" style="margin-bottom:0; display:flex; flex-direction:column;">
+                <div class="dp-table-header">
+                    <div class="dp-table-title"><i class="fas fa-users"></i> Tài xế & Vùng</div>
+                </div>
+                <div style="flex:1; overflow-y:auto;">
+                    <table class="dp-table" id="aaDriverSummaryTable">
+                        <thead>
+                            <tr><th>Tài xế</th><th>Số vùng</th><th>Màu</th></tr>
+                        </thead>
+                        <tbody id="aaDriverTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Metrics / Progress Row -->
     <div id="aaMetrics" style="display:none; margin-bottom:16px;">
         <div class="dp-stats">
@@ -451,6 +478,15 @@ let customerChart = null;
 let zonesData = [];
 let mapPolygons = {};
 let currentAssignmentResults = null;
+let aaMap = null;
+let aaPolygons = {};
+let aaMarkers = [];
+
+const driverColors = [
+    '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', 
+    '#ec4899', '#06b6d4', '#10b981', '#f43f5e', '#6366f1',
+    '#14b8a6', '#f97316', '#a855f7', '#d946ef', '#2dd4bf'
+];
 
 const now = new Date();
 const curMonth = now.getMonth() + 1;
@@ -530,7 +566,20 @@ function onMenuSwitch(menu){
     } else if(menu === 'assign'){
         document.getElementById('secAssign').classList.add('active');
         initAssignFilters();
+        setTimeout(() => { 
+            if(!aaMap) initAaMap(); 
+            else aaMap.invalidateSize();
+        }, 100);
     }
+}
+
+// ===================== AA MAP =====================
+function initAaMap(){
+    aaMap = L.map('aaMap').setView([21.0285, 105.8542], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(aaMap);
 }
 
 // ===================== DASH MAP =====================
@@ -1299,7 +1348,7 @@ function loadFullMap(){
 function initAssignFilters(){
     // Populate month
     let aaM = document.getElementById('aaMonth');
-    if(!aaM.options.length){
+    if(aaM && !aaM.options.length){
         for(let i=1;i<=12;i++){
             let o = document.createElement('option');
             o.value=i; o.text='Tháng '+i;
@@ -1309,7 +1358,7 @@ function initAssignFilters(){
     }
     // Populate year
     let aaY = document.getElementById('aaYear');
-    if(!aaY.options.length){
+    if(aaY && !aaY.options.length){
         for(let y=curYear+1;y>=curYear-2;y--){
             let o = document.createElement('option');
             o.value=y; o.text=y;
@@ -1319,7 +1368,7 @@ function initAssignFilters(){
     }
     // Populate area
     let aaA = document.getElementById('aaArea');
-    if(aaA.options.length <= 1){
+    if(aaA && aaA.options.length <= 1){
         fetch('/Dispatcher/GetAllAreas')
         .then(r=>r.json())
         .then(areas=>{
@@ -1378,23 +1427,31 @@ function runAutoAssign(){
         document.getElementById('aaTime').textContent       = data.elapsedMs + 'ms';
         document.getElementById('aaCompact').textContent    = data.metrics.compactness.toFixed(4);
 
-        // Show table
+        // Show result visual
         document.getElementById('aaResultWrap').style.display = 'block';
+        document.getElementById('aaMapArea').style.display = 'block';
         document.getElementById('aaPhaseLabel').textContent = `Phase: ${data.bestPhase} | Iter: ${data.bestIteration}`;
+
+        // Color zones on map
+        renderAaMapResults(data);
 
         let tbody = document.getElementById('aaTbody');
         tbody.innerHTML = data.slots.map((s,i) => {
+            let color = driverColors[i % driverColors.length];
             let zoneList = s.zones.map(z =>
                 `<span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:5px;font-size:10px;margin:2px;display:inline-block;">`
-                + `<b style="color:#f1f5f9">${z.zoneName}</b> (${z.orders}ð¦/${z.customers}KH)</span>`
+                + `<b style="color:#f1f5f9">${z.zoneName}</b> (${z.orders}📦/${z.customers}KH)</span>`
             ).join('');
 
             let penColor = (s.totalOrders > maxO || s.totalCustomers > maxC) ? '#f87171' : '#4ade80';
             return `
-            <tr>
+            <tr onclick="highlightDriverZones(${i})" style="cursor:pointer" id="aa-driver-row-${i}">
                 <td style="color:#475569;font-weight:700">${i+1}</td>
                 <td style="font-weight:700;color:#f1f5f9">
-                    <i class="fas fa-user" style="color:#f59e0b"></i> ${s.driverName}
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:12px;height:12px;border-radius:3px;background:${color}"></div>
+                        <span>${s.driverName}</span>
+                    </div>
                 </td>
                 <td style="color:#3b82f6;font-weight:700">${s.zoneCount}</td>
                 <td><span style="font-size:16px;font-weight:800;color:${penColor}">${s.totalOrders}</span>
@@ -1407,16 +1464,80 @@ function runAutoAssign(){
             </tr>`;
         }).join('');
 
-        // Store results globally for saving
+        // Summary on map right
+        let dBody = document.getElementById('aaDriverTbody');
+        if(dBody) {
+            dBody.innerHTML = data.slots.map((s,i) => `
+                <tr onclick="highlightDriverZones(${i})" style="cursor:pointer">
+                    <td><div style="font-weight:600;color:#f1f5f9">${s.driverName}</div></td>
+                    <td><span class="dp-badge dp-badge-ok">${s.zoneCount} vùng</span></td>
+                    <td><div style="width:20px;height:20px;border-radius:4px;background:${driverColors[i % driverColors.length]}"></div></td>
+                </tr>
+            `).join('');
+        }
+
         currentAssignmentResults = data;
-        
-        dpToast(`Phân công hoàn tất! Cải thiện ${data.improvementPct.toFixed(1)}% so với Greedy`, 'success');
+        setTimeout(() => { if(aaMap) aaMap.invalidateSize(); }, 200);
+        dpToast(`Phan cong hoan tat! Cai thien ${data.improvementPct.toFixed(1)}%`, 'success');
     })
     .catch(err=>{
         document.getElementById('aaLoading').style.display = 'none';
         document.getElementById('btnAutoAssign').disabled = false;
-        dpToast('Lỗi kết nối: ' + err.message, 'error');
+        dpToast('Loi ket noi: ' + err.message, 'error');
     });
+}
+
+function renderAaMapResults(data) {
+    if(!aaMap) return;
+    Object.values(aaPolygons).forEach(p => aaMap.removeLayer(p));
+    if(aaMarkers) aaMarkers.forEach(m => aaMap.removeLayer(m));
+    aaPolygons = {}; aaMarkers = [];
+    let bounds = [];
+    let areaId = document.getElementById('aaArea').value;
+    
+    fetch(`/Dispatcher/GetZonesByArea?areaId=${areaId}`).then(r=>r.json()).then(zResult=>{
+        let all = zResult.zones || [];
+        data.slots.forEach((slot, idx) => {
+            let color = driverColors[idx % driverColors.length];
+            slot.zones.forEach(sz => {
+                let zInfo = all.find(x => x.id == sz.zoneId);
+                if(!zInfo || !zInfo.points) return;
+                try {
+                    let pts = JSON.parse(zInfo.points);
+                    let poly = L.polygon(pts, {color, weight:2, fillColor:color, fillOpacity:0.4}).addTo(aaMap);
+                    aaPolygons[sz.zoneId] = poly;
+                    let center = poly.getBounds().getCenter();
+                    bounds.push(center);
+                    let marker = L.marker(center, {interactive:false, icon:L.divIcon({
+                        className:'zone-label',
+                        html:`<div style="background:${color};color:white;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,0.3)">${sz.zoneName}</div>`
+                    })}).addTo(aaMap);
+                    aaMarkers.push(marker);
+                    poly.bindTooltip(`<b>${slot.driverName}</b><br>${sz.zoneName}<br>${sz.orders} đơn`, {sticky:true});
+                }catch(e){}
+            });
+        });
+        if(bounds.length) aaMap.fitBounds(bounds, {padding:[40,40]});
+    });
+}
+
+function highlightDriverZones(idx) {
+    if(!currentAssignmentResults) return;
+    let slot = currentAssignmentResults.slots[idx];
+    if(!slot) return;
+    Object.keys(aaPolygons).forEach(zid => aaPolygons[zid].setStyle({weight:2, fillOpacity:0.4}));
+    let polys = [];
+    slot.zones.forEach(sz => {
+        let p = aaPolygons[sz.zoneId];
+        if(p) { p.setStyle({weight:5, fillOpacity:0.7}); polys.push(p); }
+    });
+    document.querySelectorAll('#aaTbody tr').forEach(r => r.classList.remove('selected'));
+    document.getElementById('aa-driver-row-' + idx)?.classList.add('selected');
+    if(polys.length) {
+        let group = new L.featureGroup(polys);
+        aaMap.fitBounds(group.getBounds(), {padding:[100,100]});
+    }
+    dpToast(`Đã chọn tài xế: ${slot.driverName}`, 'info');
 }
 
 function saveAutoAssignResults(){
@@ -1424,19 +1545,15 @@ function saveAutoAssignResults(){
         dpToast('Không có kết quả phân công nào để lưu!', 'error');
         return;
     }
-
     let areaId = document.getElementById('aaArea').value;
     let month  = parseInt(document.getElementById('aaMonth').value);
     let year   = parseInt(document.getElementById('aaYear').value);
-
     let btn = document.getElementById('btnSaveAutoAssign');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
-
     let payload = {
         areaId: parseInt(areaId),
-        month: month,
-        year: year,
+        month: month, year: year,
         items: currentAssignmentResults.slots.map(s => ({
             driverId: s.driverId,
             totalOrders: s.totalOrders,

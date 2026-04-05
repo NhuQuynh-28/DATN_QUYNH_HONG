@@ -2,10 +2,6 @@ using KhoaLuanTotNghiep.Models;
 
 namespace KhoaLuanTotNghiep.Services
 {
-    // ══════════════════════════════════════════════════════
-    // DTOs for Assignment
-    // ══════════════════════════════════════════════════════
-
     public class ZoneNode
     {
         public int    ZoneId     { get; set; }
@@ -24,7 +20,7 @@ namespace KhoaLuanTotNghiep.Services
 
         public int TotalOrders    => Zones.Sum(z => z.ForecastOrders);
         public int TotalCustomers => Zones.Sum(z => z.ForecastCustomers);
-        public double TotalDistance { get; set; } // Tổng kc tới tâm
+        public double TotalDistance { get; set; }
     }
 
     public class AssignmentSolution

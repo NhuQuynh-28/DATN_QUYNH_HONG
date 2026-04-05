@@ -18,6 +18,7 @@ namespace KhoaLuanTotNghiep.Controllers
         public IActionResult Index(int areaId)
         {
             var versions = _context.ZoneVersions
+                .Include(v => v.Zones)
                 .Where(v => v.AreaId == areaId)
                 .ToList();
 
@@ -59,6 +60,7 @@ namespace KhoaLuanTotNghiep.Controllers
 
             // 👉 trả lại list mới (QUAN TRỌNG)
             var list = _context.ZoneVersions
+                .Include(v => v.Zones)
                 .Where(v => v.AreaId == version.AreaId)
                 .ToList();
 
@@ -102,6 +104,7 @@ namespace KhoaLuanTotNghiep.Controllers
                 _context.SaveChanges();
 
                 var list = _context.ZoneVersions
+                    .Include(v => v.Zones)
                     .Where(v => v.AreaId == areaId)
                     .ToList();
 

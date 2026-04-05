@@ -126,6 +126,8 @@ public class DriverController : Controller
                 dispatcher  = a.Dispatcher != null ? a.Dispatcher.Username : "",
                 a.PlannedOrders,
                 a.ActualOrders,
+                a.ZoneIds,
+                zoneCount   = string.IsNullOrEmpty(a.ZoneIds) ? 0 : a.ZoneIds.Split(',', System.StringSplitOptions.RemoveEmptyEntries).Length,
                 date        = a.Date.ToString("dd/MM/yyyy"),
                 isOk        = a.ActualOrders >= a.PlannedOrders
             })
@@ -186,6 +188,8 @@ public class DriverController : Controller
                 dispatcher  = a.Dispatcher != null ? a.Dispatcher.Username   : "",
                 a.PlannedOrders,
                 a.ActualOrders,
+                a.ZoneIds,
+                zoneCount   = string.IsNullOrEmpty(a.ZoneIds) ? 0 : a.ZoneIds.Split(',', System.StringSplitOptions.RemoveEmptyEntries).Length,
                 date        = a.Date.ToString("dd/MM/yyyy"),
                 month       = a.Date.Month,
                 year        = a.Date.Year,
