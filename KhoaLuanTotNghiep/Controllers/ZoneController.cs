@@ -54,78 +54,15 @@ namespace KhoaLuanTotNghiep.Controllers
         private void UpdateVersionStats(int versionId)
         {
             var zones = _context.Zones
-                .Where(z => z.VersionId == versionId).ToList();
+                .Where(z => z.VersionId == versionId);
 
             var version = _context.ZoneVersions.Find(versionId);
 
             if (version == null) return;
 
-            foreach (var z in zones)
-            {
-                // Nếu diện tích chưa có, tính thử từ Points
-                if (z.Area <= 0 && !string.IsNullOrEmpty(z.Points))
-                {
-                    z.Area = ComputeArea(z.Points);
-                }
-            }
-
             version.SoPolygon = zones.Count();
             version.DienTichBaoPhu = zones.Sum(z => z.Area);
             version.UpdatedDate = DateTime.Now;
-        }
-
-        private double ComputeArea(string pointsJson)
-        {
-            try
-            {
-                using var doc = JsonDocument.Parse(pointsJson);
-                var root = doc.RootElement;
-                if (root.ValueKind != JsonValueKind.Array) return 0;
-
-                var points = new List<(double lat, double lng)>();
-                foreach (var p in root.EnumerateArray())
-                {
-                    if (p.ValueKind == JsonValueKind.Array && p.GetArrayLength() >= 2)
-                    {
-                        points.Add((p[0].GetDouble(), p[1].GetDouble()));
-                    }
-                    else if (p.TryGetProperty("lat", out var latProp) && p.TryGetProperty("lng", out var lngProp))
-                    {
-                        points.Add((latProp.GetDouble(), lngProp.GetDouble()));
-                    }
-                }
-
-                if (points.Count < 3) return 0;
-
-                // Công thức Shoelace trên mặt phẳng (xấp xỉ gần đúng cho diện tích nhỏ)
-                double area = 0;
-                double latRef = points[0].lat;
-                double lngRef = points[0].lng;
-
-                for (int i = 0; i < points.Count; i++)
-                {
-                    int next = (i + 1) % points.Count;
-
-                    // Chuyển sang mét (xấp xỉ)
-                    double x1 = (points[i].lng - lngRef) * 111320 * Math.Cos(latRef * Math.PI / 180);
-                    double y1 = (points[i].lat - latRef) * 111320;
-                    double x2 = (points[next].lng - lngRef) * 111320 * Math.Cos(latRef * Math.PI / 180);
-                    double y2 = (points[next].lat - latRef) * 111320;
-
-                    area += (x1 * y2 - x2 * y1);
-                }
-
-                return Math.Abs(area) / 2.0;
-            }
-            catch { return 0; }
-        }
-
-        [HttpPost]
-        public IActionResult RecalculateStats(int versionId)
-        {
-            UpdateVersionStats(versionId);
-            _context.SaveChanges();
-            return Json(new { success = true });
         }
         [HttpPost]
         public IActionResult SaveZone([FromBody] Zone data)
