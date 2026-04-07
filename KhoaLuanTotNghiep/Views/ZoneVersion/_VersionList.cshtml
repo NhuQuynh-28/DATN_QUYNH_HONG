@@ -245,10 +245,10 @@
                                 <button class="vl-btn vl-btn-map" onclick="openMap(@v.Id)" title="Mở bản đồ version này">
                                     <i class="fas fa-map"></i> Bản đồ
                                 </button>
-                                <button class="vl-btn vl-btn-dist" onclick="showVersionMatrix(@v.Id, '@v.VersionName', 'dist')" title="Tính toán ma trận khoảng cách">
+                                <button class="vl-btn vl-btn-dist" data-vname="@v.VersionName" onclick="showVersionMatrix(@v.Id, this.getAttribute('data-vname'), 'dist')" title="Tính toán ma trận khoảng cách">
                                     <i class="fas fa-arrows-alt-h"></i> Khoảng cách
                                 </button>
-                                <button class="vl-btn vl-btn-adj" onclick="showVersionMatrix(@v.Id, '@v.VersionName', 'adj')" title="Xác định các vùng kề">
+                                <button class="vl-btn vl-btn-adj" data-vname="@v.VersionName" onclick="showVersionMatrix(@v.Id, this.getAttribute('data-vname'), 'adj')" title="Xác định các vùng kề">
                                     <i class="fas fa-link"></i> Vùng kề
                                 </button>
                                 <button class="vl-btn vl-btn-active" onclick="setActive(@v.Id)" title="Đặt làm version Active">
@@ -337,18 +337,29 @@
     }
 
     function showVersionMatrix(vId, vName, focusType = 'all') {
-        document.getElementById('mtVerName').innerText = vName;
+        console.log("Analyzing Version ID:", vId, "Name:", vName);
+        
+        // Hiện modal và báo đang tính toán ở Backend
+        document.getElementById('mtVerName').innerText = vName || "N/A";
         const distBox = document.getElementById('mtDistanceBox');
         const adjBox = document.getElementById('mtAdjacentBox');
         
-        distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b;"><i class="fas fa-circle-notch fa-spin" style="font-size:32px; margin-bottom:14px; display:block; color:#fbbf24"></i> Đang tải dữ liệu và phân tích không gian...</div>';
+        distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b;"><i class="fas fa-microchip fa-spin" style="font-size:32px; margin-bottom:14px; display:block; color:#fbbf24"></i> Đang yêu cầu Server tính toán ma trận (Khoảng cách & Vùng kề)...</div>';
         adjBox.innerHTML = '';
-        
         document.getElementById('matrixModal').classList.add('open');
-        
-        fetch("/Zone/GetZones?versionId=" + vId)
+
+        // Bước 1: Gọi backend tính và lưu vào DB
+        fetch("/Zone/CalculateDistanceMatrix?versionId=" + vId, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) throw new Error(data.message || "Lỗi khi tính toán ma trận.");
+                
+                // Bước 2: Sau khi DB đã có dữ liệu, Fetch zones để hiển thị UI
+                return fetch("/Zone/GetZones?versionId=" + vId);
+            })
             .then(r => r.json())
             .then(zones => {
+                console.log("Received zones:", zones.length, zones);
                 if (!zones || zones.length === 0) {
                     distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b"><i class="fas fa-ghost" style="font-size:32px; display:block; margin-bottom:14px"></i> Không tìm thấy dữ liệu vùng cho Version này.</div>';
                     return;
@@ -357,17 +368,20 @@
                 // Helper: Tính bounds cho vùng (Fallback nếu không có Leaflet)
                 function getPolygonBounds(points) {
                     try {
+                        if (!points) return null;
                         let pts = (typeof points === 'string') ? JSON.parse(points) : points;
                         if (!Array.isArray(pts)) return null;
                         
                         let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
                         pts.forEach(p => {
-                            let lat = (p[0] !== undefined) ? p[0] : p.lat;
-                            let lng = (p[1] !== undefined) ? p[1] : p.lng;
-                            if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
-                            if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                            let lat = (p[0] !== undefined) ? p[0] : (p.lat !== undefined ? p.lat : p.Lat);
+                            let lng = (p[1] !== undefined) ? p[1] : (p.lng !== undefined ? p.lng : p.Lng);
+                            if (lat !== undefined && lng !== undefined) {
+                                if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+                                if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                            }
                         });
-                        return { minLat, maxLat, minLng, maxLng };
+                        return (minLat === 90) ? null : { minLat, maxLat, minLng, maxLng };
                     } catch(e) { return null; }
                 }
 
@@ -378,22 +392,32 @@
 
                 // 1. Render Distance Matrix
                 let distHtml = '<table class="vl-table" style="min-width:100%"><thead><tr><th>Vùng</th>';
-                zones.forEach(z => { distHtml += `<th style="text-align:center; font-size:10px">${z.zoneName}</th>`; });
+                zones.forEach(z => { 
+                    let zName = z.zoneName || z.ZoneName || "N/A";
+                    distHtml += `<th style="text-align:center; font-size:10px">${zName}</th>`; 
+                });
                 distHtml += '</tr></thead><tbody>';
                 
                 zones.forEach((z1, i) => {
-                    distHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#fbbf24; font-size:11px">${z1.zoneName}</td>`;
+                    let z1Name = z1.zoneName || z1.ZoneName || "N/A";
+                    let lat1 = z1.centerLat !== undefined ? z1.centerLat : z1.CenterLat;
+                    let lng1 = z1.centerLng !== undefined ? z1.centerLng : z1.CenterLng;
+
+                    distHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#fbbf24; font-size:11px">${z1Name}</td>`;
                     zones.forEach((z2, j) => {
                         if (i === j) {
                             distHtml += '<td style="color:#475569; text-align:center">0</td>';
                         } else {
+                            let lat2 = z2.centerLat !== undefined ? z2.centerLat : z2.CenterLat;
+                            let lng2 = z2.centerLng !== undefined ? z2.centerLng : z2.CenterLng;
+
                             let d = 0;
                             // Tính khoảng cách Havorsine nhanh
                             const R = 6371e3; // meters
-                            const p1 = z1.centerLat * Math.PI/180;
-                            const p2 = z2.centerLat * Math.PI/180;
-                            const dp = (z2.centerLat - z1.centerLat) * Math.PI/180;
-                            const dl = (z2.centerLng - z1.centerLng) * Math.PI/180;
+                            const p1 = lat1 * Math.PI/180;
+                            const p2 = lat2 * Math.PI/180;
+                            const dp = (lat2 - lat1) * Math.PI/180;
+                            const dl = (lng2 - lng1) * Math.PI/180;
                             const a = Math.sin(dp/2) * Math.sin(dp/2) +
                                       Math.cos(p1) * Math.cos(p2) *
                                       Math.sin(dl/2) * Math.sin(dl/2);
@@ -410,14 +434,18 @@
                 
                 // 2. Render Adjacency Matrix
                 let adjHtml = '<table class="vl-table" style="min-width:100%"><thead><tr><th>Vùng</th>';
-                zones.forEach(z => { adjHtml += `<th style="text-align:center; font-size:10px">${z.zoneName}</th>`; });
+                zones.forEach(z => { 
+                    let zName = z.zoneName || z.ZoneName || "N/A";
+                    adjHtml += `<th style="text-align:center; font-size:10px">${zName}</th>`; 
+                });
                 adjHtml += '</tr></thead><tbody>';
                 
                 // Tiền tính toán bounds cho tất cả zones
-                const zoneBounds = zones.map(z => getPolygonBounds(z.points));
+                const zoneBounds = zones.map(z => getPolygonBounds(z.points || z.Points));
 
                 zones.forEach((z1, i) => {
-                    adjHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#a78bfa; font-size:11px">${z1.zoneName}</td>`;
+                    let z1Name = z1.zoneName || z1.ZoneName || "N/A";
+                    adjHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#a78bfa; font-size:11px">${z1Name}</td>`;
                     let b1 = zoneBounds[i];
                     
                     zones.forEach((z2, j) => {
@@ -436,12 +464,12 @@
 
                 // Tự động cuộn đến phần quan tâm nếu cần
                 if(focusType === 'adj') {
-                    adjBox.parentElement.scrollIntoView({ behavior: 'smooth' });
+                    setTimeout(() => adjBox.parentElement.scrollIntoView({ behavior: 'smooth' }), 300);
                 }
             })
             .catch(err => {
-                console.error(err);
-                distBox.innerHTML = '<div style="padding:30px; text-align:center; color:#f87171">Lỗi hệ thống khi tải hoặc tính toán ma trận.</div>';
+                console.error("Matrix error:", err);
+                distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#f87171"><i class="fas fa-exclamation-triangle" style="font-size:32px; display:block; margin-bottom:14px"></i> Lỗi hệ thống: ' + err.message + '</div>';
             });
     }
 </script>

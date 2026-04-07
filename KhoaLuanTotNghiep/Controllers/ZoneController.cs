@@ -311,6 +311,132 @@ namespace KhoaLuanTotNghiep.Controllers
 
             _context.SaveChanges();
         }
+        [HttpPost]
+        public IActionResult CalculateDistanceMatrix(int versionId)
+        {
+            var zones = _context.Zones.Where(z => z.VersionId == versionId).ToList();
+            if (zones.Count == 0) return Json(new { success = false, message = "Không tìm thấy vùng nào trong version này." });
+
+            // 1. Xóa dữ liệu cũ của các vùng thuộc version này
+            var zoneIds = zones.Select(z => z.Id).ToList();
+            var oldDistances = _context.ZoneDistances
+                .Where(d => zoneIds.Contains(d.ZoneId1) || zoneIds.Contains(d.ZoneId2))
+                .ToList();
+            
+            if (oldDistances.Any())
+            {
+                _context.ZoneDistances.RemoveRange(oldDistances);
+                _context.SaveChanges();
+            }
+
+            // 2. Tính toán ma trận
+            var newDistances = new List<ZoneDistance>();
+            for (int i = 0; i < zones.Count; i++)
+            {
+                for (int j = i + 1; j < zones.Count; j++)
+                {
+                    var z1 = zones[i];
+                    var z2 = zones[j];
+
+                    double dist = CalculateHaversine(z1.CenterLat, z1.CenterLng, z2.CenterLat, z2.CenterLng);
+                    bool isAdj = CheckAdjacencyBB(z1.Points, z2.Points);
+
+                    newDistances.Add(new ZoneDistance
+                    {
+                        ZoneId1 = z1.Id,
+                        ZoneId2 = z2.Id,
+                        Distance = Math.Round(dist, 2),
+                        IsAdjacent = isAdj
+                    });
+                }
+            }
+
+            _context.ZoneDistances.AddRange(newDistances);
+            _context.SaveChanges();
+
+            return Json(new { success = true, count = newDistances.Count });
+        }
+
+        private double CalculateHaversine(double lat1, double lng1, double lat2, double lng2)
+        {
+            const double R = 6371000; // Meters
+            double p1 = lat1 * Math.PI / 180;
+            double p2 = lat2 * Math.PI / 180;
+            double dp = (lat2 - lat1) * Math.PI / 180;
+            double dl = (lng2 - lng1) * Math.PI / 180;
+
+            double a = Math.Sin(dp / 2) * Math.Sin(dp / 2) +
+                       Math.Cos(p1) * Math.Cos(p2) *
+                       Math.Sin(dl / 2) * Math.Sin(dl / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
+        private bool CheckAdjacencyBB(string points1, string points2)
+        {
+            if (string.IsNullOrEmpty(points1) || string.IsNullOrEmpty(points2)) return false;
+            try
+            {
+                var b1 = GetBB(points1);
+                var b2 = GetBB(points2);
+                if (b1 == null || b2 == null) return false;
+
+                // Kiểm tra giao nhau của Bounding Box
+                return !(b2.minLat > b1.maxLat || b2.maxLat < b1.minLat || b2.minLng > b1.maxLng || b2.maxLng < b1.minLng);
+            }
+            catch { return false; }
+        }
+
+        private dynamic GetBB(string json)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(json)) return null;
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                if (root.ValueKind != JsonValueKind.Array) return null;
+
+                double minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+                bool hasData = false;
+
+                foreach (var p in root.EnumerateArray())
+                {
+                    double lat = 0, lng = 0;
+                    bool found = false;
+
+                    // Handle [[lat, lng], ...]
+                    if (p.ValueKind == JsonValueKind.Array && p.GetArrayLength() >= 2)
+                    {
+                        lat = p[0].GetDouble();
+                        lng = p[1].GetDouble();
+                        found = true;
+                    }
+                    // Handle [{lat: 1, lng: 1}, ...] or [{Lat: 1, Lng: 1}, ...]
+                    else if (p.ValueKind == JsonValueKind.Object)
+                    {
+                        if (p.TryGetProperty("lat", out var latProp) || p.TryGetProperty("Lat", out latProp))
+                        {
+                            lat = latProp.GetDouble();
+                            if (p.TryGetProperty("lng", out var lngProp) || p.TryGetProperty("Lng", out lngProp) ||
+                                p.TryGetProperty("lon", out lngProp) || p.TryGetProperty("Lon", out lngProp))
+                            {
+                                lng = lngProp.GetDouble();
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+                        if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                        hasData = true;
+                    }
+                }
+                return hasData ? new { minLat, maxLat, minLng, maxLng } : null;
+            }
+            catch { return null; }
+        }
     }
 }
 
