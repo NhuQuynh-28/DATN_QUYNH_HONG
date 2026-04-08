@@ -458,11 +458,11 @@
                     
                     zones.forEach((z2, j) => {
                         if (i === j) {
-                            adjHtml += '<td style="color:#475569; text-align:center">-</td>';
+                            adjHtml += '<td style="color:#475569; text-align:center; font-family:monospace; font-size:12px">0</td>';
                         } else {
                             let b2 = zoneBounds[j];
                             let isAdj = checkIntersects(b1, b2);
-                            adjHtml += `<td style="text-align:center"><span class="vl-badge ${isAdj ? 'vl-badge-active' : ''}" style="padding:2px 8px; font-size:10px; min-width:40px; justify-content:center; ${!isAdj?'opacity:0.25;border:none;background:transparent':''}">${isAdj ? 'KỀ' : '—'}</span></td>`;
+                            adjHtml += `<td style="text-align:center; font-family:monospace; font-size:12px; font-weight:700; color:${isAdj ? '#4ade80' : '#475569'}">${isAdj ? '1' : '0'}</td>`;
                         }
                     });
                     adjHtml += '</tr>';
