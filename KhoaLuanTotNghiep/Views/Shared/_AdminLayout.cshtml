@@ -526,7 +526,17 @@
             hideMapToolbar();
             fetch("/ZoneVersion/Index?areaId="+areaId)
             .then(res=>res.text())
-            .then(data=>{ document.getElementById("content-area").innerHTML=data; });
+            .then(data=>{
+                let content = document.getElementById("content-area");
+                content.innerHTML=data;
+                const scripts = content.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    newScript.text = oldScript.text;
+                    newScript.setAttribute('data-injected', 'true');
+                    document.body.appendChild(newScript);
+                });
+            });
         }
 
         /* ================= OPEN MAP ================= */
