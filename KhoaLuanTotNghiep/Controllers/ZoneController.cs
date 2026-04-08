@@ -437,6 +437,50 @@ namespace KhoaLuanTotNghiep.Controllers
             }
             catch { return null; }
         }
+        [HttpPost]
+        public IActionResult SeedZones(int versionId)
+        {
+            var version = _context.ZoneVersions.Find(versionId);
+            if (version == null) return Json(new { success = false, message = "Không tìm thấy version." });
+
+            // Sample data centered around HCMC
+            double baseLat = 10.776;
+            double baseLng = 106.700;
+            var rand = new Random();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                double lat = baseLat + (rand.NextDouble() - 0.5) * 0.02;
+                double lng = baseLng + (rand.NextDouble() - 0.5) * 0.02;
+                
+                var pts = new[]
+                {
+                    new { lat = lat + 0.003, lng = lng - 0.003 },
+                    new { lat = lat + 0.003, lng = lng + 0.003 },
+                    new { lat = lat - 0.003, lng = lng + 0.003 },
+                    new { lat = lat - 0.003, lng = lng - 0.003 },
+                    new { lat = lat + 0.003, lng = lng - 0.003 }
+                };
+
+                var zone = new Zone
+                {
+                    ZoneName = "Vùng mẫu " + i,
+                    VersionId = versionId,
+                    CenterLat = lat,
+                    CenterLng = lng,
+                    Points = JsonSerializer.Serialize(pts),
+                    Area = 500000 + rand.Next(500000), 
+                    CreatedAt = DateTime.Now
+                };
+                _context.Zones.Add(zone);
+            }
+
+            _context.SaveChanges();
+            UpdateVersionStats(versionId);
+            _context.SaveChanges();
+
+            return Json(new { success = true, message = "Đã thêm 5 vùng mẫu thành công!" });
+        }
     }
 }
 

@@ -361,7 +361,15 @@
             .then(zones => {
                 console.log("Received zones:", zones.length, zones);
                 if (!zones || zones.length === 0) {
-                    distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b"><i class="fas fa-ghost" style="font-size:32px; display:block; margin-bottom:14px"></i> Không tìm thấy dữ liệu vùng cho Version này.</div>';
+                    distBox.innerHTML = `
+                    <div style="padding:60px; text-align:center; color:#64748b">
+                        <i class="fas fa-ghost" style="font-size:44px; display:block; margin-bottom:14px; color:#334155"></i>
+                        <div style="font-size:16px; font-weight:700">Trống trơn...</div>
+                        <p style="font-size:13px; margin:10px 0 20px">Version này chưa có Polygon nào để tính toán.</p>
+                        <button onclick="seedAndReload(${vId}, '${vName}')" class="vl-add-btn" style="background:#475569">
+                            <i class="fas fa-magic"></i> Thêm dữ liệu mẫu (Seed)
+                        </button>
+                    </div>`;
                     return;
                 }
                 
@@ -471,5 +479,24 @@
                 console.error("Matrix error:", err);
                 distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#f87171"><i class="fas fa-exclamation-triangle" style="font-size:32px; display:block; margin-bottom:14px"></i> Lỗi hệ thống: ' + err.message + '</div>';
             });
+    }
+    function seedAndReload(vId, vName) {
+        if(!confirm("Bạn có muốn thêm 5 vùng mẫu vào Version này không?")) return;
+        
+        const distBox = document.getElementById('mtDistanceBox');
+        distBox.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b"><i class="fas fa-sync fa-spin"></i> Đang khởi tạo dữ liệu mẫu...</div>';
+
+        fetch("/Zone/SeedZones?versionId=" + vId, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    showVersionMatrix(vId, vName);
+                    // Reload the background list too if possible
+                    if(typeof loadArea === 'function') loadArea(); 
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => alert("Lỗi: " + err.message));
     }
 </script>
