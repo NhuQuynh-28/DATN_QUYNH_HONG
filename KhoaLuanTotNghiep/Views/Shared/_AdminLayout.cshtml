@@ -935,118 +935,22 @@ function saveZone(){
 
         /* ================= DISTANCE ================= */
 
-                function calculateDistances(){
-
-        let polys=[];
-        let names=[];
-
-        drawnItems.eachLayer(function(layer){
-
-        polys.push(layer);
-
-        names.push("Zone "+layer.zoneId);
-
-        });
-
-        let html="<h3>Ma trận khoảng cách</h3>";
-        html+="<table border='1' style='border-collapse:collapse'>";
-
-        html+="<tr><th></th>";
-
-        names.forEach(n=>{
-        html+="<th>"+n+"</th>";
-        });
-
-        html+="</tr>";
-
-        for(let i=0;i<polys.length;i++){
-
-        html+="<tr>";
-
-        html+="<th>"+names[i]+"</th>";
-
-        for(let j=0;j<polys.length;j++){
-
-        if(i==j){
-        html+="<td>0</td>";
-        }
-        else{
-
-        let c1=polys[i].getBounds().getCenter();
-        let c2=polys[j].getBounds().getCenter();
-
-        let d=map.distance(c1,c2);
-
-        html+="<td>"+Math.round(d)+" m</td>";
-
+        function calculateDistances(){
+            if(typeof showVersionMatrix === 'function') {
+                showVersionMatrix(versionId, null, 'dist');
+            } else {
+                showToast("Tính năng này cần được load lại. Vui lòng trở về danh sách Version và thử lại.", "error");
+            }
         }
 
-        }
-
-        html+="</tr>";
-
-        }
-
-        html+="</table>";
-
-        document.getElementById("matrixResult").innerHTML=html;
-
-        }
         /* ================= ADJACENT ================= */
 
         function checkAdjacency(){
-
-        let polys=[];
-        let names=[];
-
-        drawnItems.eachLayer(function(layer){
-
-        polys.push(layer);
-        names.push("Zone " + layer.zoneId);
-
-        });
-
-        let html="<h3>Ma trận vùng kề</h3>";
-        html+="<table border='1' style='border-collapse:collapse'>";
-
-        html+="<tr><th></th>";
-
-        names.forEach(n=>{
-        html+="<th>"+n+"</th>";
-        });
-
-        html+="</tr>";
-
-        for(let i=0;i<polys.length;i++){
-
-        html+="<tr>";
-        html+="<th>"+names[i]+"</th>";
-
-        for(let j=0;j<polys.length;j++){
-
-        if(i==j){
-        html+="<td>0</td>";
-        }
-        else{
-
-        let isAdjacent = polys[i]
-        .getBounds()
-        .intersects(polys[j].getBounds());
-
-        html+="<td>"+(isAdjacent ? 1 : 0)+"</td>";
-
-        }
-
-        }
-
-        html+="</tr>";
-
-        }
-
-        html+="</table>";
-
-        document.getElementById("matrixResult").innerHTML=html;
-
+            if(typeof showVersionMatrix === 'function') {
+                showVersionMatrix(versionId, null, 'adj');
+            } else {
+                showToast("Tính năng này cần được load lại. Vui lòng trở về danh sách Version và thử lại.", "error");
+            }
         }
 
         /* ================= CENTER ================= */
