@@ -381,14 +381,27 @@
                         if (!Array.isArray(pts)) return null;
                         
                         let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-                        pts.forEach(p => {
-                            let lat = (p[0] !== undefined) ? p[0] : (p.lat !== undefined ? p.lat : p.Lat);
-                            let lng = (p[1] !== undefined) ? p[1] : (p.lng !== undefined ? p.lng : p.Lng);
-                            if (lat !== undefined && lng !== undefined) {
-                                if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
-                                if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
-                            }
-                        });
+                        function parseRec(arr) {
+                            arr.forEach(p => {
+                                if (Array.isArray(p)) {
+                                    if (p.length >= 2 && typeof p[0] === 'number' && typeof p[1] === 'number') {
+                                        let lat = p[0], lng = p[1];
+                                        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+                                        if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                                    } else {
+                                        parseRec(p);
+                                    }
+                                } else if (p && typeof p === 'object') {
+                                    let lat = (p.lat !== undefined) ? p.lat : p.Lat;
+                                    let lng = (p.lng !== undefined) ? p.lng : (p.lon !== undefined ? p.lon : (p.Lng !== undefined ? p.Lng : p.Lon));
+                                    if (lat !== undefined && lng !== undefined) {
+                                        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+                                        if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                                    }
+                                }
+                            });
+                        }
+                        parseRec(pts);
                         return (minLat === 90) ? null : { minLat, maxLat, minLng, maxLng };
                     } catch(e) { return null; }
                 }

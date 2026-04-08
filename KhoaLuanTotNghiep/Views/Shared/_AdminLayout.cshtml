@@ -794,9 +794,10 @@ function saveZone(){
                     poly.zoneId = z.id;
                     polygons.push(poly);
 
-                    // HIỆN TÊN
                     let center = poly.getBounds().getCenter();
                     let name = z.zoneName ?? z.ZoneName ?? "Zone";
+                    
+                    poly.zoneName = name;
 
                     L.marker(center,{
                         icon: L.divIcon({
@@ -944,7 +945,7 @@ function saveZone(){
 
         polys.push(layer);
 
-        names.push("Zone "+layer.zoneId);
+        names.push(layer.zoneName ? layer.zoneName : "Zone "+layer.zoneId);
 
         });
 
@@ -1002,7 +1003,7 @@ function saveZone(){
         drawnItems.eachLayer(function(layer){
 
         polys.push(layer);
-        names.push("Zone " + layer.zoneId);
+        names.push(layer.zoneName ? layer.zoneName : "Zone " + layer.zoneId);
 
         });
 
