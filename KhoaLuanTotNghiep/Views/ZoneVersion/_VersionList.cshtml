@@ -373,22 +373,47 @@
                     return;
                 }
                 
-                // Helper: Tính bounds cho vùng (Fallback nếu không có Leaflet)
                 function getPolygonBounds(points) {
                     try {
                         if (!points) return null;
                         let pts = (typeof points === 'string') ? JSON.parse(points) : points;
                         if (!Array.isArray(pts)) return null;
-                        
+
                         let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-                        pts.forEach(p => {
-                            let lat = (p[0] !== undefined) ? p[0] : (p.lat !== undefined ? p.lat : p.Lat);
-                            let lng = (p[1] !== undefined) ? p[1] : (p.lng !== undefined ? p.lng : p.Lng);
-                            if (lat !== undefined && lng !== undefined) {
+                        
+                        // Hàm đệ quy để vét hết các điểm
+                        function searchPoints(arr) {
+                            if(!arr || !Array.isArray(arr)) return;
+                            
+                            // Nếu đây là cặp [lat, lng]
+                            if (arr.length >= 2 && typeof arr[0] === 'number' && typeof arr[1] === 'number') {
+                                let lat = arr[0];
+                                let lng = arr[1];
                                 if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
                                 if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                                return;
                             }
-                        });
+                            
+                            for (let i = 0; i < arr.length; i++) {
+                                let p = arr[i];
+                                if (!p) continue;
+                                
+                                if (Array.isArray(p)) {
+                                    searchPoints(p);
+                                } else if (typeof p === 'object') {
+                                    let lat = p.lat !== undefined ? p.lat : (p.Lat !== undefined ? p.Lat : undefined);
+                                    let lng = p.lng !== undefined ? p.lng : (p.Lng !== undefined ? p.Lng : (p.lon !== undefined ? p.lon : undefined));
+                                    
+                                    if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
+                                        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+                                        if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        searchPoints(pts);
+
                         return (minLat === 90) ? null : { minLat, maxLat, minLng, maxLng };
                     } catch(e) { return null; }
                 }
@@ -406,10 +431,19 @@
                 });
                 distHtml += '</tr></thead><tbody>';
                 
+                const zoneBounds = zones.map(z => getPolygonBounds(z.points || z.Points));
+
                 zones.forEach((z1, i) => {
                     let z1Name = z1.zoneName || z1.ZoneName || "N/A";
+                    
                     let lat1 = z1.centerLat !== undefined ? z1.centerLat : z1.CenterLat;
                     let lng1 = z1.centerLng !== undefined ? z1.centerLng : z1.CenterLng;
+
+                    // Fallback to computed center if DB coordinates are mostly missing/0
+                    if ((!lat1 && !lng1) || (lat1 === 0 && lng1 === 0)) {
+                        let b1 = zoneBounds[i];
+                        if(b1) { lat1 = (b1.minLat + b1.maxLat)/2; lng1 = (b1.minLng + b1.maxLng)/2; }
+                    }
 
                     distHtml += `<tr><td style="background:#1e293b; font-weight:700; color:#fbbf24; font-size:11px">${z1Name}</td>`;
                     zones.forEach((z2, j) => {
@@ -419,18 +453,24 @@
                             let lat2 = z2.centerLat !== undefined ? z2.centerLat : z2.CenterLat;
                             let lng2 = z2.centerLng !== undefined ? z2.centerLng : z2.CenterLng;
 
+                            if ((!lat2 && !lng2) || (lat2 === 0 && lng2 === 0)) {
+                                let b2 = zoneBounds[j];
+                                if(b2) { lat2 = (b2.minLat + b2.maxLat)/2; lng2 = (b2.minLng + b2.maxLng)/2; }
+                            }
+
                             let d = 0;
-                            // Tính khoảng cách Havorsine nhanh
-                            const R = 6371e3; // meters
-                            const p1 = lat1 * Math.PI/180;
-                            const p2 = lat2 * Math.PI/180;
-                            const dp = (lat2 - lat1) * Math.PI/180;
-                            const dl = (lng2 - lng1) * Math.PI/180;
-                            const a = Math.sin(dp/2) * Math.sin(dp/2) +
-                                      Math.cos(p1) * Math.cos(p2) *
-                                      Math.sin(dl/2) * Math.sin(dl/2);
-                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                            d = R * c;
+                            if (lat1 && lng1 && lat2 && lng2) {
+                                const R = 6371e3;
+                                const p1 = lat1 * Math.PI/180;
+                                const p2 = lat2 * Math.PI/180;
+                                const dp = (lat2 - lat1) * Math.PI/180;
+                                const dl = (lng2 - lng1) * Math.PI/180;
+                                const a = Math.sin(dp/2) * Math.sin(dp/2) +
+                                          Math.cos(p1) * Math.cos(p2) *
+                                          Math.sin(dl/2) * Math.sin(dl/2);
+                                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                                d = R * c;
+                            }
                             
                             distHtml += `<td style="text-align:center; font-family:monospace; color:#e2e8f0; font-size:11px">${Math.round(d)}m</td>`;
                         }
