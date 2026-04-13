@@ -6,6 +6,9 @@
     var assignment = ViewBag.Assignment as Assignment;
     var zones = ViewBag.Zones as List<Zone>;
     var username = Context.Session.GetString("Username");
+    var availableMonths = ViewBag.AvailableMonths as List<int[]>;
+    int selectedMonth = ViewBag.SelectedMonth != null ? (int)ViewBag.SelectedMonth : DateTime.Now.Month;
+    int selectedYear  = ViewBag.SelectedYear  != null ? (int)ViewBag.SelectedYear  : DateTime.Now.Year;
 }
 <!DOCTYPE html>
 <html lang="vi">
@@ -99,6 +102,27 @@
 
         .badge-time { background:rgba(245,158,11,.1); color:#f59e0b; border:1px solid rgba(245,158,11,.2); padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; }
 
+        /* MONTH PICKER */
+        .month-picker-wrap { display:flex; align-items:center; gap:10px; }
+        .month-select {
+            appearance: none;
+            background: rgba(245,158,11,.08);
+            color: #f59e0b;
+            border: 1px solid rgba(245,158,11,.35);
+            border-radius: 20px;
+            padding: 6px 32px 6px 14px;
+            font-size: 13px; font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            outline: none;
+            transition: all .2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        .month-select:hover { background-color: rgba(245,158,11,.18); }
+        .month-select option { background: #1e293b; color: #f1f5f9; font-weight:600; }
+
         @@media (max-width: 900px) {
             .view-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr; }
@@ -148,13 +172,26 @@
         else
         {
             <div class="welcome">
-                <div style="display:flex; justify-content:space-between; align-items:flex-end">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px">
                     <div>
                         <h1>Tuyến đường của bạn</h1>
                         <p>Khu vực: <b>@assignment.Area?.Name</b></p>
                     </div>
-                    <div class="badge-time">
-                        Tháng @assignment.Month / @assignment.Year
+                    <div class="month-picker-wrap">
+                        <i class="fas fa-calendar-alt" style="color:#f59e0b; font-size:14px"></i>
+                        <select class="month-select" id="monthSelector" onchange="navigateToMonth(this.value)">
+                            @if (availableMonths != null)
+                            {
+                                foreach (var m in availableMonths)
+                                {
+                                    int mMonth = m[0];
+                                    int mYear  = m[1];
+                                    string val = $"{mMonth}-{mYear}";
+                                    bool isSelected = (mMonth == selectedMonth && mYear == selectedYear);
+                                    <option value="@val" @(isSelected ? "selected" : "")>Tháng @mMonth / @mYear</option>
+                                }
+                            }
+                        </select>
                     </div>
                 </div>
             </div>
@@ -249,11 +286,17 @@
         </script>
     }
         <script>
+            function navigateToMonth(val) {
+                const parts = val.split('-');
+                const month = parts[0];
+                const year = parts[1];
+                window.location.href = '/DriverDashboard/Index?month=' + month + '&year=' + year;
+            }
+
             // Khi người dùng nhấn Back sau khi đã đăng nhập, chuyển họ về Dashboard luôn
             if (history.length > 1) {
                 history.pushState(null, null, location.href);
                 window.onpopstate = function () {
-                    // Thay thế entry hiện tại bằng Dashboard để không quay lại Login
                     window.location.replace('/DriverDashboard/Index');
                 };
             }
