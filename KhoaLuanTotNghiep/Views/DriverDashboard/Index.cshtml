@@ -188,7 +188,7 @@
                                     int mYear  = m[1];
                                     string val = $"{mMonth}-{mYear}";
                                     bool isSelected = (mMonth == selectedMonth && mYear == selectedYear);
-                                    <option value="@val" @(isSelected ? "selected" : "")>Tháng @mMonth / @mYear</option>
+                                    <option value="@val" selected="@(isSelected ? "selected" : null)">Tháng @mMonth / @mYear</option>
                                 }
                             }
                         </select>
