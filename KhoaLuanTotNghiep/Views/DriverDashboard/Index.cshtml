@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Http
 @using KhoaLuanTotNghiep.Models
+@using System.Collections.Generic
 @{
     Layout = null;
     var driver = ViewBag.Driver as Driver;
@@ -9,6 +10,7 @@
     var availableMonths = ViewBag.AvailableMonths as List<int[]>;
     int selectedMonth = ViewBag.SelectedMonth != null ? (int)ViewBag.SelectedMonth : DateTime.Now.Month;
     int selectedYear  = ViewBag.SelectedYear  != null ? (int)ViewBag.SelectedYear  : DateTime.Now.Year;
+    var historyDict   = ViewBag.ZoneHistoryDict as Dictionary<int, ZoneHistory>;
 }
 <!DOCTYPE html>
 <html lang="vi">
@@ -226,11 +228,14 @@
                         {
                             @foreach (var z in zones)
                             {
+                                var hist = historyDict != null && historyDict.ContainsKey(z.Id) ? historyDict[z.Id] : null;
+                                int dispOrders    = hist?.OrdersForecast    ?? z.Order;
+                                int dispCustomers = hist?.CustomersForecast ?? z.Customers;
                                 <div class="zone-card" onclick="focusZone(@z.Id)">
-                                    <div class="zc-name">@z.ZoneName</div>
+                                    <div class="zc-name">@(z.ZoneName ?? $"Vùng #{z.Id}")</div>
                                     <div class="zc-info">
-                                        <span><i class="fas fa-box"></i> @z.Order đơn</span>
-                                        <span><i class="fas fa-users"></i> @z.Customers KH</span>
+                                        <span><i class="fas fa-box"></i> @dispOrders đơn</span>
+                                        <span><i class="fas fa-users"></i> @dispCustomers KH</span>
                                     </div>
                                 </div>
                             }
@@ -246,7 +251,25 @@
             let map = L.map('map').setView([21.0285, 105.8542], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(map);
 
-            let zonesData = @Html.Raw(Json.Serialize(zones));
+            // Merge zone + forecast data
+            let zonesRaw  = @Html.Raw(Json.Serialize(zones));
+            let historyRaw = @Html.Raw(Json.Serialize(
+                historyDict != null
+                    ? historyDict.Values.Select(h => new { zoneId = h.ZoneId, orders = h.OrdersForecast, customers = h.CustomersForecast }).ToList()
+                    : new List<object>()
+            ));
+
+            // Build lookup: zoneId -> { orders, customers }
+            let histMap = {};
+            historyRaw.forEach(h => { histMap[h.zoneId] = h; });
+
+            let zonesData = zonesRaw.map(z => ({
+                ...z,
+                displayOrders:    histMap[z.id] ? histMap[z.id].orders    : (z.order    ?? 0),
+                displayCustomers: histMap[z.id] ? histMap[z.id].customers : (z.customers ?? 0),
+                displayName:      z.zoneName || ('Vùng #' + z.id)
+            }));
+
             let polygons = {};
             let bounds = [];
 
@@ -267,11 +290,11 @@
                         interactive:false,
                         icon: L.divIcon({
                             className: 'zone-label',
-                            html: `<div style="background:#2563eb; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.3)">${z.zoneName}</div>`
+                            html: `<div style="background:#2563eb; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.3)">${z.displayName}</div>`
                         })
                     }).addTo(map);
 
-                    poly.bindPopup(`<b>${z.zoneName}</b><br>${z.order} đơn / ${z.customers} KH`);
+                    poly.bindPopup(`<b>${z.displayName}</b><br>${z.displayOrders} đơn / ${z.displayCustomers} KH`);
                 } catch(e) { console.error(e); }
             });
 

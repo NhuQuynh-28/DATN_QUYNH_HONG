@@ -100,6 +100,18 @@ namespace KhoaLuanTotNghiep.Controllers
                 .Where(z => zoneIds.Contains(z.Id))
                 .ToList();
 
+            // 6. Lấy dữ liệu forecast theo tháng/năm từ ZoneHistories
+            //    (đây mới là nguồn dữ liệu đơn/KH chính xác theo từng tháng)
+            var zoneHistories = _context.ZoneHistories
+                .Where(h => zoneIds.Contains(h.ZoneId)
+                         && h.Month == selectedMonth
+                         && h.Year  == selectedYear)
+                .ToList();
+
+            // Tạo dictionary: ZoneId -> ZoneHistory để tra nhanh
+            var historyDict = zoneHistories.ToDictionary(h => h.ZoneId, h => h);
+            ViewBag.ZoneHistoryDict = historyDict;
+
             ViewBag.Driver = driver;
             ViewBag.Assignment = assignment;
             ViewBag.Zones = zones;
