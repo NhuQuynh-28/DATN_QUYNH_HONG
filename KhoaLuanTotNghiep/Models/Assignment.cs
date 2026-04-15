@@ -1,3 +1,5 @@
+using System;
+
 namespace KhoaLuanTotNghiep.Models
 {
     public class Assignment

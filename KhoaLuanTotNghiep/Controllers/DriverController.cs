@@ -245,7 +245,7 @@ public class DriverController : Controller
         // 3. All zone IDs involved
         var allZoneIds = curAssignments
             .Where(a => !string.IsNullOrEmpty(a.ZoneIds))
-            .SelectMany(a => a.ZoneIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse))
+            .SelectMany(a => (a.ZoneIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse))
             .Distinct().ToList();
 
         // 4. Get zone info from DB
@@ -389,10 +389,10 @@ public class DriverController : Controller
 
         // Imbalance measure: standard deviation of orders
         double orderStdDev = 0;
-        if (driverDetails.Count > 1)
+        if (driverDetails.Count() > 1)
         {
             double mean = driverDetails.Average(d => d.plannedOrders);
-            orderStdDev = Math.Sqrt(driverDetails.Sum(d => Math.Pow(d.plannedOrders - mean, 2)) / driverDetails.Count);
+            orderStdDev = Math.Sqrt(driverDetails.Sum(d => Math.Pow(d.plannedOrders - mean, 2)) / driverDetails.Count());
         }
 
         // Hao hụt totals
