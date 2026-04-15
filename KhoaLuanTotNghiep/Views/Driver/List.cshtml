@@ -238,7 +238,7 @@
         </div>
     </div>
 
-    <!-- PANEL 2: PHÂN CÔNG THEO THÁNG -->
+    <!-- PANEL 2: PHÂN CÔNG THEO THÁNG - ĐÁNH GIÁ TOÀN DIỆN -->
     <div class="dm-panel" id="panel-month">
         <!-- FILTER -->
         <div class="dm-filter">
@@ -276,39 +276,22 @@
                     }
                 </select>
             </div>
-            <div>
-                <label>Tài xế</label>
-                <input class="dm-search" id="mf-driver" placeholder="Tên tài xế..." style="width:170px">
-            </div>
-            <button class="dm-btn-filter" onclick="loadMonthData()">
-                <i class="fas fa-search"></i> Lọc
+            <button class="dm-btn-filter" onclick="loadEvaluation()">
+                <i class="fas fa-chart-bar"></i> Đánh giá
             </button>
         </div>
 
-        <!-- SUMMARY CARDS (sẽ load bằng JS) -->
-        <div class="dm-month-stats" id="monthSummary"></div>
+        <!-- TỔNG QUAN THÁNG -->
+        <div id="evalOverview" style="margin-bottom:18px"></div>
 
-        <!-- ASSIGNMENT TABLE -->
-        <div class="dm-table-wrap">
-            <table class="dm-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Tài xế</th>
-                        <th>Khu vực</th>
-                        <th>Điều phối bởi</th>
-                        <th>Số vùng</th>
-                        <th>Dự kiến</th>
-                        <th>Thực tế</th>
-                        <th>Hoàn thành</th>
-                        <th>Ngày</th>
-                    </tr>
-                </thead>
-                <tbody id="monthTbody">
-                    <tr><td colspan="8" style="text-align:center;padding:40px;color:#475569">Chọn tháng và bấm Lọc để xem dữ liệu</td></tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- ĐÁNH GIÁ SOLUTION -->
+        <div id="evalSolution" style="margin-bottom:18px"></div>
+
+        <!-- SO SÁNH VỚI THÁNG TRƯỚC -->
+        <div id="evalComparison" style="margin-bottom:18px"></div>
+
+        <!-- BẢNG ĐÁNH GIÁ TỪNG TÀI XẾ -->
+        <div id="evalDrivers"></div>
     </div>
     <!-- PANEL 3: LỊCH SỬ PHÂN CÔNG -->
     <div class="dm-panel" id="panel-detail">
@@ -420,7 +403,7 @@ function switchTab(tab) {
     document.querySelectorAll('.dm-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
     document.getElementById('panel-' + tab).classList.add('active');
-    if (tab === 'month') loadMonthData();
+    if (tab === 'month') loadEvaluation();
 }
 
 /* ===== FILTER DRIVER TABLE ===== */
@@ -435,58 +418,290 @@ function filterDriverTable() {
     });
 }
 
-/* ===== LOAD MONTH DATA ===== */
-function loadMonthData() {
+/* ===== LOAD EVALUATION DATA ===== */
+function loadEvaluation() {
     let m = document.getElementById('mf-month').value;
     let y = document.getElementById('mf-year').value;
     let a = document.getElementById('mf-area').value;
-    let d = document.getElementById('mf-driver').value;
 
-    // Load summary
-    fetch(`/Driver/GetMonthlySummary?month=${m}&year=${y}`)
-    .then(r => r.json())
-    .then(s => {
-        let rate = s.completionRate || 0;
-        document.getElementById('monthSummary').innerHTML = `
-            <div class="dm-mstat" style="--c:#3b82f6"><div class="mv">${s.totalAssignments}</div><div class="ml">Tổng phân công</div></div>
-            <div class="dm-mstat" style="--c:#f59e0b"><div class="mv">${s.totalPlanned}</div><div class="ml">Đơn dự kiến</div></div>
-            <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${s.totalActual}</div><div class="ml">Đơn thực tế</div></div>
-            <div class="dm-mstat" style="--c:${rate>=80?'#4ade80':rate>=50?'#f59e0b':'#f87171'}"><div class="mv">${rate}%</div><div class="ml">Tỉ lệ hoàn thành</div></div>
-        `;
-        document.getElementById('statAssignMonth').textContent = s.totalAssignments;
-    });
-
-    // Load assignments
-    fetch(`/Driver/GetByMonth?month=${m}&year=${y}&areaId=${a}&driverName=${encodeURIComponent(d)}`)
+    fetch(`/Driver/GetAssignmentEvaluation?month=${m}&year=${y}&areaId=${a}`)
     .then(r => r.json())
     .then(data => {
-        let tbody = document.getElementById('monthTbody');
-        if (!data.length) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#475569"><i class="fas fa-inbox" style="font-size:28px;display:block;margin-bottom:10px"></i>Không có dữ liệu phân công</td></tr>';
+        let s = data.summary;
+        let p = data.prevSummary;
+        let drivers = data.drivers || [];
+
+        if (!drivers.length) {
+            document.getElementById('evalOverview').innerHTML = '';
+            document.getElementById('evalSolution').innerHTML = '';
+            document.getElementById('evalComparison').innerHTML = '';
+            document.getElementById('evalDrivers').innerHTML = `
+                <div class="dm-empty">
+                    <i class="fas fa-inbox"></i>
+                    <div class="et">Chưa có dữ liệu phân công tháng ${m}/${y}</div>
+                    <div class="es">Vào Điều phối để phân công tài xế trước</div>
+                </div>`;
             return;
         }
-        tbody.innerHTML = data.map((a, i) => {
-            let pct = a.plannedOrders > 0 ? Math.min(100, Math.round(a.actualOrders / a.plannedOrders * 100)) : 0;
-            let color = a.isOk ? '#4ade80' : '#f87171';
-            let zoneIds = a.zoneIds || '';
-            return `<tr onclick="previewAssignmentOnMap('${zoneIds}', '${a.driverName}')" style="cursor:pointer">
+
+        // === 1. OVERVIEW CARDS ===
+        let diffColor = s.totalOrderDiffPct > 20 ? '#f87171' : s.totalOrderDiffPct > 10 ? '#fbbf24' : '#4ade80';
+        let changePctHtml = p.ordersChangePct !== 0 ?
+            `<span style="font-size:11px;color:${p.ordersChangePct>0?'#4ade80':'#f87171'}">${p.ordersChangePct>0?'▲':'▼'} ${Math.abs(p.ordersChangePct)}% vs T${data.prevMonth}</span>` : '';
+        let actualChangePctHtml = p.actualChangePct !== 0 ?
+            `<span style="font-size:11px;color:${p.actualChangePct>0?'#4ade80':'#f87171'}">${p.actualChangePct>0?'▲':'▼'} ${Math.abs(p.actualChangePct)}% vs T${data.prevMonth}</span>` : '';
+
+        document.getElementById('evalOverview').innerHTML = `
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+                <div class="dm-mstat" style="--c:#3b82f6"><div class="mv">${s.totalDrivers}</div><div class="ml">Tài xế</div></div>
+                <div class="dm-mstat" style="--c:#8b5cf6"><div class="mv">${s.totalPolygons}</div><div class="ml">Polygon</div><div style="font-size:10px;color:#64748b">TB: ${s.avgPolygons}/TX</div></div>
+                <div class="dm-mstat" style="--c:#f59e0b"><div class="mv">${s.totalPlannedOrders}</div><div class="ml">Đơn dự kiến</div>${changePctHtml}</div>
+                <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${s.totalActualOrders}</div><div class="ml">Đơn thực tế</div>${actualChangePctHtml}</div>
+                <div class="dm-mstat" style="--c:#06b6d4"><div class="mv">${s.totalPlannedCustomers}</div><div class="ml">KH dự kiến</div></div>
+                <div class="dm-mstat" style="--c:#22d3ee"><div class="mv">${s.totalActualCustomers}</div><div class="ml">KH thực tế</div></div>
+                <div class="dm-mstat" style="--c:${diffColor}"><div class="mv">${s.totalOrderDiff}</div><div class="ml">Hao hụt đơn</div><div style="font-size:10px;color:${diffColor}">${s.totalOrderDiffPct}%</div></div>
+                <div class="dm-mstat" style="--c:${diffColor}"><div class="mv">${s.totalCustomerDiff}</div><div class="ml">Hao hụt KH</div></div>
+            </div>
+        `;
+
+        // === 2. SOLUTION QUALITY ===
+        let violationColor = s.totalViolations > 0 ? '#f87171' : '#4ade80';
+        document.getElementById('evalSolution').innerHTML = `
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:14px; padding:18px">
+                <div style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                    <i class="fas fa-chart-pie" style="color:#8b5cf6"></i> Đánh giá chất lượng Solution
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px">
+                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Độ nhỏ gọn (Compactness)</div>
+                        <div style="display:flex;gap:16px">
+                            <div><div style="font-size:10px;color:#475569">Min</div><div style="font-size:16px;font-weight:700;color:#4ade80">${s.compactnessMin.toLocaleString()}m</div></div>
+                            <div><div style="font-size:10px;color:#475569">TB</div><div style="font-size:16px;font-weight:700;color:#3b82f6">${s.compactnessAvg.toLocaleString()}m</div></div>
+                            <div><div style="font-size:10px;color:#475569">Max</div><div style="font-size:16px;font-weight:700;color:#f59e0b">${s.compactnessMax.toLocaleString()}m</div></div>
+                        </div>
+                    </div>
+                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Vi phạm cân bằng (±${s.balanceThresholdPct}%)</div>
+                        <div style="font-size:22px;font-weight:800;color:${violationColor}">${s.totalViolations} <span style="font-size:12px;color:#64748b">tài xế vượt</span></div>
+                        <div style="font-size:12px;color:#94a3b8;margin-top:4px">Tổng mức vi phạm: <b style="color:${violationColor}">${s.totalViolationAmount}</b></div>
+                    </div>
+                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Mức mất cân bằng</div>
+                        <div style="font-size:22px;font-weight:800;color:#f59e0b">${s.orderStdDev}</div>
+                        <div style="font-size:12px;color:#94a3b8;margin-top:4px">Độ lệch chuẩn đơn hàng</div>
+                    </div>
+                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">TB/Tài xế</div>
+                        <div style="display:flex;gap:16px">
+                            <div><div style="font-size:10px;color:#475569">Đơn</div><div style="font-size:16px;font-weight:700;color:#3b82f6">${s.avgOrders}</div></div>
+                            <div><div style="font-size:10px;color:#475569">KH</div><div style="font-size:16px;font-weight:700;color:#06b6d4">${s.avgCustomers}</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // === 3. COMPARISON WITH PREV MONTH ===
+        let prevDiffColor = p.totalDiffPct > 20 ? '#f87171' : p.totalDiffPct > 10 ? '#fbbf24' : '#4ade80';
+        document.getElementById('evalComparison').innerHTML = `
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:14px; padding:18px">
+                <div style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                    <i class="fas fa-exchange-alt" style="color:#f59e0b"></i> So sánh Tháng ${m} vs Tháng ${data.prevMonth}
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                        <div style="font-size:13px;font-weight:700;color:#3b82f6;margin-bottom:10px">📅 Tháng ${m}/${y}</div>
+                        <table style="width:100%;font-size:12px;color:#94a3b8">
+                            <tr><td>Tài xế</td><td style="text-align:right;color:#f1f5f9;font-weight:700">${s.totalDrivers}</td></tr>
+                            <tr><td>Đơn dự kiến</td><td style="text-align:right;color:#f59e0b;font-weight:700">${s.totalPlannedOrders}</td></tr>
+                            <tr><td>Đơn thực tế</td><td style="text-align:right;color:#4ade80;font-weight:700">${s.totalActualOrders}</td></tr>
+                            <tr><td>KH dự kiến</td><td style="text-align:right;color:#06b6d4;font-weight:700">${s.totalPlannedCustomers}</td></tr>
+                            <tr><td>KH thực tế</td><td style="text-align:right;color:#22d3ee;font-weight:700">${s.totalActualCustomers}</td></tr>
+                            <tr><td>Hao hụt đơn</td><td style="text-align:right;color:${diffColor};font-weight:700">${s.totalOrderDiff} (${s.totalOrderDiffPct}%)</td></tr>
+                        </table>
+                    </div>
+                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                        <div style="font-size:13px;font-weight:700;color:#64748b;margin-bottom:10px">📅 Tháng ${data.prevMonth}/${data.prevYear}</div>
+                        <table style="width:100%;font-size:12px;color:#94a3b8">
+                            <tr><td>Tài xế</td><td style="text-align:right;color:#f1f5f9;font-weight:700">${p.totalDrivers || 0}</td></tr>
+                            <tr><td>Đơn dự kiến</td><td style="text-align:right;color:#f59e0b;font-weight:700">${p.totalPlannedOrders}</td></tr>
+                            <tr><td>Đơn thực tế</td><td style="text-align:right;color:#4ade80;font-weight:700">${p.totalActualOrders}</td></tr>
+                            <tr><td>KH dự kiến</td><td style="text-align:right;color:#06b6d4;font-weight:700">${p.totalPlannedCustomers}</td></tr>
+                            <tr><td>KH thực tế</td><td style="text-align:right;color:#22d3ee;font-weight:700">${p.totalActualCustomers}</td></tr>
+                            <tr><td>Hao hụt đơn</td><td style="text-align:right;color:${prevDiffColor};font-weight:700">${p.totalPlannedOrders - p.totalActualOrders} (${p.totalDiffPct}%)</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // === 4. PER-DRIVER TABLE ===
+        let driverRows = drivers.map((d, i) => {
+            let balanceBadge = d.violatesBalance
+                ? `<span style="color:#f87171;font-weight:700;font-size:11px"><i class="fas fa-exclamation-triangle"></i> Vượt ${d.violationAmount}</span>`
+                : `<span style="color:#4ade80;font-size:11px"><i class="fas fa-check-circle"></i> OK</span>`;
+            let diffColor = Math.abs(d.orderDiffPct) > 20 ? '#f87171' : Math.abs(d.orderDiffPct) > 10 ? '#fbbf24' : '#4ade80';
+            let prevDiffC = Math.abs(d.prevOrderDiffPct) > 20 ? '#f87171' : Math.abs(d.prevOrderDiffPct) > 10 ? '#fbbf24' : '#4ade80';
+
+            // Zone detail rows
+            let zoneRows = (d.zones || []).map(z => {
+                let real = z.ordersReal !== null ? z.ordersReal : '—';
+                let custReal = z.customersReal !== null ? z.customersReal : '—';
+                let diff = z.ordersReal !== null ? z.ordersForecast - z.ordersReal : null;
+                let diffStr = diff !== null ? `<span style="color:${Math.abs(diff)>5?'#f87171':'#4ade80'}">${diff>0?'+':''}${diff}</span>` : '—';
+                return `<tr style="background:#0a0f1a;font-size:11px">
+                    <td colspan="2" style="padding-left:52px;color:#475569">↳ ${z.zoneName}</td>
+                    <td style="color:#f59e0b">${z.ordersForecast}</td>
+                    <td style="color:#4ade80">${real}</td>
+                    <td style="color:#06b6d4">${z.customersForecast}</td>
+                    <td style="color:#22d3ee">${custReal}</td>
+                    <td>${diffStr}</td>
+                    <td colspan="4"></td>
+                </tr>`;
+            }).join('');
+
+            return `<tr onclick="toggleEvalDetail(${i})" style="cursor:pointer" class="eval-row">
                 <td style="color:#475569;font-weight:700">${i+1}</td>
                 <td>
-                    <div style="font-weight:700;color:#f1f5f9">${a.driverName}</div>
-                    <div style="font-size:11px;color:#475569">${a.driverPhone}</div>
+                    <div class="dm-driver-cell">
+                        <div class="dm-avatar">${(d.driverName||'?')[0]}</div>
+                        <div>
+                            <div style="font-weight:700;color:#f1f5f9">${d.driverName}</div>
+                            <div style="font-size:10px;color:#475569">${d.areaName} · ${d.zoneCount} vùng</div>
+                        </div>
+                    </div>
                 </td>
-                <td style="color:#94a3b8">${a.areaName}</td>
-                <td style="color:#64748b;font-size:12px">${a.dispatcher}</td>
-                <td style="color:#3b82f6;font-weight:700">${a.zoneCount}</td>
-                <td style="font-weight:700;color:#60a5fa">${a.plannedOrders}</td>
-                <td style="font-weight:700;color:${color}">${a.actualOrders}</td>
+                <td style="font-weight:700;color:#f59e0b">${d.plannedOrders}</td>
+                <td style="font-weight:700;color:#4ade80">${d.actualOrders}</td>
+                <td style="font-weight:700;color:#06b6d4">${d.plannedCustomers}</td>
+                <td style="font-weight:700;color:#22d3ee">${d.actualCustomers}</td>
+                <td><span style="color:${diffColor};font-weight:700">${d.orderDiff>0?'+':''}${d.orderDiff} <span style="font-size:10px">(${d.orderDiffPct}%)</span></span></td>
+                <td style="font-size:11px;color:#94a3b8">${d.compactness.toLocaleString()}m</td>
+                <td>${balanceBadge}</td>
                 <td>
-                    <div class="dm-progress-bar"><div class="dm-progress-fill" style="width:${pct}%;background:${color}"></div></div>
-                    <div style="font-size:10px;color:${color};margin-top:3px">${pct}%</div>
+                    <div style="font-size:11px">
+                        <span style="color:${prevDiffC}">${d.prevOrderDiff>0?'+':''}${d.prevOrderDiff} (${d.prevOrderDiffPct}%)</span>
+                        <div style="font-size:9px;color:#475569">T${data.prevMonth}: ${d.prevPlannedOrders}→${d.prevActualOrders}</div>
+                    </div>
                 </td>
-                <td style="font-size:12px;color:#64748b">${a.date}</td>
+                <td>
+                    <button class="dm-act dm-act-edit" onclick="event.stopPropagation();openActualModal(${d.driverId},'${d.driverName}',${d.actualOrders},${d.actualCustomers})" title="Nhập thực tế">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr id="evalDetail-${i}" style="display:none">
+                <td colspan="11" style="padding:0">
+                    <table style="width:100%;border-collapse:collapse;background:#0d111c">
+                        <thead><tr style="background:#0a0f1a">
+                            <th colspan="2" style="padding:8px 14px;color:#475569;font-size:10px;text-align:left">VÙNG</th>
+                            <th style="padding:8px;color:#475569;font-size:10px">ĐƠN DK</th>
+                            <th style="padding:8px;color:#475569;font-size:10px">ĐƠN TT</th>
+                            <th style="padding:8px;color:#475569;font-size:10px">KH DK</th>
+                            <th style="padding:8px;color:#475569;font-size:10px">KH TT</th>
+                            <th style="padding:8px;color:#475569;font-size:10px">CHÊNH LỆCH</th>
+                            <th colspan="4"></th>
+                        </tr></thead>
+                        <tbody>${zoneRows || '<tr><td colspan="11" style="padding:12px;color:#475569;text-align:center;font-size:11px">Không có dữ liệu vùng</td></tr>'}</tbody>
+                    </table>
+                </td>
             </tr>`;
         }).join('');
+
+        document.getElementById('evalDrivers').innerHTML = `
+            <div class="dm-table-wrap">
+                <table class="dm-table">
+                    <thead><tr>
+                        <th>#</th>
+                        <th>Tài xế</th>
+                        <th title="Đơn hàng dự kiến">Đơn DK</th>
+                        <th title="Đơn hàng thực tế">Đơn TT</th>
+                        <th title="Khách hàng dự kiến">KH DK</th>
+                        <th title="Khách hàng thực tế">KH TT</th>
+                        <th>Hao hụt</th>
+                        <th title="Tổng khoảng cách tới tâm">Nhỏ gọn</th>
+                        <th>Cân bằng</th>
+                        <th>vs T${data.prevMonth}</th>
+                        <th></th>
+                    </tr></thead>
+                    <tbody>${driverRows}</tbody>
+                </table>
+            </div>
+        `;
+
+        document.getElementById('statAssignMonth').textContent = s.totalDrivers;
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('Lỗi khi tải dữ liệu đánh giá!', 'error');
+    });
+}
+
+function toggleEvalDetail(idx) {
+    let el = document.getElementById('evalDetail-' + idx);
+    if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+function openActualModal(driverId, driverName, curOrders, curCustomers) {
+    let ov = document.getElementById('driverOverlay');
+    document.getElementById('modalTitle').innerHTML = `<i class="fas fa-clipboard-check" style="color:#4ade80"></i> Nhập thực tế — ${driverName}`;
+    ov.querySelector('.dm-modal').innerHTML = `
+        <h3 id="modalTitle"><i class="fas fa-clipboard-check" style="color:#4ade80"></i> Nhập số liệu thực tế — ${driverName}</h3>
+        <div class="dm-field">
+            <label>Đơn hàng thực tế</label>
+            <input class="dm-input" id="actualOrders" type="number" value="${curOrders}" min="0">
+        </div>
+        <div class="dm-field">
+            <label>Khách hàng thực tế</label>
+            <input class="dm-input" id="actualCustomers" type="number" value="${curCustomers}" min="0">
+        </div>
+        <div class="dm-modal-footer">
+            <button class="dm-btn-cancel" onclick="closeDriverModal()">Hủy</button>
+            <button class="dm-btn-save" onclick="saveActualData(${driverId})"><i class="fas fa-save"></i> Lưu</button>
+        </div>
+    `;
+    ov.classList.add('open');
+}
+
+function saveActualData(driverId) {
+    let m = document.getElementById('mf-month').value;
+    let y = document.getElementById('mf-year').value;
+    let a = document.getElementById('mf-area').value;
+    let actualOrders = parseInt(document.getElementById('actualOrders').value) || 0;
+    let actualCustomers = parseInt(document.getElementById('actualCustomers').value) || 0;
+
+    // Find assignment ID first
+    fetch(`/Driver/GetByMonth?month=${m}&year=${y}&areaId=${a}`)
+    .then(r => r.json())
+    .then(data => {
+        let assignment = data.find(x => x.id);
+        // Find the correct assignment by matching driverId through the evaluation data
+        fetch(`/Driver/GetAssignmentEvaluation?month=${m}&year=${y}&areaId=${a}`)
+        .then(r => r.json())
+        .then(evalData => {
+            let driver = (evalData.drivers || []).find(d => d.driverId === driverId);
+            if (!driver) { showToast('Không tìm thấy phân công!', 'error'); return; }
+
+            // Get the assignment from GetByMonth by matching
+            let matched = data.find(x => x.driverName === driver.driverName);
+            if (!matched) { showToast('Không tìm thấy phân công!', 'error'); return; }
+
+            fetch('/Driver/UpdateActual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: matched.id, actualOrders, actualCustomers })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    closeDriverModal();
+                    showToast('Đã cập nhật số liệu thực tế!', 'success');
+                    loadEvaluation();
+                } else {
+                    showToast(d.message || 'Lỗi cập nhật!', 'error');
+                }
+            });
+        });
     });
 }
 
@@ -560,7 +775,7 @@ function switchTab(tab) {
     let panelEl = document.getElementById('panel-' + tab);
     if (tabEl)   tabEl.classList.add('active');
     if (panelEl) panelEl.classList.add('active');
-    if (tab === 'month')  loadMonthData();
+    if (tab === 'month')  loadEvaluation();
     if (tab === 'detail') loadDetailData();
 }
 

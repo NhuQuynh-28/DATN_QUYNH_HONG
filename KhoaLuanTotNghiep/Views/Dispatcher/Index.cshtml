@@ -351,11 +351,11 @@
         <div class="dp-section-title"><i class="fas fa-user-check" style="color:#22c55e"></i> Phân công tự động</div>
     </div>
 
-    <!-- Config Panel -->
+    <!-- Step 1: Config Panel -->
     <div class="dp-filter" style="margin-bottom:16px;">
         <div>
             <label>Khu vực</label>
-            <select class="dp-select" id="aaArea"><option value="">-- Chọn khu vực --</option></select>
+            <select class="dp-select" id="aaArea" onchange="loadDriversForArea()"><option value="">-- Chọn khu vực --</option></select>
         </div>
         <div>
             <label>Tháng (dự báo)</label>
@@ -366,20 +366,53 @@
             <select class="dp-select" id="aaYear"></select>
         </div>
         <div>
-            <label>Số tài xế</label>
-            <input class="dp-select" type="number" id="aaDriverCount" value="10" min="1" max="30" style="width:70px;">
-        </div>
-        <div>
-            <label>Đơn tối đa trên 1 tài xế </label>
+            <label>Đơn tối đa/TX</label>
             <input class="dp-select" type="number" id="aaMaxOrders" value="999999" min="1" style="width:90px;">
         </div>
         <div>
-            <label>MKhách hàng trên 1 tài xế </label>
+            <label>KH tối đa/TX</label>
             <input class="dp-select" type="number" id="aaMaxCustomers" value="999999" min="1" style="width:90px;">
         </div>
-        <button class="dp-btn-filter" onclick="runAutoAssign()" id="btnAutoAssign">
-            <i class="fas fa-robot"></i> Chạy phân công
-        </button>
+    </div>
+
+    <!-- Step 2: Driver Selection Panel -->
+    <div id="aaDriverPanel" style="display:none; margin-bottom:18px;">
+        <div class="dp-table-wrap" style="margin-bottom:0;">
+            <div class="dp-table-header">
+                <div class="dp-table-title">
+                    <i class="fas fa-users" style="color:#3b82f6"></i>
+                    Chọn tài xế phân công
+                    <span id="aaDriverCount" style="font-size:12px;color:#64748b;font-weight:400;margin-left:8px"></span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input class="dp-select" id="aaDriverSearch" placeholder="🔍 Tìm tài xế..." oninput="filterDriverCheckboxes()" style="width:180px;font-size:12px;padding:6px 10px;">
+                    <button class="dp-btn-outline" style="font-size:11px;padding:6px 12px" onclick="toggleAllDrivers(true)">
+                        <i class="fas fa-check-double"></i> Chọn tất cả
+                    </button>
+                    <button class="dp-btn-outline" style="font-size:11px;padding:6px 12px;background:#1c2333" onclick="toggleAllDrivers(false)">
+                        <i class="fas fa-times"></i> Bỏ chọn
+                    </button>
+                    <button class="dp-btn-filter" onclick="runAutoAssign()" id="btnAutoAssign">
+                        <i class="fas fa-robot"></i> Chạy phân công
+                    </button>
+                </div>
+            </div>
+            <table class="dp-table" id="aaDriverSelectTable">
+                <thead>
+                    <tr>
+                        <th style="width:40px"><input type="checkbox" id="aaCheckAll" onchange="toggleAllDrivers(this.checked)" style="cursor:pointer"></th>
+                        <th>Tài xế</th>
+                        <th>SĐT</th>
+                        <th>Khu vực</th>
+                        <th>Phân công hiện tại</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="aaDriverSelectTbody">
+                    <tr><td colspan="6" style="text-align:center;padding:30px;color:#475569">Chọn khu vực để xem danh sách tài xế</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Map & Legend Row -->
@@ -464,6 +497,38 @@
         <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#f59e0b;"></i>
         <div style="margin-top:12px;color:#94a3b8;font-size:14px;">Greedy → Local Search → ALNS đang chạy...</div>
         <div style="margin-top:6px;color:#475569;font-size:11px;">Có thể mất vài giây tùy theo số vùng</div>
+    </div>
+
+    <!-- Driver Edit Modal -->
+    <div id="aaDriverEditOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)" onclick="if(event.target===this)closeDriverEditModal()">
+        <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px;min-width:380px;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,.6)">
+            <h3 id="aaEditTitle" style="margin:0 0 20px;font-size:16px;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px">
+                <i class="fas fa-pen" style="color:#f59e0b"></i> Chỉnh sửa tài xế
+            </h3>
+            <input type="hidden" id="aaEditId">
+            <div style="margin-bottom:13px">
+                <label style="display:block;font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:5px;text-transform:uppercase">Họ tên</label>
+                <input id="aaEditName" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box">
+            </div>
+            <div style="margin-bottom:13px">
+                <label style="display:block;font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:5px;text-transform:uppercase">Số điện thoại</label>
+                <input id="aaEditPhone" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box">
+            </div>
+            <div style="margin-bottom:13px">
+                <label style="display:block;font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:5px;text-transform:uppercase">Trạng thái</label>
+                <select id="aaEditStatus" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box">
+                    <option value="DangLam">Đang làm</option>
+                    <option value="NghiLam">Nghỉ làm</option>
+                    <option value="RoiBo">Rời bỏ</option>
+                </select>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #334155">
+                <button onclick="closeDriverEditModal()" style="background:#334155;border:none;border-radius:8px;padding:9px 18px;color:#94a3b8;font-size:13px;cursor:pointer">Hủy</button>
+                <button onclick="saveDriverEdit()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:8px;padding:9px 22px;color:white;font-size:13px;font-weight:700;cursor:pointer">
+                    <i class="fas fa-save"></i> Lưu
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1381,15 +1446,161 @@ function initAssignFilters(){
     }
 }
 
+// ===== LOAD DRIVERS BY AREA =====
+let aaDriversData = [];
+
+function loadDriversForArea(){
+    let areaId = document.getElementById('aaArea').value;
+    let panel = document.getElementById('aaDriverPanel');
+    
+    if(!areaId){
+        panel.style.display = 'none';
+        return;
+    }
+
+    panel.style.display = 'block';
+    let tbody = document.getElementById('aaDriverSelectTbody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#f59e0b"><i class="fas fa-spinner fa-spin"></i> Đang tải danh sách tài xế...</td></tr>';
+
+    fetch(`/Dispatcher/GetDriversByArea?areaId=${areaId}`)
+    .then(r=>r.json())
+    .then(drivers=>{
+        aaDriversData = drivers;
+        renderDriverCheckboxes(drivers);
+    })
+    .catch(()=>{
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#f87171">Lỗi tải danh sách tài xế</td></tr>';
+    });
+}
+
+function renderDriverCheckboxes(drivers){
+    let tbody = document.getElementById('aaDriverSelectTbody');
+    
+    if(!drivers.length){
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#475569"><i class="fas fa-user-slash" style="font-size:24px;display:block;margin-bottom:10px"></i>Không có tài xế nào trong khu vực này</td></tr>';
+        updateDriverCount();
+        return;
+    }
+
+    tbody.innerHTML = drivers.map((d, i) => {
+        let initial = (d.name||'?')[0].toUpperCase();
+        let assignBadge = d.hasAssignment
+            ? `<span class="dp-badge dp-badge-ok"><i class="fas fa-check-circle" style="font-size:9px"></i> ${d.assignedAreaName} (${d.zoneCount} vùng, ${d.plannedOrders} đơn)</span>`
+            : `<span style="color:#475569;font-size:11px">Chưa phân công</span>`;
+        let areaBadge = d.areaName
+            ? `<span style="color:#3b82f6;font-size:12px">${d.areaName}</span>`
+            : `<span style="color:#475569;font-size:11px;font-style:italic">Chưa gán KV</span>`;
+
+        return `<tr data-driver-id="${d.id}" data-name="${(d.name||'').toLowerCase()}" class="aa-driver-row">
+            <td style="text-align:center">
+                <input type="checkbox" class="aa-driver-check" value="${d.id}" checked 
+                    onchange="updateDriverCount()" style="cursor:pointer;width:16px;height:16px">
+            </td>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0">${initial}</div>
+                    <div>
+                        <div style="font-weight:700;color:#f1f5f9">${d.name}</div>
+                        <div style="font-size:10px;color:#475569">ID: ${d.id}</div>
+                    </div>
+                </div>
+            </td>
+            <td style="color:#94a3b8;font-size:12px">${d.phone || '—'}</td>
+            <td>${areaBadge}</td>
+            <td>${assignBadge}</td>
+            <td>
+                <button class="dp-btn-predict" style="font-size:11px;padding:4px 10px" 
+                    onclick="event.stopPropagation();openDriverEditModal(${d.id},'${(d.name||'').replace(/'/g,"\\'")}','${d.phone||''}','${d.status}')">
+                    <i class="fas fa-pen"></i> Sửa
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+
+    updateDriverCount();
+}
+
+function toggleAllDrivers(checked){
+    document.querySelectorAll('.aa-driver-check').forEach(cb => {
+        if(cb.closest('tr').style.display !== 'none') cb.checked = checked;
+    });
+    let checkAll = document.getElementById('aaCheckAll');
+    if(checkAll) checkAll.checked = checked;
+    updateDriverCount();
+}
+
+function filterDriverCheckboxes(){
+    let q = (document.getElementById('aaDriverSearch')?.value || '').toLowerCase();
+    document.querySelectorAll('.aa-driver-row').forEach(tr => {
+        let name = tr.dataset.name || '';
+        tr.style.display = name.includes(q) ? '' : 'none';
+    });
+}
+
+function updateDriverCount(){
+    let checked = document.querySelectorAll('.aa-driver-check:checked').length;
+    let total = document.querySelectorAll('.aa-driver-check').length;
+    let countEl = document.getElementById('aaDriverCount');
+    if(countEl) countEl.innerHTML = `— Đã chọn <b style="color:#3b82f6">${checked}</b>/${total} tài xế`;
+}
+
+// ===== DRIVER EDIT MODAL =====
+function openDriverEditModal(id, name, phone, status){
+    document.getElementById('aaEditId').value = id;
+    document.getElementById('aaEditName').value = name;
+    document.getElementById('aaEditPhone').value = phone;
+    document.getElementById('aaEditStatus').value = status;
+    document.getElementById('aaDriverEditOverlay').style.display = 'flex';
+}
+
+function closeDriverEditModal(){
+    document.getElementById('aaDriverEditOverlay').style.display = 'none';
+}
+
+function saveDriverEdit(){
+    let id = parseInt(document.getElementById('aaEditId').value);
+    let name = document.getElementById('aaEditName').value.trim();
+    let phone = document.getElementById('aaEditPhone').value.trim();
+    let status = document.getElementById('aaEditStatus').value;
+    if(!name){ dpToast('Vui lòng nhập họ tên!','error'); return; }
+
+    fetch('/Driver/Update', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({id, driverName: name, phone, status})
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            closeDriverEditModal();
+            dpToast('Đã cập nhật tài xế!','success');
+            loadDriversForArea(); // Reload list
+        } else {
+            dpToast(d.message||'Lỗi cập nhật!','error');
+        }
+    });
+}
+
+// ===== RUN AUTO ASSIGN =====
 function runAutoAssign(){
     let areaId   = document.getElementById('aaArea').value;
     let month    = parseInt(document.getElementById('aaMonth').value);
     let year     = parseInt(document.getElementById('aaYear').value);
-    let drivers  = parseInt(document.getElementById('aaDriverCount').value)||10;
     let maxO     = parseInt(document.getElementById('aaMaxOrders').value)||999999;
     let maxC     = parseInt(document.getElementById('aaMaxCustomers').value)||999999;
 
     if(!areaId){ dpToast('Vui lòng chọn khu vực!', 'error'); return; }
+
+    // Collect selected driver IDs
+    let selectedDriverIds = [];
+    document.querySelectorAll('.aa-driver-check:checked').forEach(cb => {
+        selectedDriverIds.push(parseInt(cb.value));
+    });
+
+    if(selectedDriverIds.length === 0){
+        dpToast('Vui lòng chọn ít nhất 1 tài xế!', 'error');
+        return;
+    }
 
     // Show loading
     document.getElementById('aaLoading').style.display = 'block';
@@ -1404,7 +1615,8 @@ function runAutoAssign(){
             areaId,
             month,
             year,
-            driverCount: drivers,
+            driverIds: selectedDriverIds,
+            driverCount: selectedDriverIds.length,
             maxOrdersPerDriver: maxO,
             maxCustomersPerDriver: maxC
         })
@@ -1478,12 +1690,12 @@ function runAutoAssign(){
 
         currentAssignmentResults = data;
         setTimeout(() => { if(aaMap) aaMap.invalidateSize(); }, 200);
-        dpToast(`Phan cong hoan tat! Cai thien ${data.improvementPct.toFixed(1)}%`, 'success');
+        dpToast(`Phân công hoàn tất cho ${selectedDriverIds.length} tài xế! Cải thiện ${data.improvementPct.toFixed(1)}%`, 'success');
     })
     .catch(err=>{
         document.getElementById('aaLoading').style.display = 'none';
         document.getElementById('btnAutoAssign').disabled = false;
-        dpToast('Loi ket noi: ' + err.message, 'error');
+        dpToast('Lỗi kết nối: ' + err.message, 'error');
     });
 }
 

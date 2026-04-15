@@ -361,9 +361,76 @@ namespace KhoaLuanTotNghiep.Controllers
         {
             var drivers = _context.Drivers
                 .Where(d => d.Status == "DangLam")
-                .Select(d => new { id = d.Id, name = d.DriverName })
+                .Select(d => new { id = d.Id, name = d.DriverName, phone = d.Phone, status = d.Status })
                 .ToList();
             return Json(drivers);
+        }
+
+        /// <summary>
+        /// GET /Dispatcher/GetDriversByArea — lấy tài xế theo khu vực
+        /// Kết hợp bảng Drivers (status) và Users (AreaId)
+        /// </summary>
+        [HttpGet]
+        public IActionResult GetDriversByArea(int? areaId)
+        {
+            // Lấy tất cả tài xế đang làm
+            var driversQuery = _context.Drivers.Where(d => d.Status == "DangLam");
+            var drivers = driversQuery.ToList();
+
+            // Lấy users có Role=Driver để map AreaId
+            var driverUsers = _context.Users
+                .Where(u => u.Role == "Driver" && u.IsActive)
+                .ToList();
+
+            // Lấy assignments hiện tại để biết tài xế đang gán ở đâu
+            int curMonth = DateTime.Now.Month;
+            int curYear = DateTime.Now.Year;
+            var currentAssignments = _context.Assignments
+                .Include(a => a.Area)
+                .Where(a => a.Month == curMonth && a.Year == curYear)
+                .ToList();
+
+            var result = drivers.Select(d =>
+            {
+                // Tìm user tương ứng (match theo phone hoặc tên)
+                var matchingUser = driverUsers.FirstOrDefault(u =>
+                    (!string.IsNullOrEmpty(u.Phone) && u.Phone == d.Phone) ||
+                    (!string.IsNullOrEmpty(u.Username) && u.Username == d.DriverName));
+
+                int? driverAreaId = matchingUser?.AreaId;
+                string areaName = "";
+                if (driverAreaId.HasValue)
+                {
+                    areaName = _context.Areas.Find(driverAreaId.Value)?.Name ?? "";
+                }
+
+                // Assignment info cho tháng hiện tại
+                var assignment = currentAssignments.FirstOrDefault(a => a.DriverId == d.Id);
+
+                return new
+                {
+                    id = d.Id,
+                    name = d.DriverName,
+                    phone = d.Phone,
+                    status = d.Status,
+                    areaId = driverAreaId,
+                    areaName,
+                    hasAssignment = assignment != null,
+                    assignedAreaName = assignment?.Area?.Name ?? "",
+                    plannedOrders = assignment?.PlannedOrders ?? 0,
+                    zoneCount = !string.IsNullOrEmpty(assignment?.ZoneIds)
+                        ? assignment.ZoneIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Length : 0
+                };
+            }).ToList();
+
+            // Filter by area nếu có
+            if (areaId.HasValue && areaId > 0)
+            {
+                // Lọc tài xế thuộc khu vực hoặc chưa gán khu vực
+                result = result.Where(d => d.areaId == areaId || d.areaId == null).ToList();
+            }
+
+            return Json(result);
         }
 
         // ══════════════════════════════════════════════════════
@@ -410,12 +477,23 @@ namespace KhoaLuanTotNghiep.Controllers
                     };
                 }).ToList();
 
-                // ── 3. Load drivers
-                var drivers = _context.Drivers
-                    .Where(d => d.Status == "DangLam")
-                    .Take(req.DriverCount > 0 ? req.DriverCount : 10)
-                    .Select(d => new DriverSlot { DriverId = d.Id, DriverName = d.DriverName })
-                    .ToList();
+                // ── 3. Load drivers (hỗ trợ chọn cụ thể hoặc lấy top N)
+                List<DriverSlot> drivers;
+                if (req.DriverIds != null && req.DriverIds.Any())
+                {
+                    drivers = _context.Drivers
+                        .Where(d => req.DriverIds.Contains(d.Id) && d.Status == "DangLam")
+                        .Select(d => new DriverSlot { DriverId = d.Id, DriverName = d.DriverName })
+                        .ToList();
+                }
+                else
+                {
+                    drivers = _context.Drivers
+                        .Where(d => d.Status == "DangLam")
+                        .Take(req.DriverCount > 0 ? req.DriverCount : 10)
+                        .Select(d => new DriverSlot { DriverId = d.Id, DriverName = d.DriverName })
+                        .ToList();
+                }
 
                 if (drivers.Count == 0)
                     return Json(new { success = false, message = "Không có tài xế đang làm việc." });
@@ -508,7 +586,8 @@ namespace KhoaLuanTotNghiep.Controllers
                         PlannedCustomers = item.TotalCustomers,
                         TotalDistance    = item.TotalDistance,
                         ZoneIds          = string.Join(",", item.ZoneIds),
-                        ActualOrders     = 0
+                        ActualOrders     = 0,
+                        ActualCustomers  = 0
                     };
                     _context.Assignments.Add(assignment);
                 }
@@ -546,6 +625,7 @@ namespace KhoaLuanTotNghiep.Controllers
             public int Month                { get; set; }
             public int Year                 { get; set; }
             public int DriverCount          { get; set; } = 10;
+            public List<int> DriverIds      { get; set; }  // Danh sách ID tài xế cụ thể
             public int MaxOrdersPerDriver   { get; set; } = int.MaxValue;
             public int MaxCustomersPerDriver{ get; set; } = int.MaxValue;
         }

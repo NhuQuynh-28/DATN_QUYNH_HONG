@@ -873,45 +873,57 @@ function saveZone(){
         /* ================= UPDATE ================= */
 
         function updateZone(){
+            if(!selectedPolygon || !selectedId){
+                showToast("Vui lòng kích chọn một vùng trên bản đồ để cập nhật!", "error");
+                return;
+            }
 
-        if(!selectedPolygon){
-        alert("Chọn vùng");
-        return;
-        }
+            // Lấy tọa độ hiện tại (sau khi đã edit)
+            let coords = selectedPolygon.getLatLngs();
+            let latlngs = Array.isArray(coords[0]) ? coords[0] : coords;
+            
+            if (!latlngs || latlngs.length === 0) {
+                showToast("Không tìm thấy dữ liệu tọa độ!", "error");
+                return;
+            }
 
-        let coords=selectedPolygon.getLatLngs()[0];
+            let pts = [];
+            latlngs.forEach(c => {
+                pts.push([c.lat, c.lng]);
+            });
 
-        let pts=[];
+            let area = calculateArea(latlngs);
+            let center = selectedPolygon.getBounds().getCenter();
 
-        coords.forEach(c=>{
-        pts.push([c.lat,c.lng]);
-        });
-
-        let center=getCenter(pts);
-
-        fetch('/Zone/UpdateZone',{
-        method:'POST',
-        headers:{
-        'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-
-        Id:selectedId,
-        Points:JSON.stringify(pts),
-        CenterLat:center.lat,
-        CenterLng:center.lng
-
-        })
-        })
-        .then(r=>r.json())
-        .then(d=>{
-
-        if(d.success){
-        alert("Đã cập nhật");
-        }
-
-        })
-
+            fetch('/Zone/UpdateZone',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    Id: selectedId,
+                    ZoneName: selectedPolygon.zoneName || '',
+                    Points: JSON.stringify(pts),
+                    CenterLat: center.lat,
+                    CenterLng: center.lng,
+                    Area: area,
+                    VersionId: versionId
+                })
+            })
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){
+                    showToast(`Đã cập nhật vùng thành công! ✅`,'success');
+                    // Reload zones để cập nhật center labels mới
+                    loadZones(versionId);
+                } else {
+                    showToast('Cập nhật thất bại! Vui lòng thử lại.','error');
+                }
+            })
+            .catch(err=>{
+                console.error(err);
+                showToast('Lỗi kết nối khi cập nhật!','error');
+            });
         }
 
         /* ================= DELETE ALL ================= */
@@ -1175,6 +1187,11 @@ function saveZone(){
                 .um-reason-chip { display:inline-block; background:#334155; border-radius:6px; padding:4px 10px; margin:3px; font-size:12px; color:#94a3b8; cursor:pointer; transition:all .15s; }
                 .um-reason-chip:hover { background:#3b82f6; color:white; }
                 .role-select { background:#0f172a; border:1px solid #334155; border-radius:6px; padding:4px 8px; color:#f1f5f9; font-size:12px; cursor:pointer; outline:none; }
+                .um-role-tabs { display:flex; gap:8px; margin-top:12px; }
+                .um-role-tab { padding:7px 16px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; background:#1e293b; border:1px solid #334155; color:#94a3b8; transition:all .2s; display:flex; align-items:center; gap:6px; }
+                .um-role-tab:hover { border-color:#475569; color:#e2e8f0; background:#1e293b; }
+                .um-role-tab.active { background:#3b82f6; border-color:#3b82f6; color:white; box-shadow:0 4px 12px rgba(59,130,246,.3); }
+                .um-role-tab i { font-size:10px; opacity:.8; }
                 </style>
                 <div class="um-wrap">
                   <div class="um-header">
@@ -1186,18 +1203,28 @@ function saveZone(){
                     </div>
                   </div>
                   <div class="um-toolbar">
-                    <input class="um-search" id="umSearch" placeholder="🔍  Tìm theo username, email..." oninput="umFilter()">
-                    <select class="um-filter" id="umFilterRole" onchange="umFilter()">
-                      <option value="">Tất cả Role</option>
-                      <option value="Admin">Admin</option>
-                      <option value="Dispatcher">Dispatcher</option>
-                      <option value="Driver">Driver</option>
-                    </select>
-                    <select class="um-filter" id="umFilterStatus" onchange="umFilter()">
-                      <option value="">Tất cả trạng thái</option>
-                      <option value="approved">Đã duyệt</option>
-                      <option value="pending">Chờ duyệt</option>
-                    </select>
+                    <div style="flex:1">
+                        <input class="um-search" id="umSearch" placeholder="🔍  Tìm theo username, email..." oninput="umFilter()">
+                        <div class="um-role-tabs">
+                          <div class="um-role-tab active" data-role="" onclick="setRoleFilter('')"><i class="fas fa-users"></i> Tất cả</div>
+                          <div class="um-role-tab" data-role="Admin" onclick="setRoleFilter('Admin')"><i class="fas fa-user-shield"></i> Admin</div>
+                          <div class="um-role-tab" data-role="Dispatcher" onclick="setRoleFilter('Dispatcher')"><i class="fas fa-headset"></i> Dispatcher</div>
+                          <div class="um-role-tab" data-role="Driver" onclick="setRoleFilter('Driver')"><i class="fas fa-truck"></i> Driver</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:flex-start">
+                        <select class="um-filter" id="umFilterStatus" onchange="umFilter()" style="height:38px">
+                          <option value="">Tất cả trạng thái</option>
+                          <option value="approved">Đã duyệt</option>
+                          <option value="pending">Chờ duyệt</option>
+                        </select>
+                        <select class="um-filter" id="umFilterRole" onchange="syncRolePills(this.value);umFilter()" style="display:none">
+                          <option value="">Tất cả Role</option>
+                          <option value="Admin">Admin</option>
+                          <option value="Dispatcher">Dispatcher</option>
+                          <option value="Driver">Driver</option>
+                        </select>
+                    </div>
                   </div>
                   <div class="um-table-wrap">
                     <table class="um-table" id="umTable">
@@ -1272,6 +1299,19 @@ function saveZone(){
                 </div>`;
 
                 document.getElementById("content-area").innerHTML = html;
+            });
+        }
+
+        function setRoleFilter(role){
+            let sel = document.getElementById('umFilterRole');
+            if(sel) sel.value = role;
+            syncRolePills(role);
+            umFilter();
+        }
+
+        function syncRolePills(role){
+            document.querySelectorAll('.um-role-tab').forEach(t=>{
+                t.classList.toggle('active', (t.dataset.role||'') === (role||''));
             });
         }
 
