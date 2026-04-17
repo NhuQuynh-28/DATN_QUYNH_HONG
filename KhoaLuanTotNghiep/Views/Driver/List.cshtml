@@ -26,25 +26,19 @@
 .dm-stat .val { font-size:24px; font-weight:800; color:var(--c,#3b82f6); }
 .dm-stat .lbl { font-size:11px; color:#64748b; margin-top:2px; font-weight:600; text-transform:uppercase; }
 
-/* TABS */
-.dm-tabs { display:flex; gap:4px; margin-bottom:20px; background:#1e293b; border-radius:10px; padding:4px; width:fit-content; }
-.dm-tab {
-    padding:8px 20px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
-    color:#64748b; transition:all .2s; display:flex; align-items:center; gap:6px; border:none; background:none;
-}
-.dm-tab.active { background:#3b82f6; color:white; }
-.dm-tab:hover:not(.active) { color:#e2e8f0; background:#334155; }
+/* FILTER BAR */
+.dm-filter { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; background:#1e293b; border-radius:12px; padding:12px 16px; border:1px solid #334155; }
+.dm-filter label { font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; }
+.dm-select { background:#0f172a; border:1px solid #334155; border-radius:7px; padding:7px 10px; color:#f1f5f9; font-size:12px; outline:none; }
+.dm-select:focus { border-color:#3b82f6; }
+.dm-btn-filter { display:inline-flex; align-items:center; gap:6px; background:#334155; color:#e2e8f0; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; }
+.dm-btn-filter:hover { background:#475569; }
 
-/* PANELS */
-.dm-panel { display:none; }
-.dm-panel.active { display:block; }
-
-/* TOOLBAR */
-.dm-toolbar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
-.dm-search { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:8px 12px; color:#f1f5f9; font-size:13px; outline:none; }
-.dm-search:focus { border-color:#3b82f6; }
-.dm-btn-add { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; border:none; padding:9px 18px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .15s; }
-.dm-btn-add:hover { opacity:.88; }
+/* MONTH SUMMARY CARDS */
+.dm-month-stats { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+.dm-mstat { background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 16px; text-align:center; }
+.dm-mstat .mv { font-size:18px; font-weight:800; color:var(--c,#3b82f6); }
+.dm-mstat .ml { font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; margin-top:2px; }
 
 /* TABLE */
 .dm-table-wrap { background:#1e293b; border-radius:14px; border:1px solid #334155; overflow:hidden; }
@@ -59,46 +53,11 @@
 .dm-driver-cell { display:flex; align-items:center; gap:10px; }
 .dm-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#6366f1); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; font-weight:700; color:white; }
 
-/* STATUS BADGE */
-.dm-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
-.dm-badge-active   { background:#16a34a22; color:#4ade80; border:1px solid #16a34a44; }
-.dm-badge-inactive { background:#dc262622; color:#f87171; border:1px solid #dc262644; }
-.dm-badge-leave    { background:#78716c22; color:#a8a29e; border:1px solid #78716c44; }
-
-/* ASSIGNMENT CHIP */
-.dm-chip { display:inline-flex; align-items:center; gap:4px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:3px 9px; font-size:11px; color:#94a3b8; }
-
 /* ACTIONS */
 .dm-acts { display:flex; gap:6px; }
 .dm-act { display:inline-flex; align-items:center; gap:4px; padding:6px 11px; border-radius:7px; border:none; font-size:11px; font-weight:700; cursor:pointer; transition:all .15s; }
 .dm-act-edit  { background:#1c3d5a; color:#38bdf8; }
 .dm-act-edit:hover  { background:#0284c7; color:white; }
-.dm-act-del   { background:#3d1c1c; color:#f87171; }
-.dm-act-del:hover   { background:#dc2626; color:white; }
-
-/* FILTER BAR (tab month) */
-.dm-filter { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; background:#1e293b; border-radius:12px; padding:12px 16px; border:1px solid #334155; }
-.dm-filter label { font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; }
-.dm-select { background:#0f172a; border:1px solid #334155; border-radius:7px; padding:7px 10px; color:#f1f5f9; font-size:12px; outline:none; }
-.dm-select:focus { border-color:#3b82f6; }
-.dm-btn-filter { display:inline-flex; align-items:center; gap:6px; background:#334155; color:#e2e8f0; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; }
-.dm-btn-filter:hover { background:#475569; }
-
-/* MONTH SUMMARY CARDS */
-.dm-month-stats { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
-.dm-mstat { background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 16px; text-align:center; }
-.dm-mstat .mv { font-size:18px; font-weight:800; color:var(--c,#3b82f6); }
-.dm-mstat .ml { font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; margin-top:2px; }
-
-/* ASSIGNMENT TABLE */
-.dm-at { width:100%; border-collapse:collapse; font-size:12px; }
-.dm-at th { padding:10px 12px; text-align:left; color:#64748b; font-weight:700; font-size:11px; text-transform:uppercase; background:#0f172a; }
-.dm-at td { padding:11px 12px; border-bottom:1px solid #1e293b; color:#e2e8f0; vertical-align:middle; }
-.dm-at tr:hover td { background:#0f172a55; }
-.dm-ok-yes { color:#4ade80; font-weight:700; }
-.dm-ok-no  { color:#f87171; font-weight:700; }
-.dm-progress-bar { background:#1e293b; border-radius:4px; height:6px; overflow:hidden; min-width:60px; }
-.dm-progress-fill { height:100%; border-radius:4px; background:#3b82f6; }
 
 /* EMPTY STATE */
 .dm-empty { text-align:center; padding:60px 20px; }
@@ -118,6 +77,29 @@
 .dm-modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid #334155; }
 .dm-btn-cancel { background:#334155; border:none; border-radius:8px; padding:9px 18px; color:#94a3b8; font-size:13px; cursor:pointer; }
 .dm-btn-save { background:linear-gradient(135deg,#3b82f6,#2563eb); border:none; border-radius:8px; padding:9px 22px; color:white; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* SECTION CARDS */
+.eval-section { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:18px; margin-bottom:18px; }
+.eval-section-title { font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.eval-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px; }
+.eval-card { background:#0f172a; border-radius:10px; padding:14px; }
+.eval-card-label { font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; margin-bottom:6px; }
+.eval-card-value { font-size:22px; font-weight:800; }
+.eval-card-sub { font-size:12px; color:#94a3b8; margin-top:4px; }
+.eval-mini { display:flex; gap:16px; }
+.eval-mini-item .mini-label { font-size:10px; color:#475569; }
+.eval-mini-item .mini-value { font-size:16px; font-weight:700; }
+
+/* TABS for sub-sections */
+.eval-tabs { display:flex; gap:4px; margin-bottom:16px; background:#1e293b; border-radius:10px; padding:4px; width:fit-content; }
+.eval-tab {
+    padding:8px 20px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;
+    color:#64748b; transition:all .2s; display:flex; align-items:center; gap:6px; border:none; background:none;
+}
+.eval-tab.active { background:#3b82f6; color:white; }
+.eval-tab:hover:not(.active) { color:#e2e8f0; background:#334155; }
+.eval-panel { display:none; }
+.eval-panel.active { display:block; }
 </style>
 
 <div class="dm-wrap">
@@ -138,284 +120,97 @@
         </div>
     </div>
 
-    <!-- TABS -->
-    <div class="dm-tabs">
-        <button class="dm-tab active" id="tab-list" onclick="switchTab('list')">
-            <i class="fas fa-users"></i> Danh sách tài xế
+    <!-- EVAL TABS -->
+    <div class="eval-tabs">
+        <button class="eval-tab active" id="evtab-solution" onclick="switchEvalTab('solution')">
+            <i class="fas fa-chart-pie"></i> Đánh giá tổng thể Solution
         </button>
-        <button class="dm-tab" id="tab-month" onclick="switchTab('month')">
-            <i class="fas fa-calendar-alt"></i> Phân công theo tháng
+        <button class="eval-tab" id="evtab-driver" onclick="switchEvalTab('driver')">
+            <i class="fas fa-user-check"></i> Đánh giá từng tài xế
         </button>
-        <button class="dm-tab" id="tab-detail" onclick="switchTab('detail')">
-            <i class="fas fa-clipboard-list"></i> Lịch sử phân công
+        <button class="eval-tab" id="evtab-dispatcher" onclick="switchEvalTab('dispatcher')">
+            <i class="fas fa-user-tie"></i> Đánh giá người điều phối
         </button>
     </div>
 
-    <!-- PANEL 1: DANH SÁCH TÀI XẾ -->
-    <div class="dm-panel active" id="panel-list">
-        <div class="dm-toolbar">
-            <input class="dm-search" id="driverSearch" placeholder="🔍 Tìm tên tài xế..." oninput="filterDriverTable()" style="width:220px">
-            <select class="dm-select" id="statusFilter" onchange="filterDriverTable()">
-                <option value="">Tất cả trạng thái</option>
-                <option value="DangLam">Đang làm</option>
-                <option value="NghiLam">Nghỉ làm</option>
-                <option value="RoiBo">Rời bỏ</option>
-            </select>
-            <button class="dm-btn-add" onclick="openDriverModal()">
-                <i class="fas fa-plus-circle"></i> Thêm tài xế
-            </button>
-        </div>
-        <div class="dm-table-wrap">
-            <table class="dm-table" id="driverTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Tài xế</th>
-                        <th>Số điện thoại</th>
-                        <th>Trạng thái</th>
-                        <th><i class="fas fa-calendar-check"></i> PC tháng @now_month</th>
-                        <th>Ngày tạo</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody id="driverTbody">
-                @{ int idx = 0; }
-                @foreach (var d in Model)
+    <!-- FILTER -->
+    <div class="dm-filter">
+        <div>
+            <label>Tháng</label>
+            <select class="dm-select" id="mf-month">
+                @for (int i = 1; i <= 12; i++)
                 {
-                    idx++;
-                    int assignCount = assignmentCounts.ContainsKey(d.Id) ? assignmentCounts[d.Id] : 0;
-                    string initial = d.DriverName?.Length > 0 ? d.DriverName[0].ToString().ToUpper() : "?";
-                    string badgeClass = d.Status switch {
-                        "DangLam" => "dm-badge-active",
-                        "NghiLam" => "dm-badge-inactive",
-                        _         => "dm-badge-leave"
-                    };
-                    string statusLabel = d.Status switch {
-                        "DangLam" => "Đang làm",
-                        "NghiLam" => "Nghỉ làm",
-                        "RoiBo"   => "Rời bỏ",
-                        _         => d.Status
-                    };
-                    <tr data-name="@d.DriverName?.ToLower()" data-status="@d.Status">
-                        <td style="color:#475569;font-weight:700">@idx</td>
-                        <td>
-                            <div class="dm-driver-cell">
-                                <div class="dm-avatar">@initial</div>
-                                <div>
-                                    <div style="font-weight:700;color:#f1f5f9">@d.DriverName</div>
-                                    <div style="font-size:11px;color:#475569">ID: @d.Id</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="color:#94a3b8">@d.Phone</td>
-                        <td><span class="dm-badge @badgeClass"><i class="fas fa-circle" style="font-size:7px"></i> @statusLabel</span></td>
-                        <td>
-                            <span class="dm-chip"><i class="fas fa-briefcase"></i> @assignCount lần</span>
-                        </td>
-                        <td style="font-size:12px;color:#64748b">@d.CreatedAt.ToString("dd/MM/yyyy")</td>
-                        <td>
-                            <div class="dm-acts">
-                                <button class="dm-act dm-act-edit" onclick="editDriver(@d.Id,'@d.DriverName','@d.Phone','@d.Status')">
-                                    <i class="fas fa-pen"></i> Sửa
-                                </button>
-                                <button class="dm-act dm-act-del" onclick="deleteDriver(@d.Id)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    if (i == now_month)
+                    { <option value="@i" selected>Tháng @i</option> }
+                    else
+                    { <option value="@i">Tháng @i</option> }
                 }
-                </tbody>
-            </table>
-            @if (!Model.Any())
-            {
-                <div class="dm-empty">
-                    <i class="fas fa-truck"></i>
-                    <div class="et">Chưa có tài xế nào</div>
-                    <div class="es">Nhấn "Thêm tài xế" để bắt đầu</div>
-                </div>
-            }
+            </select>
         </div>
+        <div>
+            <label>Năm</label>
+            <select class="dm-select" id="mf-year">
+                @for (int y = now_year; y >= now_year - 2; y--)
+                {
+                    if (y == now_year)
+                    { <option value="@y" selected>@y</option> }
+                    else
+                    { <option value="@y">@y</option> }
+                }
+            </select>
+        </div>
+        <div>
+            <label>Khu vực</label>
+            <select class="dm-select" id="mf-area">
+                <option value="">Tất cả</option>
+                @foreach (dynamic a in areas)
+                {
+                    <option value="@a.Id">@a.Name</option>
+                }
+            </select>
+        </div>
+        <button class="dm-btn-filter" onclick="loadEvaluation()">
+            <i class="fas fa-chart-bar"></i> Đánh giá
+        </button>
     </div>
 
-    <!-- PANEL 2: PHÂN CÔNG THEO THÁNG - ĐÁNH GIÁ TOÀN DIỆN -->
-    <div class="dm-panel" id="panel-month">
-        <!-- FILTER -->
-        <div class="dm-filter">
-            <div>
-                <label>Tháng</label>
-                <select class="dm-select" id="mf-month">
-                    @for (int i = 1; i <= 12; i++)
-                    {
-                        if (i == now_month)
-                        { <option value="@i" selected>Tháng @i</option> }
-                        else
-                        { <option value="@i">Tháng @i</option> }
-                    }
-                </select>
-            </div>
-            <div>
-                <label>Năm</label>
-                <select class="dm-select" id="mf-year">
-                    @for (int y = now_year; y >= now_year - 2; y--)
-                    {
-                        if (y == now_year)
-                        { <option value="@y" selected>@y</option> }
-                        else
-                        { <option value="@y">@y</option> }
-                    }
-                </select>
-            </div>
-            <div>
-                <label>Khu vực</label>
-                <select class="dm-select" id="mf-area">
-                    <option value="">Tất cả</option>
-                    @foreach (dynamic a in areas)
-                    {
-                        <option value="@a.Id">@a.Name</option>
-                    }
-                </select>
-            </div>
-            <button class="dm-btn-filter" onclick="loadEvaluation()">
-                <i class="fas fa-chart-bar"></i> Đánh giá
-            </button>
-        </div>
-
-        <!-- TỔNG QUAN THÁNG -->
+    <!-- ======== PANEL 1: ĐÁNH GIÁ TỔNG THỂ SOLUTION ======== -->
+    <div class="eval-panel active" id="evpanel-solution">
         <div id="evalOverview" style="margin-bottom:18px"></div>
-
-        <!-- ĐÁNH GIÁ SOLUTION -->
         <div id="evalSolution" style="margin-bottom:18px"></div>
-
-        <!-- SO SÁNH VỚI THÁNG TRƯỚC -->
         <div id="evalComparison" style="margin-bottom:18px"></div>
+    </div>
 
-        <!-- BẢNG ĐÁNH GIÁ TỪNG TÀI XẾ -->
+    <!-- ======== PANEL 2: ĐÁNH GIÁ TỪNG TÀI XẾ ======== -->
+    <div class="eval-panel" id="evpanel-driver">
         <div id="evalDrivers"></div>
     </div>
-    <!-- PANEL 3: LỊCH SỬ PHÂN CÔNG -->
-    <div class="dm-panel" id="panel-detail">
-        <!-- FILTER -->
-        <div class="dm-filter">
-            <div>
-                <label>Tài xế</label>
-                <input class="dm-search" id="df-driver" placeholder="Tên tài xế..." style="width:160px">
-            </div>
-            <div>
-                <label>Khu vực</label>
-                <select class="dm-select" id="df-area">
-                    <option value="">Tất cả</option>
-                    @foreach (dynamic a in areas)
-                    {
-                        <option value="@a.Id">@a.Name</option>
-                    }
-                </select>
-            </div>
-            <div>
-                <label>Kết quả</label>
-                <select class="dm-select" id="df-status">
-                    <option value="">Tất cả</option>
-                    <option value="ok">✅ Đạt chỉ tiêu</option>
-                    <option value="fail">❌ Chưa đạt</option>
-                </select>
-            </div>
-            <button class="dm-btn-filter" onclick="loadDetailData()">
-                <i class="fas fa-search"></i> Lọc
-            </button>
-            <button class="dm-btn-filter" onclick="clearDetailFilter()" style="background:#475569">
-                <i class="fas fa-times"></i> Xóa lọc
-            </button>
-        </div>
 
-        <!-- DETAIL SUMMARY -->
-        <div id="detailSummary" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"></div>
-
-        <!-- TABLE -->
-        <div class="dm-table-wrap">
-            <table class="dm-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Tài xế</th>
-                        <th>Khu vực</th>
-                        <th>Điều phối</th>
-                        <th>Tháng/Năm</th>
-                        <th>Số vùng</th>
-                        <th>Dự kiến</th>
-                        <th>Thực tế</th>
-                        <th>Tiến độ</th>
-                        <th>Ngày</th>
-                    </tr>
-                </thead>
-                <tbody id="detailTbody">
-                    <tr><td colspan="9" style="text-align:center;padding:40px;color:#475569">
-                        <i class="fas fa-clipboard-list" style="font-size:28px;display:block;margin-bottom:10px"></i>
-                        Nhấn "Lọc" để xem dữ liệu phân công
-                    </td></tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- ======== PANEL 3: ĐÁNH GIÁ NGƯỜI ĐIỀU PHỐI ======== -->
+    <div class="eval-panel" id="evpanel-dispatcher">
+        <div id="evalDispatcher"></div>
     </div>
 
+</div>
 
+<!-- MODAL -->
 <div class="dm-overlay" id="driverOverlay" onclick="if(event.target===this)closeDriverModal()">
     <div class="dm-modal">
-        <h3 id="modalTitle"><i class="fas fa-user-plus" style="color:#3b82f6"></i> Thêm tài xế</h3>
-        <input type="hidden" id="editId">
-        <div class="dm-field">
-            <label>Họ tên <span style="color:#ef4444">*</span></label>
-            <input class="dm-input" id="f-name" placeholder="Nguyễn Văn A">
-        </div>
-        <div class="dm-field">
-            <label>Số điện thoại</label>
-            <input class="dm-input" id="f-phone" placeholder="0912345678">
-        </div>
-        <div class="dm-field">
-            <label>Trạng thái</label>
-            <select class="dm-input" id="f-status">
-                <option value="DangLam">Đang làm</option>
-                <option value="NghiLam">Nghỉ làm</option>
-                <option value="RoiBo">Rời bỏ</option>
-            </select>
-        </div>
+        <h3 id="modalTitle"><i class="fas fa-clipboard-check" style="color:#4ade80"></i> Nhập thực tế</h3>
         <div class="dm-modal-footer">
             <button class="dm-btn-cancel" onclick="closeDriverModal()">Hủy</button>
-            <button class="dm-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Lưu</button>
+            <button class="dm-btn-save" onclick="closeDriverModal()"><i class="fas fa-save"></i> Lưu</button>
         </div>
-    </div>
-
-    <!-- MAP PREVIEW AT BOTTOM -->
-    <div class="dp-map-wrap" style="margin-top:20px;">
-        <div class="dp-map-header">
-            <div class="dp-map-title">
-                <i class="fas fa-map-marked-alt" style="color:#f59e0b"></i> Xem chi tiết vùng phân công
-                <span id="dmMapTitle" style="font-size:12px;color:#64748b;font-weight:400;margin-left:12px">Chọn một dòng phân công để xem bản đồ</span>
-            </div>
-        </div>
-        <div id="dmMap" style="height:450px; background:#0f172a"></div>
     </div>
 </div>
 
 <script>
-/* ===== TABS ===== */
-function switchTab(tab) {
-    document.querySelectorAll('.dm-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.dm-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('panel-' + tab).classList.add('active');
-    if (tab === 'month') loadEvaluation();
-}
-
-/* ===== FILTER DRIVER TABLE ===== */
-function filterDriverTable() {
-    let q = document.getElementById('driverSearch').value.toLowerCase();
-    let s = document.getElementById('statusFilter').value;
-    document.querySelectorAll('#driverTbody tr').forEach(tr => {
-        let name   = tr.dataset.name   || '';
-        let status = tr.dataset.status || '';
-        let show = name.includes(q) && (!s || status === s);
-        tr.style.display = show ? '' : 'none';
-    });
+/* ===== EVAL TABS ===== */
+function switchEvalTab(tab) {
+    document.querySelectorAll('.eval-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.eval-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('evtab-' + tab).classList.add('active');
+    document.getElementById('evpanel-' + tab).classList.add('active');
 }
 
 /* ===== LOAD EVALUATION DATA ===== */
@@ -441,75 +236,81 @@ function loadEvaluation() {
                     <div class="et">Chưa có dữ liệu phân công tháng ${m}/${y}</div>
                     <div class="es">Vào Điều phối để phân công tài xế trước</div>
                 </div>`;
+            document.getElementById('evalDispatcher').innerHTML = '';
             return;
         }
 
-        // === 1. OVERVIEW CARDS ===
+        // Find max/min driver
+        let maxDriver = drivers.reduce((a,b) => a.plannedOrders > b.plannedOrders ? a : b);
+        let minDriver = drivers.reduce((a,b) => a.plannedOrders < b.plannedOrders ? a : b);
+
+        // ===== PANEL 1: TỔNG THỂ SOLUTION =====
         let diffColor = s.totalOrderDiffPct > 20 ? '#f87171' : s.totalOrderDiffPct > 10 ? '#fbbf24' : '#4ade80';
         let changePctHtml = p.ordersChangePct !== 0 ?
             `<span style="font-size:11px;color:${p.ordersChangePct>0?'#4ade80':'#f87171'}">${p.ordersChangePct>0?'▲':'▼'} ${Math.abs(p.ordersChangePct)}% vs T${data.prevMonth}</span>` : '';
-        let actualChangePctHtml = p.actualChangePct !== 0 ?
-            `<span style="font-size:11px;color:${p.actualChangePct>0?'#4ade80':'#f87171'}">${p.actualChangePct>0?'▲':'▼'} ${Math.abs(p.actualChangePct)}% vs T${data.prevMonth}</span>` : '';
 
+        // Overview cards
         document.getElementById('evalOverview').innerHTML = `
             <div style="display:flex; gap:10px; flex-wrap:wrap">
                 <div class="dm-mstat" style="--c:#3b82f6"><div class="mv">${s.totalDrivers}</div><div class="ml">Tài xế</div></div>
                 <div class="dm-mstat" style="--c:#8b5cf6"><div class="mv">${s.totalPolygons}</div><div class="ml">Polygon</div><div style="font-size:10px;color:#64748b">TB: ${s.avgPolygons}/TX</div></div>
                 <div class="dm-mstat" style="--c:#f59e0b"><div class="mv">${s.totalPlannedOrders}</div><div class="ml">Đơn dự kiến</div>${changePctHtml}</div>
-                <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${s.totalActualOrders}</div><div class="ml">Đơn thực tế</div>${actualChangePctHtml}</div>
+                <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${s.totalActualOrders}</div><div class="ml">Đơn thực tế</div></div>
                 <div class="dm-mstat" style="--c:#06b6d4"><div class="mv">${s.totalPlannedCustomers}</div><div class="ml">KH dự kiến</div></div>
                 <div class="dm-mstat" style="--c:#22d3ee"><div class="mv">${s.totalActualCustomers}</div><div class="ml">KH thực tế</div></div>
-                <div class="dm-mstat" style="--c:${diffColor}"><div class="mv">${s.totalOrderDiff}</div><div class="ml">Hao hụt đơn</div><div style="font-size:10px;color:${diffColor}">${s.totalOrderDiffPct}%</div></div>
-                <div class="dm-mstat" style="--c:${diffColor}"><div class="mv">${s.totalCustomerDiff}</div><div class="ml">Hao hụt KH</div></div>
-            </div>
-        `;
+            </div>`;
 
-        // === 2. SOLUTION QUALITY ===
+        // Solution quality section
         let violationColor = s.totalViolations > 0 ? '#f87171' : '#4ade80';
         document.getElementById('evalSolution').innerHTML = `
-            <div style="background:#1e293b; border:1px solid #334155; border-radius:14px; padding:18px">
-                <div style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-                    <i class="fas fa-chart-pie" style="color:#8b5cf6"></i> Đánh giá chất lượng Solution
-                </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px">
-                    <div style="background:#0f172a;border-radius:10px;padding:14px">
-                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Độ nhỏ gọn (Compactness)</div>
-                        <div style="display:flex;gap:16px">
-                            <div><div style="font-size:10px;color:#475569">Min</div><div style="font-size:16px;font-weight:700;color:#4ade80">${s.compactnessMin.toLocaleString()}m</div></div>
-                            <div><div style="font-size:10px;color:#475569">TB</div><div style="font-size:16px;font-weight:700;color:#3b82f6">${s.compactnessAvg.toLocaleString()}m</div></div>
-                            <div><div style="font-size:10px;color:#475569">Max</div><div style="font-size:16px;font-weight:700;color:#f59e0b">${s.compactnessMax.toLocaleString()}m</div></div>
+            <div class="eval-section">
+                <div class="eval-section-title"><i class="fas fa-chart-pie" style="color:#8b5cf6"></i> Tiêu chí đánh giá tổng thể Solution</div>
+                <div class="eval-grid">
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tổng mức mất cân bằng</div>
+                        <div class="eval-card-value" style="color:#f59e0b">${s.orderStdDev}</div>
+                        <div class="eval-card-sub">Độ lệch chuẩn đơn hàng</div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Vi phạm cân bằng (±${s.balanceThresholdPct}%)</div>
+                        <div class="eval-card-value" style="color:${violationColor}">${s.totalViolations} <span style="font-size:12px;color:#64748b">tài xế vượt</span></div>
+                        <div class="eval-card-sub">Tổng mức vi phạm: <b style="color:${violationColor}">${s.totalViolationAmount}</b></div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tổng Compactness (Nhỏ gọn)</div>
+                        <div class="eval-mini">
+                            <div class="eval-mini-item"><div class="mini-label">Min</div><div class="mini-value" style="color:#4ade80">${s.compactnessMin.toLocaleString()}m</div></div>
+                            <div class="eval-mini-item"><div class="mini-label">TB</div><div class="mini-value" style="color:#3b82f6">${s.compactnessAvg.toLocaleString()}m</div></div>
+                            <div class="eval-mini-item"><div class="mini-label">Max</div><div class="mini-value" style="color:#f59e0b">${s.compactnessMax.toLocaleString()}m</div></div>
                         </div>
                     </div>
-                    <div style="background:#0f172a;border-radius:10px;padding:14px">
-                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Vi phạm cân bằng (±${s.balanceThresholdPct}%)</div>
-                        <div style="font-size:22px;font-weight:800;color:${violationColor}">${s.totalViolations} <span style="font-size:12px;color:#64748b">tài xế vượt</span></div>
-                        <div style="font-size:12px;color:#94a3b8;margin-top:4px">Tổng mức vi phạm: <b style="color:${violationColor}">${s.totalViolationAmount}</b></div>
-                    </div>
-                    <div style="background:#0f172a;border-radius:10px;padding:14px">
-                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Mức mất cân bằng</div>
-                        <div style="font-size:22px;font-weight:800;color:#f59e0b">${s.orderStdDev}</div>
-                        <div style="font-size:12px;color:#94a3b8;margin-top:4px">Độ lệch chuẩn đơn hàng</div>
-                    </div>
-                    <div style="background:#0f172a;border-radius:10px;padding:14px">
-                        <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">TB/Tài xế</div>
-                        <div style="display:flex;gap:16px">
-                            <div><div style="font-size:10px;color:#475569">Đơn</div><div style="font-size:16px;font-weight:700;color:#3b82f6">${s.avgOrders}</div></div>
-                            <div><div style="font-size:10px;color:#475569">KH</div><div style="font-size:16px;font-weight:700;color:#06b6d4">${s.avgCustomers}</div></div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">TB / Tài xế</div>
+                        <div class="eval-mini">
+                            <div class="eval-mini-item"><div class="mini-label">Đơn</div><div class="mini-value" style="color:#3b82f6">${s.avgOrders}</div></div>
+                            <div class="eval-mini-item"><div class="mini-label">KH</div><div class="mini-value" style="color:#06b6d4">${s.avgCustomers}</div></div>
                         </div>
                     </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tài xế NHIỀU nhất</div>
+                        <div style="font-size:14px;font-weight:700;color:#f59e0b">${maxDriver.driverName}</div>
+                        <div class="eval-card-sub">${maxDriver.plannedOrders} đơn · ${maxDriver.plannedCustomers} KH · ${maxDriver.zoneCount} vùng</div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tài xế ÍT nhất</div>
+                        <div style="font-size:14px;font-weight:700;color:#06b6d4">${minDriver.driverName}</div>
+                        <div class="eval-card-sub">${minDriver.plannedOrders} đơn · ${minDriver.plannedCustomers} KH · ${minDriver.zoneCount} vùng</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            </div>`;
 
-        // === 3. COMPARISON WITH PREV MONTH ===
+        // Comparison section
         let prevDiffColor = p.totalDiffPct > 20 ? '#f87171' : p.totalDiffPct > 10 ? '#fbbf24' : '#4ade80';
         document.getElementById('evalComparison').innerHTML = `
-            <div style="background:#1e293b; border:1px solid #334155; border-radius:14px; padding:18px">
-                <div style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-                    <i class="fas fa-exchange-alt" style="color:#f59e0b"></i> So sánh Tháng ${m} vs Tháng ${data.prevMonth}
-                </div>
+            <div class="eval-section">
+                <div class="eval-section-title"><i class="fas fa-exchange-alt" style="color:#f59e0b"></i> So sánh Tháng ${m} vs Tháng ${data.prevMonth}</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                    <div class="eval-card">
                         <div style="font-size:13px;font-weight:700;color:#3b82f6;margin-bottom:10px">📅 Tháng ${m}/${y}</div>
                         <table style="width:100%;font-size:12px;color:#94a3b8">
                             <tr><td>Tài xế</td><td style="text-align:right;color:#f1f5f9;font-weight:700">${s.totalDrivers}</td></tr>
@@ -520,7 +321,7 @@ function loadEvaluation() {
                             <tr><td>Hao hụt đơn</td><td style="text-align:right;color:${diffColor};font-weight:700">${s.totalOrderDiff} (${s.totalOrderDiffPct}%)</td></tr>
                         </table>
                     </div>
-                    <div style="background:#0f172a;border-radius:10px;padding:14px">
+                    <div class="eval-card">
                         <div style="font-size:13px;font-weight:700;color:#64748b;margin-bottom:10px">📅 Tháng ${data.prevMonth}/${data.prevYear}</div>
                         <table style="width:100%;font-size:12px;color:#94a3b8">
                             <tr><td>Tài xế</td><td style="text-align:right;color:#f1f5f9;font-weight:700">${p.totalDrivers || 0}</td></tr>
@@ -532,18 +333,16 @@ function loadEvaluation() {
                         </table>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
 
-        // === 4. PER-DRIVER TABLE ===
+        // ===== PANEL 2: PER-DRIVER TABLE =====
         let driverRows = drivers.map((d, i) => {
             let balanceBadge = d.violatesBalance
                 ? `<span style="color:#f87171;font-weight:700;font-size:11px"><i class="fas fa-exclamation-triangle"></i> Vượt ${d.violationAmount}</span>`
                 : `<span style="color:#4ade80;font-size:11px"><i class="fas fa-check-circle"></i> OK</span>`;
-            let diffColor = Math.abs(d.orderDiffPct) > 20 ? '#f87171' : Math.abs(d.orderDiffPct) > 10 ? '#fbbf24' : '#4ade80';
+            let dColor = Math.abs(d.orderDiffPct) > 20 ? '#f87171' : Math.abs(d.orderDiffPct) > 10 ? '#fbbf24' : '#4ade80';
             let prevDiffC = Math.abs(d.prevOrderDiffPct) > 20 ? '#f87171' : Math.abs(d.prevOrderDiffPct) > 10 ? '#fbbf24' : '#4ade80';
 
-            // Zone detail rows
             let zoneRows = (d.zones || []).map(z => {
                 let real = z.ordersReal !== null ? z.ordersReal : '—';
                 let custReal = z.customersReal !== null ? z.customersReal : '—';
@@ -575,7 +374,7 @@ function loadEvaluation() {
                 <td style="font-weight:700;color:#4ade80">${d.actualOrders}</td>
                 <td style="font-weight:700;color:#06b6d4">${d.plannedCustomers}</td>
                 <td style="font-weight:700;color:#22d3ee">${d.actualCustomers}</td>
-                <td><span style="color:${diffColor};font-weight:700">${d.orderDiff>0?'+':''}${d.orderDiff} <span style="font-size:10px">(${d.orderDiffPct}%)</span></span></td>
+                <td><span style="color:${dColor};font-weight:700">${d.orderDiff>0?'+':''}${d.orderDiff} <span style="font-size:10px">(${d.orderDiffPct}%)</span></span></td>
                 <td style="font-size:11px;color:#94a3b8">${d.compactness.toLocaleString()}m</td>
                 <td>${balanceBadge}</td>
                 <td>
@@ -609,23 +408,108 @@ function loadEvaluation() {
         }).join('');
 
         document.getElementById('evalDrivers').innerHTML = `
-            <div class="dm-table-wrap">
-                <table class="dm-table">
-                    <thead><tr>
-                        <th>#</th>
-                        <th>Tài xế</th>
-                        <th title="Đơn hàng dự kiến">Đơn DK</th>
-                        <th title="Đơn hàng thực tế">Đơn TT</th>
-                        <th title="Khách hàng dự kiến">KH DK</th>
-                        <th title="Khách hàng thực tế">KH TT</th>
-                        <th>Hao hụt</th>
-                        <th title="Tổng khoảng cách tới tâm">Nhỏ gọn</th>
-                        <th>Cân bằng</th>
-                        <th>vs T${data.prevMonth}</th>
-                        <th></th>
-                    </tr></thead>
-                    <tbody>${driverRows}</tbody>
-                </table>
+            <div class="eval-section">
+                <div class="eval-section-title"><i class="fas fa-user-check" style="color:#4ade80"></i> Tiêu chí đánh giá phân công từng tài xế</div>
+                <div style="font-size:12px;color:#64748b;margin-bottom:12px">
+                    Nhấn vào từng dòng để xem chi tiết vùng. Các tiêu chí: tổng đơn, tổng KH, mức độ thiếu/vượt, compactness, chênh lệch so với kì trước.
+                </div>
+                <div class="dm-table-wrap">
+                    <table class="dm-table">
+                        <thead><tr>
+                            <th>#</th>
+                            <th>Tài xế</th>
+                            <th title="Đơn hàng dự kiến">Đơn DK</th>
+                            <th title="Đơn hàng thực tế">Đơn TT</th>
+                            <th title="Khách hàng dự kiến">KH DK</th>
+                            <th title="Khách hàng thực tế">KH TT</th>
+                            <th>Thiếu/Vượt</th>
+                            <th title="Tổng khoảng cách tới tâm">Compactness</th>
+                            <th>Cân bằng</th>
+                            <th>Δ vs T${data.prevMonth}</th>
+                            <th></th>
+                        </tr></thead>
+                        <tbody>${driverRows}</tbody>
+                    </table>
+                </div>
+            </div>`;
+
+        // ===== PANEL 3: ĐÁNH GIÁ NGƯỜI ĐIỀU PHỐI =====
+        // Section A: Chất lượng solution chuẩn bị apply cho tháng sau (= tiêu chí tổng thể)
+        // Section B: Chất lượng solution thực tế tháng trước (so sánh DK vs TT)
+        let prevOrderDiffAbs = p.totalPlannedOrders - p.totalActualOrders;
+        let prevCustDiffAbs = p.totalPlannedCustomers - p.totalActualCustomers;
+        let prevOrderDiffPctVal = p.totalPlannedOrders > 0 ? ((prevOrderDiffAbs / p.totalPlannedOrders) * 100).toFixed(1) : 0;
+        let prevCustDiffPctVal = p.totalPlannedCustomers > 0 ? ((prevCustDiffAbs / p.totalPlannedCustomers) * 100).toFixed(1) : 0;
+        let prevDiffColorD = Math.abs(prevOrderDiffPctVal) > 20 ? '#f87171' : Math.abs(prevOrderDiffPctVal) > 10 ? '#fbbf24' : '#4ade80';
+        let biendong = Math.abs(p.ordersChangePct) > 20 ? '#f87171' : Math.abs(p.ordersChangePct) > 10 ? '#fbbf24' : '#4ade80';
+
+        document.getElementById('evalDispatcher').innerHTML = `
+            <!-- A: Chất lượng solution cho tháng tới -->
+            <div class="eval-section">
+                <div class="eval-section-title"><i class="fas fa-clipboard-check" style="color:#3b82f6"></i> Chất lượng Solution chuẩn bị apply (Tháng ${m}/${y})</div>
+                <div style="font-size:12px;color:#64748b;margin-bottom:12px">
+                    Đánh giá solution mà người điều phối đã chuẩn bị cho tháng ${m}. Bao gồm mức cân bằng, compactness, phân bổ tài xế.
+                </div>
+                <div class="eval-grid">
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tổng mất cân bằng dự kiến</div>
+                        <div class="eval-card-value" style="color:#f59e0b">${s.orderStdDev}</div>
+                        <div class="eval-card-sub">Độ lệch chuẩn · ${s.totalViolations} TX vượt ngưỡng</div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tổng Compactness dự kiến</div>
+                        <div class="eval-card-value" style="color:#3b82f6">${s.compactnessAvg.toLocaleString()}m</div>
+                        <div class="eval-card-sub">TB khoảng cách tới tâm</div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tài xế nhiều nhất</div>
+                        <div style="font-size:14px;font-weight:700;color:#f59e0b">${maxDriver.driverName}</div>
+                        <div class="eval-card-sub">${maxDriver.plannedOrders} đơn · ${maxDriver.plannedCustomers} KH</div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Tài xế ít nhất</div>
+                        <div style="font-size:14px;font-weight:700;color:#06b6d4">${minDriver.driverName}</div>
+                        <div class="eval-card-sub">${minDriver.plannedOrders} đơn · ${minDriver.plannedCustomers} KH</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- B: Chất lượng thực tế tháng trước -->
+            <div class="eval-section">
+                <div class="eval-section-title"><i class="fas fa-history" style="color:#f59e0b"></i> Chất lượng thực tế tháng trước (Tháng ${data.prevMonth}/${data.prevYear})</div>
+                <div style="font-size:12px;color:#64748b;margin-bottom:12px">
+                    So sánh SL đơn/KH dự kiến khi điều phối tháng trước vs SL thực tế cuối tháng → đánh giá mức chênh lệch & biến động.
+                </div>
+                <div class="eval-grid">
+                    <div class="eval-card">
+                        <div class="eval-card-label">Đơn hàng</div>
+                        <table style="width:100%;font-size:12px;color:#94a3b8;margin-top:6px">
+                            <tr><td>Dự kiến</td><td style="text-align:right;color:#f59e0b;font-weight:700">${p.totalPlannedOrders}</td></tr>
+                            <tr><td>Thực tế</td><td style="text-align:right;color:#4ade80;font-weight:700">${p.totalActualOrders}</td></tr>
+                            <tr><td>Chênh lệch</td><td style="text-align:right;color:${prevDiffColorD};font-weight:700">${prevOrderDiffAbs} (${prevOrderDiffPctVal}%)</td></tr>
+                        </table>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Khách hàng</div>
+                        <table style="width:100%;font-size:12px;color:#94a3b8;margin-top:6px">
+                            <tr><td>Dự kiến</td><td style="text-align:right;color:#06b6d4;font-weight:700">${p.totalPlannedCustomers}</td></tr>
+                            <tr><td>Thực tế</td><td style="text-align:right;color:#22d3ee;font-weight:700">${p.totalActualCustomers}</td></tr>
+                            <tr><td>Chênh lệch</td><td style="text-align:right;color:${prevDiffColorD};font-weight:700">${prevCustDiffAbs} (${prevCustDiffPctVal}%)</td></tr>
+                        </table>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Mức độ biến động</div>
+                        <div class="eval-card-value" style="color:${biendong}">${Math.abs(p.ordersChangePct)}%</div>
+                        <div class="eval-card-sub">Thay đổi đơn hàng so với T${data.prevMonth > 1 ? data.prevMonth-1 : 12}</div>
+                    </div>
+                    <div class="eval-card">
+                        <div class="eval-card-label">Đánh giá chung</div>
+                        <div style="font-size:14px;font-weight:700;color:${Math.abs(prevOrderDiffPctVal) <= 10 ? '#4ade80' : Math.abs(prevOrderDiffPctVal) <= 20 ? '#fbbf24' : '#f87171'}">
+                            ${Math.abs(prevOrderDiffPctVal) <= 10 ? '✅ Tốt' : Math.abs(prevOrderDiffPctVal) <= 20 ? '⚠️ Trung bình' : '❌ Cần cải thiện'}
+                        </div>
+                        <div class="eval-card-sub">Sai lệch ${prevOrderDiffPctVal}% đơn hàng</div>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -644,7 +528,6 @@ function toggleEvalDetail(idx) {
 
 function openActualModal(driverId, driverName, curOrders, curCustomers) {
     let ov = document.getElementById('driverOverlay');
-    document.getElementById('modalTitle').innerHTML = `<i class="fas fa-clipboard-check" style="color:#4ade80"></i> Nhập thực tế — ${driverName}`;
     ov.querySelector('.dm-modal').innerHTML = `
         <h3 id="modalTitle"><i class="fas fa-clipboard-check" style="color:#4ade80"></i> Nhập số liệu thực tế — ${driverName}</h3>
         <div class="dm-field">
@@ -670,19 +553,14 @@ function saveActualData(driverId) {
     let actualOrders = parseInt(document.getElementById('actualOrders').value) || 0;
     let actualCustomers = parseInt(document.getElementById('actualCustomers').value) || 0;
 
-    // Find assignment ID first
     fetch(`/Driver/GetByMonth?month=${m}&year=${y}&areaId=${a}`)
     .then(r => r.json())
     .then(data => {
-        let assignment = data.find(x => x.id);
-        // Find the correct assignment by matching driverId through the evaluation data
         fetch(`/Driver/GetAssignmentEvaluation?month=${m}&year=${y}&areaId=${a}`)
         .then(r => r.json())
         .then(evalData => {
             let driver = (evalData.drivers || []).find(d => d.driverId === driverId);
             if (!driver) { showToast('Không tìm thấy phân công!', 'error'); return; }
-
-            // Get the assignment from GetByMonth by matching
             let matched = data.find(x => x.driverName === driver.driverName);
             if (!matched) { showToast('Không tìm thấy phân công!', 'error'); return; }
 
@@ -705,224 +583,14 @@ function saveActualData(driverId) {
     });
 }
 
-/* ===== DRIVER MODAL ===== */
-function openDriverModal() {
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus" style="color:#3b82f6"></i> Thêm tài xế';
-    document.getElementById('editId').value = '';
-    document.getElementById('f-name').value = '';
-    document.getElementById('f-phone').value = '';
-    document.getElementById('f-status').value = 'DangLam';
-    document.getElementById('driverOverlay').classList.add('open');
-    setTimeout(() => document.getElementById('f-name').focus(), 100);
-}
-function editDriver(id, name, phone, status) {
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen" style="color:#f59e0b"></i> Chỉnh sửa tài xế';
-    document.getElementById('editId').value = id;
-    document.getElementById('f-name').value = name;
-    document.getElementById('f-phone').value = phone;
-    document.getElementById('f-status').value = status;
-    document.getElementById('driverOverlay').classList.add('open');
-}
 function closeDriverModal() {
     document.getElementById('driverOverlay').classList.remove('open');
 }
-function saveDriver() {
-    let id     = document.getElementById('editId').value;
-    let name   = document.getElementById('f-name').value.trim();
-    let phone  = document.getElementById('f-phone').value.trim();
-    let status = document.getElementById('f-status').value;
 
-    if (!name) { showToast('Vui lòng nhập họ tên tài xế!', 'error'); return; }
-
-    let url    = id ? '/Driver/Update' : '/Driver/Create';
-    let body   = id ? { id: parseInt(id), driverName: name, phone, status }
-                    : { driverName: name, phone, status };
-
-    fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
-    .then(r => r.json())
-    .then(d => {
-        if (d.success) {
-            closeDriverModal();
-            showToast(id ? 'Đã cập nhật tài xế!' : 'Đã thêm tài xế mới!', 'success');
-            loadPage('/Driver/List');
-        } else {
-            showToast(d.message || 'Có lỗi xảy ra!', 'error');
-        }
-    })
-    .catch(() => showToast('Lỗi kết nối server!', 'error'));
-}
-function deleteDriver(id) {
-    if (!confirm('Xác nhận xóa tài xế này?')) return;
-    fetch('/Driver/Delete', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'id='+id })
-    .then(r => r.json())
-    .then(d => {
-        if (d.success) { showToast('Đã xóa tài xế!', 'info'); loadPage('/Driver/List'); }
-        else showToast(d.message || 'Không thể xóa!', 'error');
-    });
-}
-
-// Keyboard shortcuts
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeDriverModal();
-    if (e.key === 'Enter' && document.getElementById('driverOverlay').classList.contains('open')) saveDriver();
 });
 
-/* ===== SWITCH TAB (override - 3 tabs) ===== */
-function switchTab(tab) {
-    document.querySelectorAll('.dm-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.dm-panel').forEach(p => p.classList.remove('active'));
-    let tabEl   = document.getElementById('tab-' + tab);
-    let panelEl = document.getElementById('panel-' + tab);
-    if (tabEl)   tabEl.classList.add('active');
-    if (panelEl) panelEl.classList.add('active');
-    if (tab === 'month')  loadEvaluation();
-    if (tab === 'detail') loadDetailData();
-}
-
-/* ===== LOAD DETAIL DATA ===== */
-function loadDetailData() {
-    let driver = document.getElementById('df-driver')?.value || '';
-    let area   = document.getElementById('df-area')?.value   || '';
-    let status = document.getElementById('df-status')?.value || '';
-
-    let url = `/Driver/GetAllAssignments?driverName=${encodeURIComponent(driver)}&areaId=${area}&status=${status}`;
-
-    fetch(url)
-    .then(r => r.json())
-    .then(data => {
-        // Summary cards
-        let total   = data.length;
-        let ok      = data.filter(x => x.isOk).length;
-        let fail    = total - ok;
-        let sumPlan = data.reduce((s, x) => s + x.plannedOrders, 0);
-        let sumAct  = data.reduce((s, x) => s + x.actualOrders, 0);
-        let rate    = total > 0 ? Math.round(ok / total * 100) : 0;
-
-        document.getElementById('detailSummary').innerHTML = `
-            <div class="dm-mstat" style="--c:#3b82f6"><div class="mv">${total}</div><div class="ml">Tổng phân công</div></div>
-            <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${ok}</div><div class="ml">Đạt chỉ tiêu</div></div>
-            <div class="dm-mstat" style="--c:#f87171"><div class="mv">${fail}</div><div class="ml">Chưa đạt</div></div>
-            <div class="dm-mstat" style="--c:#f59e0b"><div class="mv">${sumPlan}</div><div class="ml">Tổng đơn dự kiến</div></div>
-            <div class="dm-mstat" style="--c:#4ade80"><div class="mv">${sumAct}</div><div class="ml">Tổng đơn thực tế</div></div>
-            <div class="dm-mstat" style="--c:${rate>=80?'#4ade80':rate>=50?'#f59e0b':'#f87171'}">
-                <div class="mv">${rate}%</div><div class="ml">Tỉ lệ hoàn thành</div>
-            </div>
-        `;
-
-        // Table
-        let tbody = document.getElementById('detailTbody');
-        if (!data.length) {
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#475569">
-                <i class="fas fa-inbox" style="font-size:28px;display:block;margin-bottom:10px"></i>
-                Không có dữ liệu phân công phù hợp
-            </td></tr>`;
-            return;
-        }
-        tbody.innerHTML = data.map((a, i) => {
-            let pct   = a.plannedOrders > 0 ? Math.min(100, Math.round(a.actualOrders / a.plannedOrders * 100)) : 0;
-            let color = a.isOk ? '#4ade80' : '#f87171';
-            let icon  = a.isOk ? '✅' : '❌';
-            let zoneIds = a.zoneIds || '';
-            return `<tr onclick="previewAssignmentOnMap('${zoneIds}', '${a.driverName}')" style="cursor:pointer">
-                <td style="color:#475569;font-weight:700">${i+1}</td>
-                <td>
-                    <div style="font-weight:700;color:#f1f5f9">${icon} ${a.driverName}</div>
-                    <div style="font-size:11px;color:#475569">${a.driverPhone}</div>
-                </td>
-                <td><span class="dm-chip"><i class="fas fa-map-marker-alt"></i> ${a.areaName}</span></td>
-                <td style="color:#64748b;font-size:12px">${a.dispatcher || '—'}</td>
-                <td style="color:#64748b;font-size:12px">T${a.month}/${a.year}</td>
-                <td style="color:#3b82f6;font-weight:700">${a.zoneCount}</td>
-                <td style="font-weight:700;color:#60a5fa">${a.plannedOrders}</td>
-                <td style="font-weight:700;color:${color}">${a.actualOrders}</td>
-                <td>
-                    <div class="dm-progress-bar"><div class="dm-progress-fill" style="width:${pct}%;background:${color}"></div></div>
-                    <div style="font-size:10px;color:${color};margin-top:3px">${pct}%</div>
-                </td>
-                <td style="font-size:12px;color:#64748b">${a.date}</td>
-            </tr>`;
-        }).join('');
-    })
-    .catch(() => showToast('Lỗi khi tải dữ liệu phân công!', 'error'));
-}
-
-function clearDetailFilter() {
-    document.getElementById('df-driver').value = '';
-    document.getElementById('df-area').value   = '';
-    document.getElementById('df-status').value = '';
-    loadDetailData();
-}
-
-/* ===== MAP LOGIC ===== */
-let dmMap = null;
-let dmPolygons = [];
-let dmMarkers = [];
-
-function initDmMap() {
-    if (dmMap) return;
-    dmMap = L.map('dmMap').setView([21.0285, 105.8542], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(dmMap);
-}
-
-function previewAssignmentOnMap(zoneIds, driverName) {
-    if (!zoneIds) {
-        dpToast('Tài xế này không có vùng phân công cụ thể!', 'info');
-        return;
-    }
-    
-    initDmMap();
-    if(dmMap) {
-        dmMap.invalidateSize();
-    }
-
-    // Clear old layers
-    dmPolygons.forEach(p => dmMap.removeLayer(p));
-    dmMarkers.forEach(m => dmMap.removeLayer(m));
-    dmPolygons = [];
-    dmMarkers = [];
-
-    document.getElementById('dmMapTitle').innerHTML = `Đang xem các vùng của: <b style="color:#f1f5f9">${driverName}</b>`;
-
-    let idArray = zoneIds.split(',').map(x => x.trim()).filter(x => x);
-    let bounds = [];
-    
-    // Fetch zone geometries
-    fetch(`/Dispatcher/GetForecastStatus?month=0&year=0`).then(r=>r.json()).then(data => {
-        let allZones = data.zones || [];
-        idArray.forEach(zid => {
-            let zInfo = allZones.find(x => x.zoneId == zid);
-            if(zInfo && zInfo.points) {
-                try {
-                    let pts = JSON.parse(zInfo.points);
-                    let poly = L.polygon(pts, {color: '#3b82f6', weight: 3, fillOpacity: 0.4}).addTo(dmMap);
-                    dmPolygons.push(poly);
-                    let center = poly.getBounds().getCenter();
-                    bounds.push(center);
-
-                    let marker = L.marker(center, {
-                        interactive: false,
-                        icon: L.divIcon({
-                            className: 'zone-label',
-                            html: `<div style="background:#2563eb;color:white;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3)">${zInfo.zoneName}</div>`
-                        })
-                    }).addTo(dmMap);
-                    dmMarkers.push(marker);
-                    
-                    poly.bindTooltip(`${driverName} - ${zInfo.zoneName}`, {sticky:true});
-                } catch(e){}
-            }
-        });
-
-        if(bounds.length) {
-            dmMap.fitBounds(bounds, {padding:[50,50]});
-        }
-        
-        // Scroll to map
-        document.getElementById('dmMap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-}
-</script>
+// Auto-load on page ready
+loadEvaluation();
 </script>
