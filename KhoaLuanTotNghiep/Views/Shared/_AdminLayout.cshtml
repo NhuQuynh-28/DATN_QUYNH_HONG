@@ -768,97 +768,96 @@ function saveZone(){
     });
 }
         /* ================= LOAD ZONE ================= */
-                     function loadZones(versionId){
-
-            drawnItems.clearLayers();
+        function loadZones(versionId){
+            // Xóa tất cả layer cũ (polygon + marker) khỏi map
+            if(window._zoneMarkers){ window._zoneMarkers.forEach(m=>{ try{ map.removeLayer(m); }catch(e){} }); }
+            window._zoneMarkers = [];
+            polygons.forEach(p=>{ try{ map.removeLayer(p); }catch(e){}  try{ drawnItems.removeLayer(p); }catch(e){}});
+            polygons = [];
 
             fetch("/Zone/GetZones?versionId="+versionId)
             .then(r=>r.json())
             .then(data=>{
-
-                polygons=[];
-
                 data.forEach(z=>{
+                    let pts;
+                    try { pts = JSON.parse(z.points); } catch(e){ return; }
 
-                    let pts = JSON.parse(z.points);
-
-            let poly = L.polygon(pts,{
-            color:'blue',
-            fillOpacity:0.3
-        });
-
-        drawnItems.addLayer(poly); // ⭐ thêm vào layer chuẩn
-
-                    poly.zoneId = z.id;
-                    polygons.push(poly);
-
-                    let center = poly.getBounds().getCenter();
-                    let name = z.zoneName ?? z.ZoneName ?? "Zone";
-                    
-                    poly.zoneName = name;
-
-                    L.marker(center,{
-                        icon: L.divIcon({
-                            className:'zone-label',
-                            html:`<div style="
-                                background:#2563eb;
-                                color:white;
-                                padding:3px 6px;
-                                border-radius:4px;
-                                font-size:12px;
-                            ">${name}</div>`
-                        })
+                    // Tạo polygon, thêm TRỰC TIẾP lên map (không qua drawnItems)
+                    // để tránh Leaflet.Draw can thiệp click/style
+                    let poly = L.polygon(pts, {
+                        color: '#3b82f6',
+                        weight: 2,
+                        fillOpacity: 0.3,
+                        fillColor: '#3b82f6'
                     }).addTo(map);
 
-                    // CLICK
-                    poly.on("click", function () {
+                    poly.zoneId  = z.id;
+                    poly.zoneName = z.zoneName ?? z.ZoneName ?? "Zone";
+                    polygons.push(poly);
 
+                    // Label marker
+                    let center = poly.getBounds().getCenter();
+                    let marker = L.marker(center, {
+                        interactive: false,
+                        icon: L.divIcon({
+                            className: 'zone-label',
+                            html: `<div style="background:#2563eb;color:white;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3)">${poly.zoneName}</div>`
+                        })
+                    }).addTo(map);
+                    window._zoneMarkers.push(marker);
+
+                    // ===== CLICK: chọn vùng để sửa =====
+                    poly.on('click', function(e){
+                        L.DomEvent.stopPropagation(e);
+
+                        // Reset tất cả polygon về màu xanh, tắt editing, xóa khỏi drawnItems
+                        polygons.forEach(p => {
+                            try { p.editing.disable(); } catch(ex){}
+                            try { drawnItems.removeLayer(p); } catch(ex){}
+                            p.setStyle({ color:'#3b82f6', fillColor:'#3b82f6', weight:2, fillOpacity:0.3 });
+                        });
+
+                        // Đánh dấu polygon được chọn
                         selectedPolygon = poly;
-                        selectedId = z.id;
+                        selectedId      = z.id;
 
-                        loadHistory(z.id);
-                        loadPredict(z.id);
-
+                        // Thêm vào drawnItems để Leaflet.draw editing hoạt động
                         drawnItems.addLayer(poly);
 
-                        polygons.forEach(p=>{
-                            p.setStyle({
-                                color:'blue',
-                                fillOpacity:0.3
-                            });
-                            // Tắt editing các polygon khác
-                            try { p.editing.disable(); } catch(e){}
-                        });
+                        // Đổi màu đỏ NGAY SAU KHI thêm vào drawnItems
+                        poly.setStyle({ color:'#ef4444', fillColor:'#ef4444', weight:3, fillOpacity:0.5 });
 
-                        poly.setStyle({
-                            color:'red',
-                            fillOpacity:0.6
-                        });
+                        // Bật editing → hiện điểm neo để kéo
+                        try { poly.editing.enable(); } catch(ex){ console.warn('editing not available', ex); }
 
-                        // Bật chỉnh sửa polygon
-                        poly.editing.enable();
-                        
-                        // Hướng dẫn user
-                        showToast(`Đã chọn vùng "${poly.zoneName || 'Zone'}". Kéo các điểm để chỉnh kích thước, rồi bấm nút ✏️ Cập nhật để lưu!`, 'info');
-                        
-                        // Highlight nút Cập nhật trong toolbar
+                        // Sidebar history/predict
+                        if(typeof loadHistory === 'function') loadHistory(z.id);
+                        if(typeof loadPredict  === 'function') loadPredict(z.id);
+
+                        // Toast hướng dẫn
+                        showToast(`🔴 Đã chọn "${poly.zoneName}". Kéo điểm neo để chỉnh vùng → bấm ✏️ Cập nhật để lưu.`, 'info');
+
+                        // Highlight nút Cập nhật
                         let updateBtn = document.querySelector('.mt-btn-update');
-                        if (updateBtn) {
-                            updateBtn.style.animation = 'pulse-btn 0.8s 3';
+                        if(updateBtn){
                             updateBtn.style.background = '#d97706';
                             updateBtn.style.color = 'white';
-                            setTimeout(() => {
-                                updateBtn.style.animation = '';
+                            updateBtn.style.boxShadow = '0 0 0 3px rgba(217,119,6,0.4)';
+                            setTimeout(()=>{
                                 updateBtn.style.background = '';
                                 updateBtn.style.color = '';
-                            }, 2500);
+                                updateBtn.style.boxShadow = '';
+                            }, 3000);
                         }
                     });
+                });
 
-                }); // ✅ đóng forEach
-
-            }); // ✅ đóng then
-
+                // Zoom vào tất cả vùng sau khi load
+                if(polygons.length > 0){
+                    let group = new L.featureGroup(polygons);
+                    map.fitBounds(group.getBounds(), { padding:[30,30] });
+                }
+            });
         } // ✅ đóng function
         /* ================= DELETE ================= */
 
@@ -899,33 +898,31 @@ function saveZone(){
             try { selectedPolygon.editing.disable(); } catch(e){}
 
             // Lấy tọa độ hiện tại (sau khi đã edit)
-            // Leaflet polygon.getLatLngs() trả về mảng lồng: [[LatLng, LatLng, ...]]
+            // Leaflet polygon.getLatLngs() trả về [[LatLng, ...]] cho simple polygon
             let rawCoords = selectedPolygon.getLatLngs();
             
-            // Xử lý mảng lồng nhiều cấp
-            let latlngs;
-            if (Array.isArray(rawCoords[0]) || (rawCoords[0] && rawCoords[0].lat === undefined)) {
-                // Mảng lồng 2 cấp hoặc là L.LatLng[][]
-                latlngs = rawCoords[0];
-            } else {
-                // Mảng phẳng L.LatLng[]
-                latlngs = rawCoords;
+            // Flatten an toàn: lấy tất cả LatLng từ mọi ring
+            let latlngs = [];
+            function flattenLatLngs(arr) {
+                arr.forEach(item => {
+                    if (item && typeof item.lat === 'number' && typeof item.lng === 'number') {
+                        // Đây là LatLng object
+                        latlngs.push(item);
+                    } else if (Array.isArray(item) || (item && typeof item.forEach === 'function')) {
+                        // Đây là mảng lồng → đệ quy
+                        flattenLatLngs(Array.from(item));
+                    }
+                });
             }
+            flattenLatLngs(rawCoords);
             
             if (!latlngs || latlngs.length === 0) {
                 showToast("Không tìm thấy dữ liệu tọa độ!", "error");
                 return;
             }
 
-            // Chuyển đổi an toàn sang mảng [lat, lng]
-            let pts = [];
-            latlngs.forEach(c => {
-                if (c && c.lat !== undefined && c.lng !== undefined) {
-                    pts.push([c.lat, c.lng]);
-                } else if (Array.isArray(c) && c.length >= 2) {
-                    pts.push([c[0], c[1]]);
-                }
-            });
+            // Chuyển sang mảng [lat, lng] để gửi lên server
+            let pts = latlngs.map(c => [c.lat, c.lng]);
 
             if (pts.length < 3) {
                 showToast("Vùng cần ít nhất 3 điểm!", "error");
