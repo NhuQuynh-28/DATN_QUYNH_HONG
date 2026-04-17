@@ -143,6 +143,12 @@
             width:130px;
         }
         .mt-zone-name:focus { border-color:#3b82f6; }
+        
+        @@keyframes pulse-btn {
+            0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(217,119,6,0.6); }
+            50%  { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(217,119,6,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217,119,6,0); }
+        }
 
         /* modal overlay */
         .am-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9000;
@@ -820,6 +826,8 @@ function saveZone(){
                                 color:'blue',
                                 fillOpacity:0.3
                             });
+                            // Tắt editing các polygon khác
+                            try { p.editing.disable(); } catch(e){}
                         });
 
                         poly.setStyle({
@@ -827,7 +835,24 @@ function saveZone(){
                             fillOpacity:0.6
                         });
 
+                        // Bật chỉnh sửa polygon
                         poly.editing.enable();
+                        
+                        // Hướng dẫn user
+                        showToast(`Đã chọn vùng "${poly.zoneName || 'Zone'}". Kéo các điểm để chỉnh kích thước, rồi bấm nút ✏️ Cập nhật để lưu!`, 'info');
+                        
+                        // Highlight nút Cập nhật trong toolbar
+                        let updateBtn = document.querySelector('.mt-btn-update');
+                        if (updateBtn) {
+                            updateBtn.style.animation = 'pulse-btn 0.8s 3';
+                            updateBtn.style.background = '#d97706';
+                            updateBtn.style.color = 'white';
+                            setTimeout(() => {
+                                updateBtn.style.animation = '';
+                                updateBtn.style.background = '';
+                                updateBtn.style.color = '';
+                            }, 2500);
+                        }
                     });
 
                 }); // ✅ đóng forEach
@@ -870,19 +895,47 @@ function saveZone(){
                 return;
             }
 
+            // Tắt editing trước khi lấy tọa độ để đảm bảo data nhất quán
+            try { selectedPolygon.editing.disable(); } catch(e){}
+
             // Lấy tọa độ hiện tại (sau khi đã edit)
-            let coords = selectedPolygon.getLatLngs();
-            let latlngs = Array.isArray(coords[0]) ? coords[0] : coords;
+            // Leaflet polygon.getLatLngs() trả về mảng lồng: [[LatLng, LatLng, ...]]
+            let rawCoords = selectedPolygon.getLatLngs();
+            
+            // Xử lý mảng lồng nhiều cấp
+            let latlngs;
+            if (Array.isArray(rawCoords[0]) || (rawCoords[0] && rawCoords[0].lat === undefined)) {
+                // Mảng lồng 2 cấp hoặc là L.LatLng[][]
+                latlngs = rawCoords[0];
+            } else {
+                // Mảng phẳng L.LatLng[]
+                latlngs = rawCoords;
+            }
             
             if (!latlngs || latlngs.length === 0) {
                 showToast("Không tìm thấy dữ liệu tọa độ!", "error");
                 return;
             }
 
+            // Chuyển đổi an toàn sang mảng [lat, lng]
             let pts = [];
             latlngs.forEach(c => {
-                pts.push([c.lat, c.lng]);
+                if (c && c.lat !== undefined && c.lng !== undefined) {
+                    pts.push([c.lat, c.lng]);
+                } else if (Array.isArray(c) && c.length >= 2) {
+                    pts.push([c[0], c[1]]);
+                }
             });
+
+            if (pts.length < 3) {
+                showToast("Vùng cần ít nhất 3 điểm!", "error");
+                return;
+            }
+
+            // Highlight nút Cập nhật đang xử lý
+            let btn = document.querySelector('.mt-btn-update');
+            let origText = btn ? btn.innerHTML : '';
+            if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...'; btn.disabled = true; }
 
             let area = calculateArea(latlngs);
             let center = selectedPolygon.getBounds().getCenter();
@@ -904,15 +957,21 @@ function saveZone(){
             })
             .then(r=>r.json())
             .then(d=>{
+                if (btn) { btn.innerHTML = origText; btn.disabled = false; }
                 if(d.success){
-                    showToast(`Đã cập nhật vùng thành công! ✅`,'success');
+                    showToast(`Đã cập nhật vùng "${selectedPolygon.zoneName || ''}" thành công! ✅`,'success');
+                    selectedPolygon = null;
+                    selectedId = null;
                     // Reload zones để cập nhật center labels mới
                     loadZones(versionId);
                 } else {
                     showToast('Cập nhật thất bại! Vui lòng thử lại.','error');
+                    // Bật lại editing nếu thất bại
+                    try { selectedPolygon.editing.enable(); } catch(e){}
                 }
             })
             .catch(err=>{
+                if (btn) { btn.innerHTML = origText; btn.disabled = false; }
                 console.error(err);
                 showToast('Lỗi kết nối khi cập nhật!','error');
             });
